@@ -1,2 +1,46 @@
-# puzzle-platformer
-Puzzle-platformer inspired by the game The Lost Vikings 
+# Puzzle Platformer
+
+A browser-based 2D puzzle-platformer about coordinating three characters with complementary abilities. The project is currently building its first movement-focused vertical slice.
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) 22.13 or newer (Node 22 LTS recommended)
+- npm 10 or newer
+
+The repository includes an `.nvmrc`, so contributors using `nvm` can select the expected Node major with `nvm use`.
+
+## Local development
+
+```sh
+npm ci
+npm run dev
+```
+
+Vite prints the local development URL, normally `http://localhost:5173`.
+
+## Project checks
+
+```sh
+npm run typecheck
+npm run lint
+npm run format:check
+npm test
+npm run build
+```
+
+The production build is written to `dist/`. Preview it locally with:
+
+```sh
+npm run preview
+```
+
+## Current state
+
+The application currently boots a minimal Phaser scene that confirms rendering is working. Gameplay, movement, and level loading are intentionally reserved for their own issues.
+
+See the project documents for current direction:
+
+- [Game design](docs/GAME_DESIGN.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Roadmap and proposed issues](docs/ROADMAP.md)
+- [Contributor and agent guidance](AGENTS.md)
