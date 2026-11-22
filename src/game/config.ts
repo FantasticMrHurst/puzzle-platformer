@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import { BootScene } from './scenes/BootScene';
+import { TestRoomScene } from './scenes/TestRoomScene';
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -12,5 +13,12 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene],
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { x: 0, y: 900 },
+      debug: false,
+    },
+  },
+  scene: [BootScene, TestRoomScene],
 };

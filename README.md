@@ -36,11 +36,12 @@ npm run preview
 
 ## Current state
 
-The application currently boots a minimal Phaser scene that confirms rendering is working. Gameplay, movement, and level loading are intentionally reserved for their own issues.
+The application currently loads a validated, data-driven movement test room with visible static Arcade Physics geometry. A controllable character and movement remain intentionally reserved for later issues.
 
 See the project documents for current direction:
 
 - [Game design](docs/GAME_DESIGN.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap and proposed issues](docs/ROADMAP.md)
+- [Movement test-room measurements](docs/TEST_ROOM.md)
 - [Contributor and agent guidance](AGENTS.md)
