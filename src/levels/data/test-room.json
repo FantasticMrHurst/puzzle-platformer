@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "id": "movement-test-room",
+  "name": "Movement Test Room",
+  "world": {
+    "width": 3600,
+    "height": 1080,
+    "backgroundColor": "#0b1020"
+  },
+  "spawn": {
+    "x": 160,
+    "y": 840
+  },
+  "staticGeometry": [
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 920,
+      "surface": "wall",
+      "purpose": "Left world boundary"
+    },
+    {
+      "id": "start-ground",
+      "x": 0,
+      "y": 920,
+      "width": 900,
+      "height": 160,
+      "surface": "ground",
+      "purpose": "Safe start and 700 px acceleration runway"
+    },
+    {
+      "id": "low-platform",
+      "x": 300,
+      "y": 790,
+      "width": 180,
+      "height": 32,
+      "surface": "platform",
+      "purpose": "130 px rise test"
+    },
+    {
+      "id": "high-platform",
+      "x": 580,
+      "y": 680,
+      "width": 180,
+      "height": 32,
+      "surface": "platform",
+      "purpose": "240 px rise test"
+    },
+    {
+      "id": "middle-ground",
+      "x": 1060,
+      "y": 920,
+      "width": 560,
+      "height": 160,
+      "surface": "ground",
+      "purpose": "Landing after 160 px short gap"
+    },
+    {
+      "id": "middle-step",
+      "x": 1260,
+      "y": 820,
+      "width": 180,
+      "height": 32,
+      "surface": "platform",
+      "purpose": "Low running-jump target"
+    },
+    {
+      "id": "far-ground",
+      "x": 1960,
+      "y": 920,
+      "width": 760,
+      "height": 160,
+      "surface": "ground",
+      "purpose": "Landing after 340 px long gap"
+    },
+    {
+      "id": "wall-test-left",
+      "x": 2320,
+      "y": 500,
+      "width": 40,
+      "height": 420,
+      "surface": "wall",
+      "purpose": "Future wall-contact test"
+    },
+    {
+      "id": "wall-test-right",
+      "x": 2540,
+      "y": 600,
+      "width": 40,
+      "height": 320,
+      "surface": "wall",
+      "purpose": "Future wall-jump spacing test"
+    },
+    {
+      "id": "end-ground",
+      "x": 2900,
+      "y": 920,
+      "width": 700,
+      "height": 160,
+      "surface": "ground",
+      "purpose": "Landing after 180 px recovery gap"
+    },
+    {
+      "id": "right-boundary",
+      "x": 3560,
+      "y": 0,
+      "width": 40,
+      "height": 920,
+      "surface": "wall",
+      "purpose": "Right world boundary"
+    }
+  ]
+}
