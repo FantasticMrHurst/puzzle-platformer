@@ -11,6 +11,8 @@ export interface MovementConfig {
   readonly airDeceleration: number;
   /** Initial upward jump speed in pixels per second. */
   readonly jumpSpeed: number;
+  /** Maximum downward speed in pixels per second. */
+  readonly maxFallSpeed: number;
   /** Multiplier applied to upward velocity when jump is released early. */
   readonly jumpCutMultiplier: number;
   /** Grace period after leaving ground, in seconds. */
@@ -26,6 +28,7 @@ export const DEFAULT_MOVEMENT_CONFIG: MovementConfig = {
   airAcceleration: 900,
   airDeceleration: 250,
   jumpSpeed: 650,
+  maxFallSpeed: 900,
   jumpCutMultiplier: 0.45,
   coyoteTimeSeconds: 0.1,
   jumpBufferSeconds: 0.12,
@@ -38,6 +41,7 @@ export function validateMovementConfig(config: MovementConfig): void {
   requirePositive(config.airAcceleration, 'airAcceleration');
   requireNonNegative(config.airDeceleration, 'airDeceleration');
   requirePositive(config.jumpSpeed, 'jumpSpeed');
+  requirePositive(config.maxFallSpeed, 'maxFallSpeed');
   requireNonNegative(config.coyoteTimeSeconds, 'coyoteTimeSeconds');
   requireNonNegative(config.jumpBufferSeconds, 'jumpBufferSeconds');
 

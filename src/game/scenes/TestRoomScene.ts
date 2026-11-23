@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
 
+import { PlayerCharacter } from '../../entities/PlayerCharacter';
+import { KeyboardInput } from '../../input/KeyboardInput';
+import type { PlayerIntent } from '../../input/PlayerIntent';
 import testRoomSource from '../../levels/data/test-room.json';
 import { loadLevelData } from '../../levels/LevelLoader';
 import type {
@@ -7,6 +10,8 @@ import type {
   StaticGeometryData,
   SurfaceKind,
 } from '../../levels/LevelSchema';
+import { DEFAULT_MOVEMENT_CONFIG } from '../../movement/MovementConfig';
+import { FixedStepClock, GAMEPLAY_STEP_SECONDS } from '../FixedStepClock';
 
 const SURFACE_COLORS: Readonly<Record<SurfaceKind, number>> = {
   ground: 0x334155,
@@ -15,20 +20,61 @@ const SURFACE_COLORS: Readonly<Record<SurfaceKind, number>> = {
 };
 
 export class TestRoomScene extends Phaser.Scene {
+  private readonly fixedStepClock = new FixedStepClock();
+  private staticGeometry!: Phaser.Physics.Arcade.StaticGroup;
+  private character!: PlayerCharacter;
+  private keyboardInput!: KeyboardInput;
+  private level!: LevelData;
+  private pendingIntent: PlayerIntent = {
+    moveX: 0,
+    jumpPressed: false,
+    jumpHeld: false,
+    jumpReleased: false,
+  };
+  private simulationTimeMs = 0;
+
   public constructor() {
     super('test-room');
   }
 
   public create(): void {
-    const level = loadLevelData(testRoomSource, 'test-room.json');
+    this.level = loadLevelData(testRoomSource, 'test-room.json');
+    this.fixedStepClock.reset();
+    this.simulationTimeMs = 0;
 
-    this.configureWorld(level);
-    this.createBackdrop(level);
-    level.staticGeometry.forEach((geometry) =>
+    if (this.input.keyboard === null) {
+      throw new Error('Keyboard input is unavailable');
+    }
+    this.keyboardInput = new KeyboardInput(this.input.keyboard);
+    this.staticGeometry = this.physics.add.staticGroup();
+
+    this.configureWorld(this.level);
+    this.createBackdrop(this.level);
+    this.level.staticGeometry.forEach((geometry) =>
       this.createStaticGeometry(geometry),
     );
-    this.createSpawnMarker(level);
-    this.createHud(level);
+    this.createSpawnMarker(this.level);
+    this.createCharacter(this.level);
+    this.createHud(this.level);
+  }
+
+  public override update(_time: number, deltaMs: number): void {
+    this.captureInput();
+
+    this.fixedStepClock.advance(deltaMs / 1_000, () => {
+      this.character.simulateStep(GAMEPLAY_STEP_SECONDS, this.pendingIntent);
+      this.clearConsumedInputEdges();
+
+      this.simulationTimeMs += GAMEPLAY_STEP_SECONDS * 1_000;
+      this.physics.world.update(
+        this.simulationTimeMs,
+        GAMEPLAY_STEP_SECONDS * 1_000,
+      );
+
+      if (this.character.isBelow(this.level.world.height + 64)) {
+        this.resetCharacter();
+      }
+    });
   }
 
   private configureWorld(level: LevelData): void {
@@ -69,7 +115,7 @@ export class TestRoomScene extends Phaser.Scene {
       .setStrokeStyle(2, 0xcbd5e1, 0.7);
 
     rectangle.setData('levelEntityId', geometry.id);
-    this.physics.add.existing(rectangle, true);
+    this.staticGeometry.add(rectangle);
 
     if (geometry.purpose !== undefined && geometry.width >= 160) {
       this.add
@@ -97,6 +143,19 @@ export class TestRoomScene extends Phaser.Scene {
       .setOrigin(0.5);
   }
 
+  private createCharacter(level: LevelData): void {
+    this.character = new PlayerCharacter(
+      this,
+      level.spawn.x,
+      level.spawn.y,
+      DEFAULT_MOVEMENT_CONFIG,
+    );
+    this.physics.add.collider(this.character.gameObject, this.staticGeometry);
+
+    this.cameras.main.startFollow(this.character.gameObject, true, 0.12, 0.12);
+    this.cameras.main.setDeadzone(360, 220);
+  }
+
   private createHud(level: LevelData): void {
     this.add
       .text(24, 24, `${level.name} · schema v${level.schemaVersion}`, {
@@ -108,5 +167,45 @@ export class TestRoomScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(10);
+
+    this.add
+      .text(24, 78, 'Move: A/D or ←/→  ·  Jump: W, ↑, or Space', {
+        backgroundColor: '#080b16cc',
+        color: '#cbd5e1',
+        fontFamily: 'ui-monospace, monospace',
+        fontSize: '15px',
+        padding: { x: 10, y: 6 },
+      })
+      .setScrollFactor(0)
+      .setDepth(10);
+  }
+
+  private captureInput(): void {
+    const intent = this.keyboardInput.readIntent();
+    this.pendingIntent = {
+      moveX: intent.moveX,
+      jumpHeld: intent.jumpHeld,
+      jumpPressed: this.pendingIntent.jumpPressed || intent.jumpPressed,
+      jumpReleased: this.pendingIntent.jumpReleased || intent.jumpReleased,
+    };
+  }
+
+  private clearConsumedInputEdges(): void {
+    this.pendingIntent = {
+      ...this.pendingIntent,
+      jumpPressed: false,
+      jumpReleased: false,
+    };
+  }
+
+  private resetCharacter(): void {
+    this.character.reset(this.level.spawn.x, this.level.spawn.y);
+    this.cameras.main.centerOn(this.level.spawn.x, this.level.spawn.y);
+    this.pendingIntent = {
+      moveX: 0,
+      jumpPressed: false,
+      jumpHeld: false,
+      jumpReleased: false,
+    };
   }
 }

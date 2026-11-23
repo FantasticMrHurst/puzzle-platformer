@@ -1,6 +1,6 @@
 # Movement Controller
 
-The movement controller is a plain TypeScript policy layer. It does not import Phaser, read keys, own a sprite, or advance a physics world. Task 4 will add the narrow adapter that supplies resolved velocity and collision contacts to and from Arcade Physics.
+The movement controller is a plain TypeScript policy layer. It does not import Phaser, read keys, own a sprite, or advance a physics world. `ArcadeBodyAdapter` supplies resolved velocity and collision contacts to and from Arcade Physics.
 
 ## Units and contracts
 
@@ -36,9 +36,9 @@ Coyote time is refreshed from the configured duration on grounded steps. Once ai
 
 A jump press refreshes the jump buffer. The buffer counts down while the player cannot jump, and is consumed on the first grounded/coyote-eligible step. Releasing jump while rising multiplies upward velocity by `jumpCutMultiplier`, producing a shorter jump.
 
-The controller assumes the integration layer provides collision contacts from a documented point in the physics update. That exact ordering and fixed-step behavior remain Task 4 decisions.
+The integration layer provides contacts resolved by the previous fixed physics step. Exact ordering and catch-up behavior are documented in `docs/PHYSICS_INTEGRATION.md`.
 
 ## Deferred behavior
 
-The contact contract carries wall direction for the upcoming physics adapter, but wall sliding and wall jumping are intentionally deferred until baseline running and jumping are playable. Animation, camera behavior, falling/reset logic, and character abilities also remain outside this module.
+The contact contract carries wall direction, but wall sliding and wall jumping are intentionally deferred until baseline running and jumping are validated. Animation and character abilities also remain outside this module.
 
