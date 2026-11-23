@@ -52,4 +52,8 @@ export class FixedStepClock {
   public reset(): void {
     this.accumulatorSeconds = 0;
   }
+
+  public getInterpolationAlpha(): number {
+    return this.accumulatorSeconds / this.stepSeconds;
+  }
 }

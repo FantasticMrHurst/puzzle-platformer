@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 
+import type { DebugPosition } from '../debug/MovementDebugSnapshot';
 import type {
   MovementContacts,
   MovementVelocity,
@@ -19,6 +20,10 @@ export class ArcadeBodyAdapter {
 
   public readVelocity(): MovementVelocity {
     return { x: this.body.velocity.x, y: this.body.velocity.y };
+  }
+
+  public readPosition(): DebugPosition {
+    return { x: this.body.center.x, y: this.body.center.y };
   }
 
   public readContacts(): MovementContacts {

@@ -34,4 +34,14 @@ describe('FixedStepClock', () => {
     expect(stepsThisFrame).toBe(MAX_CATCH_UP_STEPS);
     expect(simulationSteps * GAMEPLAY_STEP_SECONDS).toBeCloseTo(5 / 60);
   });
+
+  it('exposes fractional progress for render interpolation', () => {
+    const clock = new FixedStepClock();
+
+    clock.advance(GAMEPLAY_STEP_SECONDS / 2, () => {
+      throw new Error('A half step must not simulate');
+    });
+
+    expect(clock.getInterpolationAlpha()).toBeCloseTo(0.5);
+  });
 });

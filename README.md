@@ -18,6 +18,12 @@ npm run dev
 
 Vite prints the local development URL, normally `http://localhost:5173`.
 
+Install the pinned Chromium runtime once before running browser tests:
+
+```sh
+npx playwright install chromium
+```
+
 ## Project checks
 
 ```sh
@@ -26,6 +32,7 @@ npm run lint
 npm run format:check
 npm test
 npm run build
+npm run test:e2e
 ```
 
 The production build is written to `dist/`. Preview it locally with:
@@ -38,6 +45,8 @@ npm run preview
 
 The application currently provides a playable placeholder character in the validated, data-driven movement test room. Device-independent input drives the custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, and fall reset.
 
+Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
+
 See the project documents for current direction:
 
 - [Game design](docs/GAME_DESIGN.md)
@@ -46,4 +55,6 @@ See the project documents for current direction:
 - [Movement test-room measurements](docs/TEST_ROOM.md)
 - [Movement-controller contracts and timing](docs/MOVEMENT_CONTROLLER.md)
 - [Physics integration and fixed-step ordering](docs/PHYSICS_INTEGRATION.md)
+- [Movement tuning baseline](docs/MOVEMENT_TUNING.md)
+- [Movement play-test template](docs/PLAYTEST_TEMPLATE.md)
 - [Contributor and agent guidance](AGENTS.md)
