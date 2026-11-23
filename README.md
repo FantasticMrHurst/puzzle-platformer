@@ -36,7 +36,7 @@ npm run preview
 
 ## Current state
 
-The application currently loads a validated, data-driven movement test room with visible static Arcade Physics geometry. A controllable character and movement remain intentionally reserved for later issues.
+The application currently loads a validated, data-driven movement test room with visible static Arcade Physics geometry. Device-independent input and the pure movement controller are implemented and tested, but will not become playable until the next physics-integration issue.
 
 See the project documents for current direction:
 
@@ -44,4 +44,5 @@ See the project documents for current direction:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap and proposed issues](docs/ROADMAP.md)
 - [Movement test-room measurements](docs/TEST_ROOM.md)
+- [Movement-controller contracts and timing](docs/MOVEMENT_CONTROLLER.md)
 - [Contributor and agent guidance](AGENTS.md)
