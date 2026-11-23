@@ -41,6 +41,15 @@ The production build is written to `dist/`. Preview it locally with:
 npm run preview
 ```
 
+## Playable build
+
+Merges to `main` are validated and published to GitHub Pages by the
+`Deploy playable build` workflow. The repository must use **GitHub Actions** as
+its Pages source under **Settings → Pages**.
+
+Once the first deployment completes, the playable build will be available at
+[fantasticmrhurst.github.io/puzzle-platformer](https://fantasticmrhurst.github.io/puzzle-platformer/).
+
 ## Current state
 
 The application currently provides a playable placeholder character in the validated, data-driven movement test room. Device-independent input drives the custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, and fall reset.
