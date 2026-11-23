@@ -1,6 +1,19 @@
 # Movement Tuning Baseline
 
-This document records the initial `baseline-v1` movement profile. These values are a reproducible starting point, not final game design.
+Status: **Approved**
+
+Confirmed: **November 22, 2026**
+
+`baseline-v1` is the approved shared movement profile for the prototype and the starting point for the character-cooperation milestone. It was confirmed after manual play testing of running, stopping, jumping, air control, collision, camera behavior, and fall reset.
+
+These values are a stable reference, not a prohibition on future tuning. Character-specific profiles may intentionally differ, and changes to the shared baseline should be recorded under a new profile version so comparisons remain reproducible.
+
+## Change policy
+
+- Preserve `baseline-v1` as the reference profile used for the completed movement milestone.
+- Create a named character profile when behavior intentionally differs by character.
+- Record future shared tuning as a new baseline version rather than silently changing this table.
+- Re-run the movement test room, unit tests, and browser smoke tests after changing movement behavior.
 
 ## Baseline values
 
