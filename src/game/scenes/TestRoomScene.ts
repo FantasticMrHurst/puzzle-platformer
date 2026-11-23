@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 
+import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
 import { KeyboardInput } from '../../input/KeyboardInput';
 import type { PlayerIntent } from '../../input/PlayerIntent';
@@ -11,13 +12,17 @@ import type {
   SurfaceKind,
 } from '../../levels/LevelSchema';
 import { DEFAULT_MOVEMENT_CONFIG } from '../../movement/MovementConfig';
+import { MovementDebugOverlay } from '../../ui/MovementDebugOverlay';
 import { FixedStepClock, GAMEPLAY_STEP_SECONDS } from '../FixedStepClock';
+import { publishTestState } from '../TestProbe';
 
 const SURFACE_COLORS: Readonly<Record<SurfaceKind, number>> = {
   ground: 0x334155,
   platform: 0x0f766e,
   wall: 0x7c3aed,
 };
+const MOVEMENT_PROFILE_NAME = 'baseline-v1';
+const GAMEPLAY_STEP_HZ = Math.round(1 / GAMEPLAY_STEP_SECONDS);
 
 export class TestRoomScene extends Phaser.Scene {
   private readonly fixedStepClock = new FixedStepClock();
@@ -31,7 +36,17 @@ export class TestRoomScene extends Phaser.Scene {
     jumpHeld: false,
     jumpReleased: false,
   };
-  private simulationTimeMs = 0;
+  private debugOverlay!: MovementDebugOverlay;
+  private debugToggleKey!: Phaser.Input.Keyboard.Key;
+  private lastSampledIntent: PlayerIntent = {
+    moveX: 0,
+    jumpPressed: false,
+    jumpHeld: false,
+    jumpReleased: false,
+  };
+  private stepsThisFrame = 0;
+  private totalSimulationSteps = 0;
+  private totalRenderedFrames = 0;
 
   public constructor() {
     super('test-room');
@@ -40,12 +55,14 @@ export class TestRoomScene extends Phaser.Scene {
   public create(): void {
     this.level = loadLevelData(testRoomSource, 'test-room.json');
     this.fixedStepClock.reset();
-    this.simulationTimeMs = 0;
 
     if (this.input.keyboard === null) {
       throw new Error('Keyboard input is unavailable');
     }
     this.keyboardInput = new KeyboardInput(this.input.keyboard);
+    this.debugToggleKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.F3,
+    );
     this.staticGeometry = this.physics.add.staticGroup();
 
     this.configureWorld(this.level);
@@ -56,24 +73,44 @@ export class TestRoomScene extends Phaser.Scene {
     this.createSpawnMarker(this.level);
     this.createCharacter(this.level);
     this.createHud(this.level);
+    this.debugOverlay = new MovementDebugOverlay(this);
   }
 
-  public override update(_time: number, deltaMs: number): void {
+  public override update(): void {
+    this.totalRenderedFrames += 1;
+
+    if (Phaser.Input.Keyboard.JustDown(this.debugToggleKey)) {
+      this.debugOverlay.toggle();
+    }
+
     this.captureInput();
 
-    this.fixedStepClock.advance(deltaMs / 1_000, () => {
-      this.character.simulateStep(GAMEPLAY_STEP_SECONDS, this.pendingIntent);
-      this.clearConsumedInputEdges();
+    this.stepsThisFrame = this.fixedStepClock.advance(
+      this.game.loop.rawDelta / 1_000,
+      () => {
+        this.character.prepareSimulationStep(
+          GAMEPLAY_STEP_SECONDS,
+          this.pendingIntent,
+        );
+        this.clearConsumedInputEdges();
+        this.totalSimulationSteps += 1;
 
-      this.simulationTimeMs += GAMEPLAY_STEP_SECONDS * 1_000;
-      this.physics.world.update(
-        this.simulationTimeMs,
-        GAMEPLAY_STEP_SECONDS * 1_000,
-      );
+        this.physics.world.singleStep();
+        this.character.completeSimulationStep();
 
-      if (this.character.isBelow(this.level.world.height + 64)) {
-        this.resetCharacter();
-      }
+        if (this.character.isBelow(this.level.world.height + 64)) {
+          this.resetCharacter();
+        }
+      },
+    );
+    this.character.render(this.fixedStepClock.getInterpolationAlpha());
+
+    const snapshot = this.createDebugSnapshot();
+    this.debugOverlay.update(snapshot);
+    publishTestState({
+      scene: this.scene.key,
+      debugOverlayVisible: this.debugOverlay.isVisible(),
+      movement: snapshot,
     });
   }
 
@@ -150,9 +187,17 @@ export class TestRoomScene extends Phaser.Scene {
       level.spawn.y,
       DEFAULT_MOVEMENT_CONFIG,
     );
-    this.physics.add.collider(this.character.gameObject, this.staticGeometry);
+    this.physics.add.collider(
+      this.character.physicsObject,
+      this.staticGeometry,
+    );
 
-    this.cameras.main.startFollow(this.character.gameObject, true, 0.12, 0.12);
+    this.cameras.main.startFollow(
+      this.character.visualObject,
+      true,
+      0.12,
+      0.12,
+    );
     this.cameras.main.setDeadzone(360, 220);
   }
 
@@ -182,6 +227,7 @@ export class TestRoomScene extends Phaser.Scene {
 
   private captureInput(): void {
     const intent = this.keyboardInput.readIntent();
+    this.lastSampledIntent = intent;
     this.pendingIntent = {
       moveX: intent.moveX,
       jumpHeld: intent.jumpHeld,
@@ -206,6 +252,21 @@ export class TestRoomScene extends Phaser.Scene {
       jumpPressed: false,
       jumpHeld: false,
       jumpReleased: false,
+    };
+  }
+
+  private createDebugSnapshot(): MovementDebugSnapshot {
+    return {
+      ...this.character.getDebugState(),
+      intent: this.lastSampledIntent,
+      timing: {
+        fixedStepHz: GAMEPLAY_STEP_HZ,
+        stepsThisFrame: this.stepsThisFrame,
+        totalSimulationSteps: this.totalSimulationSteps,
+        totalRenderedFrames: this.totalRenderedFrames,
+        renderedFramesPerSecond: this.game.loop.actualFps,
+      },
+      profileName: MOVEMENT_PROFILE_NAME,
     };
   }
 }
