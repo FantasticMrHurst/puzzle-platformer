@@ -41,15 +41,29 @@ Exit criteria:
 - A production build runs from a static server with correct asset paths.
 - The team agrees the movement baseline is strong enough to build upon.
 
-## Milestone 2: Character cooperation prototype
+## Milestone 2: Character playability and cooperation prototype
 
-Outcome: three in-world characters can be selected and positioned to solve a simple cooperative scenario.
+Outcome: the team has playable evidence for selecting a complementary three-character roster, and multiple in-world characters can be selected and positioned to solve a simple cooperative scenario.
 
-- Decide switching rules and inactive-character behavior.
+- Implement and play-test the documented switching and inactive-character rules.
 - Instantiate multiple characters from shared controller code and distinct profiles.
 - Add clear selection and camera feedback.
-- Define reset/checkpoint behavior that prevents costly soft locks.
-- Prototype one meaningful ability per character; revise provisional archetypes as needed.
+- Implement the documented whole-room reset/checkpoint behavior.
+- Build a small character-playability lab that can evaluate abilities without requiring a production level.
+- Prototype the defining verb for Brute, Scout, Tinkerer, Ranger, Pet, and Gardener at deliberately small scope.
+- Ensure the Brute can both push and deliberately pull a heavy object.
+- Test character combinations and revise, combine, or reject concepts before selecting the final three-character roster.
+
+Candidate prototypes do not all need production-ready art, complete mechanics, or simultaneous inclusion in one room. The purpose is to compare playability, cooperation potential, clarity, and implementation cost using consistent evaluation criteria.
+
+Exit criteria:
+
+- Switching, inactive-character behavior, camera transitions, and reset rules are documented and playable.
+- Shared controller code supports distinct movement profiles and the Pet's shorter collision body without character-specific controller forks.
+- Each of the six candidates has a focused prototype of its defining verb.
+- Play-test notes compare each candidate using the criteria in `GAME_DESIGN.md`.
+- At least one test scenario requires actions from multiple characters and demonstrates a recoverable reset path.
+- The team records which three-character combination should advance, or explicitly records why more prototyping is required.
 
 ## Milestone 3: Reusable puzzle vocabulary
 
@@ -198,12 +212,29 @@ These issues are ordered to minimize overlapping work. They are proposals for re
 
 **Dependencies:** Issue 4.
 
-## Decisions required before Milestone 2
+## Recorded Milestone 2 prototype decisions
 
-- final switching behavior and inactive-character rules;
-- whether all characters share or specialize in advanced traversal;
-- death, reset, checkpoint, and soft-lock recovery behavior;
-- initial ability prototypes and their control scheme;
-- keyboard/gamepad priority and target browser matrix;
-- first-published-level authoring workflow.
+- Global, instant switching controls one member of an in-world three-character roster.
+- Inactive characters receive neutral input but remain physically simulated and can sustain puzzle state.
+- Characters do not collide with one another during the initial prototype.
+- Control transfers immediately while the camera eases to the selected character and selection feedback remains visible without relying on color alone.
+- All three roster members must reach the shared exit.
+- Manual reset, falling, and future death reset the whole room to the latest checkpoint without a lives or rewind system.
+- `F` is the initial contextual interaction or primary-ability key; aimed abilities receive separate device-independent aim intent.
+- Every candidate shares baseline movement fundamentals while typed profiles and composed abilities create differences.
+- Keyboard and current desktop Chromium are the first prototype targets; gamepad support remains an architectural seam, and touch is out of scope.
+- Milestone 2 rooms continue to use directly authored, validated JSON.
+- Brute, Scout, Tinkerer, Ranger, Pet, and Gardener each receive a focused playability prototype before the final three-character roster is selected.
+
+## Milestone 2 implementation sequence
+
+1. Add a three-character roster, control transfer, selection feedback, and camera retargeting.
+2. Add whole-room reset, checkpoint state, and a shared three-character exit condition.
+3. Add distinct movement/body profiles and prototype Scout wall traversal and Pet half-height navigation in separate chambers.
+4. Prototype the Brute's deliberate grip/push/pull interaction and the Tinkerer's contextual mechanism interaction.
+5. Add device-independent aiming for the Ranger's environmental action.
+6. Add resettable world creation for the Gardener's first growth action.
+7. Assemble at least one cooperation scenario, compare all six candidates with the shared play-test criteria, and record the roster recommendation.
+
+Each candidate ability should remain independently reviewable. Split an implementation step into separate GitHub Issues when its candidates do not share a small prerequisite or test chamber.
 

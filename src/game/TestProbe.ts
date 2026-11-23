@@ -3,6 +3,12 @@ import type { MovementDebugSnapshot } from '../debug/MovementDebugSnapshot';
 interface PuzzlePlatformerTestState {
   readonly scene: string;
   readonly debugOverlayVisible: boolean;
+  readonly activeCharacterId: string;
+  readonly roster: readonly {
+    readonly id: string;
+    readonly active: boolean;
+    readonly position: { readonly x: number; readonly y: number };
+  }[];
   readonly movement: MovementDebugSnapshot;
 }
 

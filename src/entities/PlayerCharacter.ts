@@ -8,16 +8,13 @@ import {
   type MovementResult,
   type MovementVelocity,
 } from '../movement/MovementController';
-import type { MovementConfig } from '../movement/MovementConfig';
 import type { MovementState } from '../movement/MovementState';
 import { ArcadeBodyAdapter } from '../physics/ArcadeBodyAdapter';
 import {
   interpolatePosition,
   type Position,
 } from '../rendering/interpolatePosition';
-
-const CHARACTER_WIDTH = 48;
-const CHARACTER_HEIGHT = 72;
+import type { CharacterDefinition } from './CharacterCatalog';
 
 export interface CharacterDebugState {
   readonly position: DebugPosition;
@@ -27,37 +24,58 @@ export interface CharacterDebugState {
 }
 
 export class PlayerCharacter {
+  public readonly id: string;
   public readonly physicsObject: Phaser.GameObjects.Rectangle;
   public readonly visualObject: Phaser.GameObjects.Rectangle;
 
   private readonly bodyAdapter: ArcadeBodyAdapter;
   private readonly controller: MovementController;
+  private readonly labelObject: Phaser.GameObjects.Text;
   private lastResult: MovementResult;
   private previousPosition: Position;
   private currentPosition: Position;
 
   public constructor(
     scene: Phaser.Scene,
+    id: string,
     x: number,
     y: number,
-    movementConfig: MovementConfig,
+    private readonly definition: CharacterDefinition,
   ) {
+    this.id = id;
     this.physicsObject = scene.add
-      .rectangle(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT)
+      .rectangle(x, y, definition.width, definition.height)
       .setVisible(false);
     scene.physics.add.existing(this.physicsObject);
 
     this.visualObject = scene.add
-      .rectangle(x, y, CHARACTER_WIDTH, CHARACTER_HEIGHT, 0xf97316)
-      .setStrokeStyle(3, 0xffedd5)
+      .rectangle(
+        x,
+        y,
+        definition.width,
+        definition.height,
+        definition.fillColor,
+      )
+      .setStrokeStyle(3, definition.strokeColor)
       .setDepth(5);
+    this.labelObject = scene.add
+      .text(x, y - definition.height / 2 - 8, definition.label, {
+        backgroundColor: '#080b16cc',
+        color: '#f8fafc',
+        fontFamily: 'ui-monospace, monospace',
+        fontSize: '12px',
+        fontStyle: 'bold',
+        padding: { x: 4, y: 2 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(6);
 
     this.bodyAdapter = new ArcadeBodyAdapter(this.physicsObject);
     this.bodyAdapter.setMaximumVelocity(
-      movementConfig.maxRunSpeed,
-      movementConfig.maxFallSpeed,
+      definition.movementConfig.maxRunSpeed,
+      definition.movementConfig.maxFallSpeed,
     );
-    this.controller = new MovementController(movementConfig);
+    this.controller = new MovementController(definition.movementConfig);
     this.lastResult = {
       velocity: { x: 0, y: 0 },
       state: this.controller.getState(),
@@ -92,6 +110,30 @@ export class PlayerCharacter {
       interpolationAlpha,
     );
     this.visualObject.setPosition(position.x, position.y);
+    this.labelObject.setPosition(
+      position.x,
+      position.y - this.definition.height / 2 - 8,
+    );
+  }
+
+  public setActive(active: boolean): void {
+    this.labelObject.setText(
+      active ? `▼ ${this.definition.label}` : this.definition.label,
+    );
+    this.visualObject.setDepth(active ? 7 : 5);
+    this.labelObject.setDepth(8).setVisible(active);
+    this.visualObject.setStrokeStyle(
+      active ? 5 : 2,
+      this.definition.strokeColor,
+    );
+  }
+
+  public getMovementProfileName(): string {
+    return this.definition.movementProfileName;
+  }
+
+  public getLabel(): string {
+    return this.definition.label;
   }
 
   public reset(x: number, y: number): void {
@@ -107,6 +149,10 @@ export class PlayerCharacter {
     this.visualObject.setPosition(
       this.currentPosition.x,
       this.currentPosition.y,
+    );
+    this.labelObject.setPosition(
+      this.currentPosition.x,
+      this.currentPosition.y - this.definition.height / 2 - 8,
     );
   }
 

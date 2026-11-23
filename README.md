@@ -52,7 +52,9 @@ Once the first deployment completes, the playable build will be available at
 
 ## Current state
 
-The application currently provides a playable placeholder character in the validated, data-driven movement test room. Device-independent input drives the custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, and fall reset.
+The application currently provides a three-character prototype roster in the validated, data-driven movement test room. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
+
+Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump.
 
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 

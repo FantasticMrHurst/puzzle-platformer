@@ -3,6 +3,12 @@ import { expect, test, type Page } from '@playwright/test';
 interface TestProbe {
   readonly scene: string;
   readonly debugOverlayVisible: boolean;
+  readonly activeCharacterId: string;
+  readonly roster: readonly {
+    readonly id: string;
+    readonly active: boolean;
+    readonly position: { readonly x: number; readonly y: number };
+  }[];
   readonly movement: {
     readonly position: { readonly x: number; readonly y: number };
   };
@@ -29,16 +35,39 @@ test('boots the movement room and toggles diagnostics', async ({ page }) => {
 
 test('responds to movement input', async ({ page }) => {
   await page.goto('/');
-  const initial = await waitForProbe(page);
+  await waitForProbe(page);
+
+  await page.keyboard.down('Digit2');
+  await expect
+    .poll(async () => (await readProbe(page)).activeCharacterId)
+    .toBe('scout-prototype');
+  await page.keyboard.up('Digit2');
+
+  const initial = await readProbe(page);
+  const initialScout = findRosterMember(initial, 'scout-prototype');
 
   await page.keyboard.down('KeyD');
   await page.waitForTimeout(500);
   await page.keyboard.up('KeyD');
 
   await expect
-    .poll(async () => (await readProbe(page)).movement.position.x)
-    .toBeGreaterThan(initial.movement.position.x + 80);
+    .poll(
+      async () =>
+        findRosterMember(await readProbe(page), 'scout-prototype').position.x,
+    )
+    .toBeGreaterThan(initialScout.position.x + 80);
 });
+
+function findRosterMember(
+  probe: TestProbe,
+  id: string,
+): TestProbe['roster'][number] {
+  const member = probe.roster.find((candidate) => candidate.id === id);
+  if (member === undefined) {
+    throw new Error(`Roster member "${id}" is not available`);
+  }
+  return member;
+}
 
 async function waitForProbe(page: Page): Promise<TestProbe> {
   await page.waitForFunction(

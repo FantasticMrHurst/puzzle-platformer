@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "movement-test-room",
   "name": "Movement Test Room",
   "world": {
@@ -7,10 +7,23 @@
     "height": 1080,
     "backgroundColor": "#0b1020"
   },
-  "spawn": {
-    "x": 160,
-    "y": 840
-  },
+  "characters": [
+    {
+      "id": "brute-prototype",
+      "archetype": "brute",
+      "spawn": { "x": 160, "y": 840 }
+    },
+    {
+      "id": "scout-prototype",
+      "archetype": "scout",
+      "spawn": { "x": 240, "y": 840 }
+    },
+    {
+      "id": "tinkerer-prototype",
+      "archetype": "tinkerer",
+      "spawn": { "x": 320, "y": 840 }
+    }
+  ],
   "staticGeometry": [
     {
       "id": "left-boundary",

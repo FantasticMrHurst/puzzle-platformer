@@ -93,7 +93,7 @@ The direction of dependency is important:
 
 ## Input contract
 
-Input should represent player intent, not raw key codes. A minimal shape might contain horizontal intent and edge-aware actions such as jump pressed, jump held, and jump released.
+Input should represent player intent, not raw key codes. Movement intent contains horizontal direction and edge-aware jump state. Milestone 2 adds named actions for direct/cycled character selection, contextual interaction or primary ability, room reset, and an optional device-independent aim vector.
 
 The input layer is responsible for:
 
@@ -161,16 +161,40 @@ Characters should share the same controller implementation and differ through co
 
 Avoid deep class hierarchies such as a base character with a subclass for every ability. Prefer small interfaces and composition once multiple characters exist.
 
+The Milestone 2 candidate lab adds three requirements without selecting final implementations prematurely:
+
+- Body dimensions belong to character configuration so the Pet can test half-height passages without forking movement rules.
+- Aimed actions such as the Ranger's shot must receive device-independent aim intent rather than reading pointer or keyboard state inside the ability.
+- Spawned or transformed world state such as Gardener growth must have clear ownership and participate in the same room-reset contract as other puzzle entities.
+
+Ability prototypes should implement only the contract needed by their focused test. Do not create a universal ability framework, inventory system, projectile hierarchy, or plant simulation before two real prototypes demonstrate a shared need.
+
+### Control transfer
+
+The scene-level roster owns which character is active; individual characters do not select one another. At each simulation step it supplies live player intent to exactly one character and neutral intent to the rest. All characters still advance through the same physics world.
+
+Control transfer must clear unconsumed press/release edges without resetting position, velocity, controller timers, or persistent world effects. Camera target, selection presentation, and debug output observe the active identity but do not own it. Candidate rooms should contain no more than three active-roster slots even though the lab can load different candidate combinations.
+
+Character-to-character collision is disabled for the first cooperation prototype. Environment and puzzle-object collision remain normal. Add character collision later only if a designed interaction, such as carrying or boosting, demonstrates that its benefits outweigh blocking and stacking complexity.
+
+### Room reset contract
+
+The gameplay scene owns room recovery. A reset restores an authored or checkpoint state for the complete room rather than calling unrelated partial-reset methods from UI or input code. Reset participants include the roster, active selection, character controllers and bodies, puzzle entities, ability-created entities, signal state, and completion state.
+
+`R`, out-of-world detection, and future death events request the same reset operation. Until checkpoints exist, re-instantiating from validated level data is an acceptable simple implementation. Persistent progression and save data are outside this contract.
+
 ## Level data
 
 Levels should be data, not imperative scene code. The first schema only needs what the test room uses, likely:
 
 - schema version and level identifier;
 - world bounds and optional presentation metadata;
-- player spawn point;
+- one to three character entries with stable IDs, archetypes, and spawn points;
 - static collision geometry or a reference to tile data;
 
 Later revisions can add entities with stable IDs, typed component configuration, signal connections, checkpoints, and exits.
+
+Directly authored, validated JSON remains the Milestone 2 format. Add only fields required by a current character chamber or cooperation scenario. Tiled and custom editors remain deferred until direct authoring produces specific, repeated friction.
 
 Validation should run when loading a level in development and produce a message containing the level, entity, and invalid field. The schema must be versioned before compatibility matters. Whether validation uses a small handwritten validator or a library remains open; do not add a schema dependency until the data warrants it.
 
@@ -229,20 +253,21 @@ The production artifact should be static. Vite's base path must support the sele
 - Keep movement policy custom and separate from sprites.
 - Use one configurable controller across characters.
 - Represent levels as validated, versioned data.
+- Author Milestone 2 rooms directly as JSON.
+- Target keyboard input and current desktop Chromium first while keeping device-independent action contracts.
+- Reset the whole room to its latest checkpoint on manual reset, fall, or future death.
+- Publish validated builds through GitHub Pages.
 - Keep multiplayer out of scope while maintaining clean input/state/rendering seams.
 
 ### Not yet decided
 
 - exact Phaser and other dependency versions at scaffold time;
-- fixed-step implementation versus a bounded variable-step compromise;
 - whether Phaser gravity or controller-applied vertical acceleration owns gravity policy;
-- tilemap format and whether Tiled becomes the authoring tool;
 - handwritten versus library-based runtime schema validation;
 - entity/component registry design for level instantiation;
 - event, signal, or state model for puzzle connections;
 - save-data representation and compatibility policy;
-- target browser/version matrix and required gamepad support;
-- deployment provider.
+- final browser/version matrix and required gamepad support.
 
 Resolve these only when the responsible milestone provides evidence.
 
