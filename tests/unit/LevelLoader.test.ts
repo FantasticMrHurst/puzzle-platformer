@@ -7,11 +7,17 @@ import {
 } from '../../src/levels/LevelLoader';
 
 const validLevel = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   id: 'unit-test-level',
   name: 'Unit Test Level',
   world: { width: 800, height: 600, backgroundColor: '#112233' },
-  spawn: { x: 100, y: 100 },
+  characters: [
+    {
+      id: 'test-character',
+      archetype: 'scout',
+      spawn: { x: 100, y: 100 },
+    },
+  ],
   staticGeometry: [
     {
       id: 'floor',
@@ -29,16 +35,28 @@ describe('loadLevelData', () => {
     const level = loadLevelData(testRoomSource, 'test-room.json');
 
     expect(level.id).toBe('movement-test-room');
+    expect(level.characters).toHaveLength(3);
     expect(level.staticGeometry).toHaveLength(11);
   });
 
   it('reports the source and field path for missing data', () => {
     expect(() =>
-      loadLevelData({ ...validLevel, spawn: { x: 100 } }, 'broken-room.json'),
+      loadLevelData(
+        {
+          ...validLevel,
+          characters: [
+            {
+              ...validLevel.characters[0],
+              spawn: { x: 100 },
+            },
+          ],
+        },
+        'broken-room.json',
+      ),
     ).toThrowError(
       new LevelValidationError(
         'broken-room.json',
-        '$.spawn.y',
+        '$.characters[0].spawn.y',
         'must be a finite number',
       ),
     );
@@ -54,6 +72,33 @@ describe('loadLevelData', () => {
     expect(() =>
       loadLevelData(duplicateGeometryLevel, 'duplicate.json'),
     ).toThrow('duplicate.json: $.staticGeometry[1].id must be unique');
+  });
+
+  it('rejects duplicate character identifiers', () => {
+    const character = validLevel.characters[0];
+
+    expect(() =>
+      loadLevelData(
+        { ...validLevel, characters: [character, { ...character }] },
+        'duplicate-character.json',
+      ),
+    ).toThrow('duplicate-character.json: $.characters[1].id must be unique');
+  });
+
+  it('rejects unknown character archetypes', () => {
+    const character = validLevel.characters[0];
+
+    expect(() =>
+      loadLevelData(
+        {
+          ...validLevel,
+          characters: [{ ...character, archetype: 'wizard' }],
+        },
+        'unknown-character.json',
+      ),
+    ).toThrow(
+      'unknown-character.json: $.characters[0].archetype must be one of brute, scout, tinkerer, ranger, pet, gardener',
+    );
   });
 
   it('rejects geometry outside the world bounds', () => {

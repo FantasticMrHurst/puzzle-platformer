@@ -51,13 +51,13 @@ Interaction, character switching, wall movement, and abilities should be added o
 
 ## Provisional character concepts
 
-These archetypes establish the kind of complementarity the game may use. Names, abilities, body sizes, and exact constraints are not final.
+These archetypes establish the kind of complementarity the game may use. Names, abilities, body sizes, and exact constraints are not final. Milestone 2 should prototype all six candidates at a deliberately small scale before the team selects or revises the final three-character roster.
 
 ### Brute
 
-Provisional role: alter heavy or reinforced parts of the environment.
+Provisional role: reposition heavy or reinforced parts of the environment.
 
-Candidate abilities include pushing heavy blocks, breaking barriers, bracing mechanisms, or carrying another character. The design must avoid reducing this character to a slow key for strength-marked locks.
+Candidate abilities include pushing and pulling heavy blocks, breaking barriers, bracing mechanisms, or carrying another character. Pulling should use a clear grip or attachment state so ordinary movement does not accidentally drag objects. The design must avoid reducing this character to a slow key for strength-marked locks.
 
 ### Scout
 
@@ -71,6 +71,49 @@ Provisional role: understand and reconfigure mechanisms.
 
 Candidate abilities include powering devices, routing signals, repairing machines, and changing switch behavior. Interactions should remain visually understandable and should not turn every mechanism into a separate mini-game.
 
+### Ranger
+
+Provisional role: manipulate the environment precisely from a distance.
+
+Candidate abilities include hitting remote targets, cutting or attaching ropes, pinning moving objects, and creating temporary tether lines. The ranged verb should primarily support environmental problem-solving rather than turn the game into a combat platformer.
+
+### Pet
+
+Provisional role: enter, inspect, and affect spaces the other characters cannot reach directly.
+
+The Pet should have a substantially shorter collision body for small passages. Candidate abilities include retrieving small objects, crawling through machinery, following readable scent trails, and riding with another character when regrouping. Small tunnels alone are not enough: actions inside them should change the shared puzzle for the rest of the team.
+
+### Gardener
+
+Provisional role: reshape traversal and mechanisms by growing temporary plant structures.
+
+Candidate abilities include growing vines, platforms, bridges, roots that restrain objects, and plants that react to water or light. Growth rules and limits must remain predictable, visually legible, and easy to reset.
+
+## Character prototype evaluation
+
+Milestone 2 is a playability lab, not a commitment to ship six characters. Each candidate should receive the smallest prototype that expresses its defining verb. Prototypes may use focused test chambers rather than requiring all abilities in one polished level.
+
+Evaluate each candidate against the same questions:
+
+- Is the defining action enjoyable and understandable without lengthy instruction?
+- Does it create useful consequences for the whole team rather than an isolated character-only route?
+- Can the action combine with multiple characters and environmental systems?
+- Is the character still interesting when its obvious matching obstacle is absent?
+- Does the character create excessive aiming, physics, reset, camera, or level-authoring complexity?
+- Can the player recover and regroup without tedious backtracking or frequent soft locks?
+- Is the character's movement, silhouette, and interaction language clearly distinct from the other candidates?
+
+The initial prototype verbs are:
+
+| Candidate | First verb to test |
+| --- | --- |
+| Brute | Grip, push, and pull a heavy block |
+| Scout | Wall slide and wall jump |
+| Tinkerer | Operate or reconfigure a powered mechanism |
+| Ranger | Aim one environmental shot or tether action |
+| Pet | Traverse a half-height passage and retrieve or activate something useful |
+| Gardener | Grow one temporary, resettable traversal structure |
+
 ## Character cooperation principles
 
 - Every character should contribute decisions, not merely be transported to the exit.
@@ -78,6 +121,50 @@ Candidate abilities include powering devices, routing signals, repairing machine
 - Switching characters should be fast and should preserve the player's mental model of the level.
 - Leaving a character in a location may itself be part of a solution, for example holding a plate or bracing a platform.
 - Levels should minimize unrecoverable soft locks. When a state can become unwinnable, recovery should be obvious and quick.
+
+## Milestone 2 switching rules
+
+**Decision for prototype:** Switching is global, immediate, and available during ordinary movement. A playable scenario contains up to three characters selected from the candidate roster; the playability lab does not place all six candidates into every room.
+
+- Exactly one character receives player intent at a time.
+- Direct selection and previous/next cycling are both supported. Initial keyboard mappings are number keys for direct selection and `Q`/`E` for cycling; these bindings remain provisional and must be represented as named actions.
+- Switching has no cooldown, range, or line-of-sight requirement.
+- The newly inactive character retains its position and physical momentum, then continues to obey gravity and collisions with neutral movement input. It does not walk, jump, or use abilities autonomously.
+- Inactive characters remain part of the puzzle and can continue holding plates, bracing objects, or sustaining an already-created world effect when that ability explicitly allows it.
+- A held or channeled action ends on switching unless its prototype defines a persistent result. Input press edges are cleared during control transfer so held keys cannot trigger an action on the newly selected character.
+- Characters do not collide with one another during the first prototype. This avoids accidental blocking and stacking while object and environment collisions are evaluated.
+- Switching changes control immediately. The camera follows with a short eased transition and does not pause input while moving.
+- Selection feedback includes a marker and character label or icon; it must not rely on color alone.
+- Hazard behavior for unattended characters remains deferred until a prototype contains meaningful hazards. The initial character lab should not punish the player with unseen off-camera threats.
+
+These rules should be revisited if play tests show that unrestricted switching removes useful tension, camera travel causes disorientation, or neutral inactive physics makes precise placement unreliable.
+
+## Milestone 2 cooperation and completion rules
+
+**Decision for prototype:** A scenario is complete when all three characters in its active roster reach the shared exit. Candidate-focused chambers may use a shorter local objective, but they must still demonstrate how the candidate creates value for the team.
+
+- All characters retain the baseline movement fundamentals and use the same movement controller. Typed profiles may adjust values such as jump height, acceleration, or body dimensions.
+- Advanced traversal is character-specific when it defines a candidate's role. The first such experiment is the Scout's wall slide and wall jump.
+- `F` is the initial contextual interaction or primary-ability key. Abilities consume named actions, not physical keys. Aimed abilities also consume device-independent aim intent.
+- Automatic interactions are reserved for unambiguous physical behavior such as standing on a plate or pushing an object. Deliberate actions such as gripping an object, using a console, firing a tether, or growing a plant require input.
+- Keyboard is the first supported input device. The action contracts must permit a gamepad adapter later without changing gameplay rules; touch controls are out of scope for Milestone 2.
+- The prototype targets current desktop Chromium browsers. Broader browser certification and required gamepad support are later decisions.
+
+## Milestone 2 reset and recovery rules
+
+**Decision for prototype:** Recovery uses a fast whole-room reset to the latest checkpoint, with no lives, inventory penalty, rewind system, or persistent failure cost.
+
+- `R` manually resets the room so a player can immediately recover from a soft lock.
+- Falling out of the world or a future character-death event triggers the same whole-room reset.
+- A reset restores all three characters, active selection, puzzle objects, mechanisms, ability-created objects, and completion state to the checkpoint snapshot.
+- Until checkpoint entities are implemented, the authored room start is the checkpoint.
+- Reset feedback should be brief and readable; it must not require reloading the page or replaying a long traversal.
+
+Whole-room reset is intentionally simple and deterministic for the character lab. Individual respawn, rewind, and partial puzzle persistence can be reconsidered only after a designed scenario demonstrates a clear benefit.
+
+## Milestone 2 authoring direction
+
+**Decision for prototype:** Continue authoring validated JSON directly. Candidate chambers should extend the existing versioned level data only as required by a current prototype. Reconsider Tiled or another authoring tool when repeated geometry editing becomes a measured bottleneck.
 
 ## Initial environment vocabulary
 
@@ -151,20 +238,13 @@ This section is intent, not a committed accessibility feature list.
 These questions should be answered through discussion and prototypes rather than assumed in implementation:
 
 1. What are the final three character identities and truly unique abilities?
-2. Must all three characters physically reach every exit, or can completion use other conditions?
-3. Can inactive characters be harmed, move autonomously, or react to nearby hazards?
-4. Is switching global and instant, limited by line of sight/range, or represented in-world?
-5. Are advanced moves such as wall jumping shared, character-specific, unlockable, or removed?
-6. What is the primary interaction model: automatic context actions, one interaction button, or ability-specific controls?
-7. What happens on death or an unwinnable puzzle state: individual respawn, room reset, checkpoint reset, or rewind?
-8. What level length, difficulty curve, and target audience should guide puzzle design?
-9. Is the game keyboard-first, gamepad-first, or equally committed to both? Are touch devices supported?
-10. What viewport, aspect-ratio, and camera behavior are required?
-11. What art direction, theme, narrative premise, and tone distinguish the game from its inspirations?
-12. Are levels authored as JSON directly, exported from Tiled, or built with a later custom tool?
-13. What progression, persistence, scoring, collectibles, or optional challenges exist?
-14. How much execution precision should puzzles require relative to planning?
-15. Which accessibility options are launch requirements?
+2. How should inactive characters react to hazards once meaningful hazards exist?
+3. What level length, difficulty curve, and target audience should guide puzzle design?
+4. What viewport and aspect-ratio requirements should guide final camera behavior?
+5. What art direction, theme, narrative premise, and tone distinguish the game from its inspirations?
+6. What progression, persistence, scoring, collectibles, or optional challenges exist?
+7. How much execution precision should puzzles require relative to planning?
+8. Which accessibility options are launch requirements?
 
 ## Near-term validation questions
 

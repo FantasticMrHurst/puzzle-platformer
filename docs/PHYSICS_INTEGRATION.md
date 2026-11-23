@@ -28,7 +28,7 @@ For each gameplay step:
 4. Input press/release edges are cleared; held and horizontal state remain available to catch-up steps.
 5. `world.singleStep()` advances Arcade Physics by exactly 1/60 second, resolves collisions, and synchronizes the hidden physics proxy before another catch-up step can begin.
 6. The new authoritative position is recorded for presentation interpolation.
-7. Falling below the world reset threshold returns the character to spawn.
+7. Falling below the world reset threshold returns the roster to its authored spawns.
 
 Calling Phaser's paired single-step operation is important. Repeating `world.update()` before `postUpdate()` would allow the next body pre-update to restore a stale Game Object position, so controller timers could advance multiple times while displacement advanced only once.
 
@@ -49,7 +49,7 @@ The controller never imports Phaser and does not know about body or collider API
 
 The camera follows the interpolated visual with a dead zone and smoothing, constrained to the level's declared world bounds. It cannot reveal space beyond those bounds. Static geometry collides only with the hidden authoritative physics proxy.
 
-The character does not collide with the world's bottom edge. Falling 64 pixels below the declared world height resets body position, velocity, controller timers, pending input edges, both interpolation endpoints, and the visible object before recentering the camera. The physical-key edge tracker is intentionally not reset, so a jump key held through a fall cannot become a new press after respawn.
+Characters do not collide with the world's bottom edge. When any roster member falls 64 pixels below the declared world height, every member returns to its authored spawn and active selection returns to slot one. The reset clears body position, velocity, controller timers, pending input edges, both interpolation endpoints, and visible objects before recentering the camera. The physical-key edge tracker is intentionally not reset, so a jump key held through a fall cannot become a new press after respawn.
 
 ## Validation observations
 

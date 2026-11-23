@@ -1,4 +1,15 @@
-export const LEVEL_SCHEMA_VERSION = 1 as const;
+export const LEVEL_SCHEMA_VERSION = 2 as const;
+
+export const CHARACTER_ARCHETYPES = [
+  'brute',
+  'scout',
+  'tinkerer',
+  'ranger',
+  'pet',
+  'gardener',
+] as const;
+
+export type CharacterArchetype = (typeof CHARACTER_ARCHETYPES)[number];
 
 export type SurfaceKind = 'ground' | 'platform' | 'wall';
 
@@ -11,6 +22,12 @@ export interface LevelWorldData {
 export interface PointData {
   readonly x: number;
   readonly y: number;
+}
+
+export interface CharacterSpawnData {
+  readonly id: string;
+  readonly archetype: CharacterArchetype;
+  readonly spawn: PointData;
 }
 
 export interface StaticGeometryData {
@@ -28,6 +45,6 @@ export interface LevelData {
   readonly id: string;
   readonly name: string;
   readonly world: LevelWorldData;
-  readonly spawn: PointData;
+  readonly characters: readonly CharacterSpawnData[];
   readonly staticGeometry: readonly StaticGeometryData[];
 }

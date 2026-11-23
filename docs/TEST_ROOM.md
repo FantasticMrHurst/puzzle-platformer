@@ -8,7 +8,7 @@ Coordinates use pixels with the origin at the world's top-left. Static rectangle
 
 - World bounds: 3600 × 1080 px.
 - Nominal floor top: y = 920 px.
-- Spawn marker: (160, 840).
+- Roster spawn markers: (160, 840), (240, 840), and (320, 840).
 - Grid spacing: 64 px.
 
 ## Diagnostic obstacles
@@ -27,10 +27,13 @@ Coordinates use pixels with the origin at the world's top-left. Static rectangle
 
 The dimensions are initial measurement fixtures, not final movement targets. Adjusting an obstacle to match a controller profile should be an explicit tuning change with updated documentation.
 
-## Current limitations
+## Current roster behavior
 
-- The yellow spawn marker is diagnostic; there is no controllable character yet.
-- All authored geometry is fully solid. One-way platforms are not part of schema version 1.
-- Falling and reset behavior arrive with player/physics integration.
-- The camera is centered at the spawn but does not move without a player target.
+- Schema version 2 defines one to three character spawns with stable IDs and candidate archetypes.
+- The current room loads Brute, Scout, and Tinkerer placeholders using the shared `baseline-v1` movement profile.
+- Number keys select roster slots directly; `Q` and `E` cycle selection.
+- Inactive characters continue through physics with neutral movement input and do not collide with one another.
+- The camera follows the selected character, whose label and heavier outline indicate active control.
+- If any roster member falls below the room, all three return to their authored spawns and selection returns to slot one.
+- All authored geometry remains fully solid. One-way platforms are not part of schema version 2.
 

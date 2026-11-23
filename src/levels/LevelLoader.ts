@@ -1,5 +1,8 @@
 import {
+  CHARACTER_ARCHETYPES,
   LEVEL_SCHEMA_VERSION,
+  type CharacterArchetype,
+  type CharacterSpawnData,
   type LevelData,
   type LevelWorldData,
   type PointData,
@@ -8,6 +11,9 @@ import {
 } from './LevelSchema';
 
 const SURFACE_KINDS = new Set<SurfaceKind>(['ground', 'platform', 'wall']);
+const CHARACTER_ARCHETYPE_SET = new Set<CharacterArchetype>(
+  CHARACTER_ARCHETYPES,
+);
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 type UnknownRecord = Record<string, unknown>;
@@ -37,23 +43,71 @@ export function loadLevelData(
   const id = requireNonEmptyString(root, 'id', source, '$');
   const name = requireNonEmptyString(root, 'name', source, '$');
   const world = parseWorld(root.world, source);
-  const spawn = parsePoint(root.spawn, source, '$.spawn');
+  const characters = parseCharacters(root.characters, source, world);
   const staticGeometry = parseStaticGeometry(
     root.staticGeometry,
     source,
     world,
   );
 
-  assertPointInsideWorld(spawn, world, source, '$.spawn');
-
   return {
     schemaVersion: LEVEL_SCHEMA_VERSION,
     id,
     name,
     world,
-    spawn,
+    characters,
     staticGeometry,
   };
+}
+
+function parseCharacters(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly CharacterSpawnData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.characters', 'must be an array');
+  }
+  if (input.length < 1 || input.length > 3) {
+    fail(source, '$.characters', 'must contain between 1 and 3 characters');
+  }
+
+  const seenIds = new Set<string>();
+
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.characters[${index}]`;
+    const character = requireRecord(entry, source, path);
+    const id = requireNonEmptyString(character, 'id', source, path);
+
+    if (seenIds.has(id)) {
+      fail(source, `${path}.id`, `must be unique; received duplicate "${id}"`);
+    }
+    seenIds.add(id);
+
+    const archetype = requireCharacterArchetype(character, source, path);
+    const spawn = parsePoint(character.spawn, source, `${path}.spawn`);
+    assertPointInsideWorld(spawn, world, source, `${path}.spawn`);
+
+    return { id, archetype, spawn };
+  });
+}
+
+function requireCharacterArchetype(
+  record: UnknownRecord,
+  source: string,
+  path: string,
+): CharacterArchetype {
+  const archetype = requireNonEmptyString(record, 'archetype', source, path);
+
+  if (!CHARACTER_ARCHETYPE_SET.has(archetype as CharacterArchetype)) {
+    fail(
+      source,
+      `${path}.archetype`,
+      `must be one of ${CHARACTER_ARCHETYPES.join(', ')}`,
+    );
+  }
+
+  return archetype as CharacterArchetype;
 }
 
 function parseWorld(input: unknown, source: string): LevelWorldData {
