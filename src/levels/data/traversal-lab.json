@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 6,
+  "id": "traversal-lab",
+  "name": "Character Traversal Lab",
+  "world": {
+    "width": 2000,
+    "height": 720,
+    "backgroundColor": "#101528"
+  },
+  "characters": [
+    {
+      "id": "scout-prototype",
+      "archetype": "scout",
+      "spawn": { "x": 120, "y": 520 }
+    },
+    {
+      "id": "pet-prototype",
+      "archetype": "pet",
+      "spawn": { "x": 200, "y": 520 }
+    },
+    {
+      "id": "brute-prototype",
+      "archetype": "brute",
+      "spawn": { "x": 280, "y": 520 }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1800,
+    "y": 420,
+    "width": 160,
+    "height": 180
+  },
+  "staticGeometry": [
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall",
+      "purpose": "Left world boundary"
+    },
+    {
+      "id": "lab-floor",
+      "x": 0,
+      "y": 600,
+      "width": 2000,
+      "height": 120,
+      "surface": "ground",
+      "purpose": "Shared traversal runway"
+    },
+    {
+      "id": "wall-lab-left",
+      "x": 520,
+      "y": 260,
+      "width": 40,
+      "height": 260,
+      "surface": "wall",
+      "purpose": "Scout wall-jump chamber"
+    },
+    {
+      "id": "wall-lab-right",
+      "x": 700,
+      "y": 260,
+      "width": 40,
+      "height": 240,
+      "surface": "wall",
+      "purpose": "Upper section of the split wall"
+    },
+    {
+      "id": "wall-lab-landing",
+      "x": 700,
+      "y": 220,
+      "width": 300,
+      "height": 40,
+      "surface": "platform",
+      "purpose": "Scout wall-jump landing"
+    },
+    {
+      "id": "pet-tunnel-ceiling",
+      "x": 1100,
+      "y": 490,
+      "width": 400,
+      "height": 60,
+      "surface": "platform",
+      "purpose": "50 px Pet passage; larger characters use the top route"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1960,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall",
+      "purpose": "Right world boundary"
+    }
+  ],
+  "pressurePlates": [
+    {
+      "id": "scout-wall-plate",
+      "x": 820,
+      "y": 208,
+      "width": 110,
+      "height": 12,
+      "channel": "split-wall-lock"
+    }
+  ],
+  "pushableBlocks": [
+    {
+      "id": "split-wall-block",
+      "x": 700,
+      "y": 520,
+      "width": 60,
+      "height": 80,
+      "channel": "split-wall-lock",
+      "requiredArchetype": "brute",
+      "maxPushX": 850,
+      "pushSpeed": 320,
+      "purpose": "Scout plate unlocks · Brute holds F to push or pull"
+    }
+  ],
+  "mechanismConsoles": [],
+  "poweredBridges": [],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": []
+}

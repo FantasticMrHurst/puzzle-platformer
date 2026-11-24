@@ -51,7 +51,7 @@ Outcome: the team has playable evidence for selecting a complementary three-char
 - Implement the documented whole-room reset/checkpoint behavior.
 - Build a small character-playability lab that can evaluate abilities without requiring a production level.
 - Prototype the defining verb for Brute, Scout, Tinkerer, Ranger, Pet, and Gardener at deliberately small scope.
-- Ensure the Brute can both push and deliberately pull a heavy object.
+- Ensure the Brute can push and deliberately pull a heavy object, and evaluate the Brute's brace-as-platform cooperation verb.
 - Test character combinations and revise, combine, or reject concepts before selecting the final three-character roster.
 
 Candidate prototypes do not all need production-ready art, complete mechanics, or simultaneous inclusion in one room. The purpose is to compare playability, cooperation potential, clarity, and implementation cost using consistent evaluation criteria.
@@ -231,9 +231,9 @@ These issues are ordered to minimize overlapping work. They are proposals for re
 1. Add a three-character roster, control transfer, selection feedback, and camera retargeting.
 2. Add whole-room reset, checkpoint state, and a shared three-character exit condition.
 3. Add distinct movement/body profiles and prototype Scout wall traversal and Pet half-height navigation in separate chambers.
-4. Prototype the Brute's deliberate grip/push/pull interaction and the Tinkerer's contextual mechanism interaction.
-5. Add device-independent aiming for the Ranger's environmental action.
-6. Add resettable world creation for the Gardener's first growth action.
+4. Prototype the Brute's deliberate grip/push/pull and brace-platform interactions (implemented in the cooperation lab), then the Tinkerer's contextual powered-bridge interaction (implemented in the mechanism lab; Issue 13).
+5. Add device-independent aiming for the Ranger's environmental action (implemented in the ranged-action lab; Issue 14).
+6. Add resettable world creation for the Gardener's first growth action (implemented in the growth lab, Issue 15).
 7. Assemble at least one cooperation scenario, compare all six candidates with the shared play-test criteria, and record the roster recommendation.
 
 Each candidate ability should remain independently reviewable. Split an implementation step into separate GitHub Issues when its candidates do not share a small prerequisite or test chamber.

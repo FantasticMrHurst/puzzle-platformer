@@ -38,6 +38,15 @@ export class ArcadeBodyAdapter {
     this.body.setMaxVelocity(horizontal, vertical);
   }
 
+  public setImmovable(immovable: boolean): void {
+    this.body.setImmovable(immovable);
+    this.body.pushable = !immovable;
+  }
+
+  public setAllowGravity(allowGravity: boolean): void {
+    this.body.setAllowGravity(allowGravity);
+  }
+
   public reset(x: number, y: number): void {
     this.body.reset(x, y);
     this.body.setAcceleration(0, 0);

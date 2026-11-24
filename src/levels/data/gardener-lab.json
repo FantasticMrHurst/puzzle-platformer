@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 6,
+  "id": "gardener-lab",
+  "name": "Gardener Growth Lab",
+  "world": {
+    "width": 1800,
+    "height": 720,
+    "backgroundColor": "#0b1b12"
+  },
+  "characters": [
+    {
+      "id": "gardener-prototype",
+      "archetype": "gardener",
+      "spawn": { "x": 120, "y": 560 }
+    },
+    {
+      "id": "brute-support",
+      "archetype": "brute",
+      "spawn": { "x": 220, "y": 560 }
+    },
+    {
+      "id": "pet-support",
+      "archetype": "pet",
+      "spawn": { "x": 310, "y": 590 }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1480,
+    "y": 200,
+    "width": 220,
+    "height": 200
+  },
+  "staticGeometry": [
+    {
+      "id": "lower-ground",
+      "x": 0,
+      "y": 640,
+      "width": 860,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Seed bed and roster staging area"
+    },
+    {
+      "id": "upper-ledge",
+      "x": 860,
+      "y": 400,
+      "width": 940,
+      "height": 320,
+      "surface": "platform",
+      "purpose": "240 px ledge requires the living platform"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1760,
+      "y": 0,
+      "width": 40,
+      "height": 400,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [],
+  "poweredBridges": [],
+  "rangedTargets": [],
+  "growthNodes": [
+    {
+      "id": "ledge-seed-bed",
+      "x": 590,
+      "y": 600,
+      "width": 70,
+      "height": 40,
+      "channel": "ledge-growth",
+      "requiredArchetype": "gardener",
+      "interactionRange": 72,
+      "initiallyGrown": false
+    }
+  ],
+  "plantStructures": [
+    {
+      "id": "living-step",
+      "x": 700,
+      "y": 520,
+      "width": 140,
+      "height": 120,
+      "channel": "ledge-growth",
+      "purpose": "Two-step route to the upper ledge"
+    }
+  ]
+}

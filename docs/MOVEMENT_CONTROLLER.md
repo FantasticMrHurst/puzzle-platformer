@@ -25,8 +25,10 @@ For each gameplay simulation step, the controller currently:
 4. refreshes or expires coyote time;
 5. captures a new jump press or expires the existing jump buffer;
 6. consumes a buffered jump when grounded or within coyote time;
-7. otherwise cuts upward velocity on a jump-release edge;
-8. records grounded, rising, or falling mode and returns requested velocity.
+7. for profiles with wall movement enabled, consumes a buffered jump during airborne wall contact, automatically launches away from the contacted wall, and starts the configured horizontal steering lock;
+8. otherwise cuts upward velocity on a jump-release edge;
+9. caps downward speed and records `wall-sliding` mode when an enabled profile falls against a wall;
+10. records grounded, rising, or falling mode for all other states and returns requested velocity.
 
 The controller does not apply gravity. Arcade Physics owns gravity in the initial integration; the controller receives the body's current velocity and returns any policy-driven changes.
 
@@ -38,7 +40,13 @@ A jump press refreshes the jump buffer. The buffer counts down while the player 
 
 The integration layer provides contacts resolved by the previous fixed physics step. Exact ordering and catch-up behavior are documented in `docs/PHYSICS_INTEGRATION.md`.
 
-## Deferred behavior
+## Optional wall behavior
 
-The contact contract carries wall direction, but wall sliding and wall jumping are intentionally deferred until baseline running and jumping are validated. Animation and character abilities also remain outside this module.
+Wall behavior is absent unless a movement profile supplies `wallMovement`. While touching a wall, any jump press launches the character away from that wall; horizontal input does not gate the action. This keeps the player's attention on wall contact and jump timing instead of requiring a direction change at the same instant.
+
+The controller also remembers the last contacted wall for the configured contact-grace duration. The Scout can therefore peel slightly away and still wall-jump, similar to ground coyote time. Wall sliding still requires real wall contact; the grace window affects jump eligibility only.
+
+The optional configuration defines maximum wall-slide fall speed, a small inward cling speed, horizontal and vertical wall-jump launch speeds, and a short horizontal steering lock after launch. The cling speed keeps Arcade contact active from the initial airborne wall touch through the downward slide while the player is neutral or pressing toward the wall; pressing away intentionally releases it. The launch lock makes the away-from-wall impulse readable before normal air control resumes; it does not disable jump cutting or vertical physics. The controller checks configuration and contacts rather than character identity, so the Scout prototype uses the same controller as baseline characters.
+
+Wall-jump tuning, contact-grace duration, and steering-lock duration remain play-test questions. Animation and character abilities remain outside this module.
 

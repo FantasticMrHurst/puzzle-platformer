@@ -2,15 +2,15 @@
 
 Status: **Approved**
 
-Confirmed: **November 22, 2026**
+Revised: **November 24, 2026**
 
-`baseline-v1` is the approved shared movement profile for the prototype and the starting point for the character-cooperation milestone. It was confirmed after manual play testing of running, stopping, jumping, air control, collision, camera behavior, and fall reset.
+`baseline-v2` is the current shared movement profile for the character-cooperation prototype. It increases Arcade gravity from 900 to 1400 px/s² and raises launch speeds enough to preserve approximately the same maximum jump heights while producing quicker ascents and descents. `baseline-v1` remains the reference for the completed first movement milestone in repository history.
 
 These values are a stable reference, not a prohibition on future tuning. Character-specific profiles may intentionally differ, and changes to the shared baseline should be recorded under a new profile version so comparisons remain reproducible.
 
 ## Change policy
 
-- Preserve `baseline-v1` as the reference profile used for the completed movement milestone.
+- Preserve named profile versions as reproducible references instead of silently retuning them.
 - Create a named character profile when behavior intentionally differs by character.
 - Record future shared tuning as a new baseline version rather than silently changing this table.
 - Re-run the movement test room, unit tests, and browser smoke tests after changing movement behavior.
@@ -24,8 +24,9 @@ These values are a stable reference, not a prohibition on future tuning. Charact
 | Ground deceleration | 3000 | px/s² |
 | Air acceleration | 900 | px/s² |
 | Air deceleration | 250 | px/s² |
-| Jump speed | 650 | px/s upward |
-| Maximum fall speed | 900 | px/s |
+| Arcade gravity | 1400 | px/s² downward |
+| Jump speed | 810 | px/s upward |
+| Maximum fall speed | 1200 | px/s |
 | Early-release jump multiplier | 0.45 | ratio |
 | Coyote time | 0.100 | seconds |
 | Jump buffer | 0.120 | seconds |

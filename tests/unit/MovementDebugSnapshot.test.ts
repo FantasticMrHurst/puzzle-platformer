@@ -23,6 +23,9 @@ const snapshot: MovementDebugSnapshot = {
     mode: 'rising',
     coyoteTimeRemainingSeconds: 0.083,
     jumpBufferRemainingSeconds: 0,
+    wallJumpControlLockRemainingSeconds: 0,
+    wallContactGraceRemainingSeconds: 0,
+    lastWallDirection: 0,
   },
   timing: {
     fixedStepHz: 60,
@@ -31,7 +34,7 @@ const snapshot: MovementDebugSnapshot = {
     totalRenderedFrames: 43,
     renderedFramesPerSecond: 59.94,
   },
-  profileName: 'baseline-v1',
+  profileName: 'baseline-v2',
 };
 
 describe('formatMovementDebugSnapshot', () => {
@@ -39,7 +42,7 @@ describe('formatMovementDebugSnapshot', () => {
     const before = structuredClone(snapshot);
     const formatted = formatMovementDebugSnapshot(snapshot);
 
-    expect(formatted).toContain('MOVEMENT DEBUG · baseline-v1');
+    expect(formatted).toContain('MOVEMENT DEBUG · baseline-v2');
     expect(formatted).toContain('velocity 240.0, -325.0');
     expect(formatted).toContain('ground:N ceiling:N wall:1');
     expect(formatted).toContain('pressed:Y held:Y released:N');

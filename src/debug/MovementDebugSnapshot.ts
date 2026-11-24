@@ -43,6 +43,8 @@ export function formatMovementDebugSnapshot(
     `intent   x:${intent.moveX.toFixed(2)} pressed:${flag(intent.jumpPressed)} held:${flag(intent.jumpHeld)} released:${flag(intent.jumpReleased)}`,
     `coyote   ${movementState.coyoteTimeRemainingSeconds.toFixed(3)} s`,
     `buffer   ${movementState.jumpBufferRemainingSeconds.toFixed(3)} s`,
+    `wall lock ${movementState.wallJumpControlLockRemainingSeconds.toFixed(3)} s`,
+    `wall grace ${movementState.wallContactGraceRemainingSeconds.toFixed(3)} s · last:${movementState.lastWallDirection}`,
     `timing   ${timing.fixedStepHz} Hz · ${timing.stepsThisFrame} step/frame · ${timing.renderedFramesPerSecond.toFixed(1)} fps`,
     `counts   ${timing.totalSimulationSteps} steps · ${timing.totalRenderedFrames} frames`,
   ].join('\n');

@@ -4,9 +4,16 @@ import {
   type CharacterArchetype,
   type CharacterSpawnData,
   type ExitData,
+  type GrowthNodeData,
   type LevelData,
   type LevelWorldData,
+  type MechanismConsoleData,
   type PointData,
+  type PlantStructureData,
+  type PoweredBridgeData,
+  type PressurePlateData,
+  type PushableBlockData,
+  type RangedTargetData,
   type StaticGeometryData,
   type SurfaceKind,
 } from './LevelSchema';
@@ -51,6 +58,69 @@ export function loadLevelData(
     source,
     world,
   );
+  const pressurePlates = parsePressurePlates(
+    root.pressurePlates,
+    source,
+    world,
+  );
+  const pushableBlocks = parsePushableBlocks(
+    root.pushableBlocks,
+    source,
+    world,
+  );
+  const mechanismConsoles = parseMechanismConsoles(
+    root.mechanismConsoles,
+    source,
+    world,
+  );
+  const poweredBridges = parsePoweredBridges(
+    root.poweredBridges,
+    source,
+    world,
+  );
+  const rangedTargets = parseRangedTargets(root.rangedTargets, source, world);
+  const growthNodes = parseGrowthNodes(root.growthNodes, source, world);
+  const plantStructures = parsePlantStructures(
+    root.plantStructures,
+    source,
+    world,
+  );
+
+  const plateChannels = new Set(pressurePlates.map(({ channel }) => channel));
+  pushableBlocks.forEach(({ channel }, index) => {
+    if (!plateChannels.has(channel)) {
+      fail(
+        source,
+        `$.pushableBlocks[${index}].channel`,
+        `must reference a pressure-plate channel; received "${channel}"`,
+      );
+    }
+  });
+  const consoleChannels = new Set(
+    mechanismConsoles.map(({ channel }) => channel),
+  );
+  const rangedTargetChannels = new Set(
+    rangedTargets.map(({ channel }) => channel),
+  );
+  poweredBridges.forEach(({ channel }, index) => {
+    if (!consoleChannels.has(channel) && !rangedTargetChannels.has(channel)) {
+      fail(
+        source,
+        `$.poweredBridges[${index}].channel`,
+        `must reference a mechanism-console or ranged-target channel; received "${channel}"`,
+      );
+    }
+  });
+  const growthChannels = new Set(growthNodes.map(({ channel }) => channel));
+  plantStructures.forEach(({ channel }, index) => {
+    if (!growthChannels.has(channel)) {
+      fail(
+        source,
+        `$.plantStructures[${index}].channel`,
+        `must reference a growth-node channel; received "${channel}"`,
+      );
+    }
+  });
 
   return {
     schemaVersion: LEVEL_SCHEMA_VERSION,
@@ -60,7 +130,249 @@ export function loadLevelData(
     characters,
     exit,
     staticGeometry,
+    pressurePlates,
+    pushableBlocks,
+    mechanismConsoles,
+    poweredBridges,
+    rangedTargets,
+    growthNodes,
+    plantStructures,
   };
+}
+
+function parseGrowthNodes(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly GrowthNodeData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.growthNodes', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.growthNodes[${index}]`;
+    const node = requireRecord(entry, source, path);
+    const id = requireUniqueId(node, seenIds, source, path);
+    const bounds = parseBounds(node, source, path, world);
+    const channel = requireNonEmptyString(node, 'channel', source, path);
+    const requiredArchetype = requireCharacterArchetype(
+      node,
+      source,
+      path,
+      'requiredArchetype',
+    );
+    const interactionRange = requirePositiveNumber(
+      node,
+      'interactionRange',
+      source,
+      path,
+    );
+    const initiallyGrown = requireBoolean(node, 'initiallyGrown', source, path);
+
+    return {
+      id,
+      ...bounds,
+      channel,
+      requiredArchetype,
+      interactionRange,
+      initiallyGrown,
+    };
+  });
+}
+
+function parsePlantStructures(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly PlantStructureData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.plantStructures', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.plantStructures[${index}]`;
+    const structure = requireRecord(entry, source, path);
+    const id = requireUniqueId(structure, seenIds, source, path);
+    const bounds = parseBounds(structure, source, path, world);
+    const channel = requireNonEmptyString(structure, 'channel', source, path);
+    const purpose = optionalNonEmptyString(structure, 'purpose', source, path);
+
+    return {
+      id,
+      ...bounds,
+      channel,
+      ...(purpose === undefined ? {} : { purpose }),
+    };
+  });
+}
+
+function parseRangedTargets(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly RangedTargetData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.rangedTargets', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.rangedTargets[${index}]`;
+    const target = requireRecord(entry, source, path);
+    const id = requireUniqueId(target, seenIds, source, path);
+    const bounds = parseBounds(target, source, path, world);
+    const channel = requireNonEmptyString(target, 'channel', source, path);
+    const initiallyActive = requireBoolean(
+      target,
+      'initiallyActive',
+      source,
+      path,
+    );
+
+    return { id, ...bounds, channel, initiallyActive };
+  });
+}
+
+function parseMechanismConsoles(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly MechanismConsoleData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.mechanismConsoles', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.mechanismConsoles[${index}]`;
+    const consoleData = requireRecord(entry, source, path);
+    const id = requireUniqueId(consoleData, seenIds, source, path);
+    const bounds = parseBounds(consoleData, source, path, world);
+    const channel = requireNonEmptyString(consoleData, 'channel', source, path);
+    const requiredArchetype = requireCharacterArchetype(
+      consoleData,
+      source,
+      path,
+      'requiredArchetype',
+    );
+    const interactionRange = requirePositiveNumber(
+      consoleData,
+      'interactionRange',
+      source,
+      path,
+    );
+    const initiallyPowered = requireBoolean(
+      consoleData,
+      'initiallyPowered',
+      source,
+      path,
+    );
+
+    return {
+      id,
+      ...bounds,
+      channel,
+      requiredArchetype,
+      interactionRange,
+      initiallyPowered,
+    };
+  });
+}
+
+function parsePoweredBridges(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly PoweredBridgeData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.poweredBridges', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.poweredBridges[${index}]`;
+    const bridge = requireRecord(entry, source, path);
+    const id = requireUniqueId(bridge, seenIds, source, path);
+    const bounds = parseBounds(bridge, source, path, world);
+    const channel = requireNonEmptyString(bridge, 'channel', source, path);
+    const purpose = optionalNonEmptyString(bridge, 'purpose', source, path);
+
+    return {
+      id,
+      ...bounds,
+      channel,
+      ...(purpose === undefined ? {} : { purpose }),
+    };
+  });
+}
+
+function parsePressurePlates(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly PressurePlateData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.pressurePlates', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.pressurePlates[${index}]`;
+    const plate = requireRecord(entry, source, path);
+    const id = requireUniqueId(plate, seenIds, source, path);
+    const bounds = parseBounds(plate, source, path, world);
+    const channel = requireNonEmptyString(plate, 'channel', source, path);
+
+    return { id, ...bounds, channel };
+  });
+}
+
+function parsePushableBlocks(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly PushableBlockData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.pushableBlocks', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.pushableBlocks[${index}]`;
+    const block = requireRecord(entry, source, path);
+    const id = requireUniqueId(block, seenIds, source, path);
+    const bounds = parseBounds(block, source, path, world);
+    const channel = requireNonEmptyString(block, 'channel', source, path);
+    const requiredArchetype = requireCharacterArchetype(
+      block,
+      source,
+      path,
+      'requiredArchetype',
+    );
+    const maxPushX = requireFiniteNumber(block, 'maxPushX', source, path);
+    const pushSpeed = requirePositiveNumber(block, 'pushSpeed', source, path);
+    const purpose = optionalNonEmptyString(block, 'purpose', source, path);
+
+    if (maxPushX < bounds.x || maxPushX + bounds.width > world.width) {
+      fail(
+        source,
+        `${path}.maxPushX`,
+        'must move the block rightward while keeping it inside $.world bounds',
+      );
+    }
+
+    return {
+      id,
+      ...bounds,
+      channel,
+      requiredArchetype,
+      maxPushX,
+      pushSpeed,
+      ...(purpose === undefined ? {} : { purpose }),
+    };
+  });
 }
 
 function parseExit(
@@ -119,13 +431,14 @@ function requireCharacterArchetype(
   record: UnknownRecord,
   source: string,
   path: string,
+  field = 'archetype',
 ): CharacterArchetype {
-  const archetype = requireNonEmptyString(record, 'archetype', source, path);
+  const archetype = requireNonEmptyString(record, field, source, path);
 
   if (!CHARACTER_ARCHETYPE_SET.has(archetype as CharacterArchetype)) {
     fail(
       source,
-      `${path}.archetype`,
+      `${path}.${field}`,
       `must be one of ${CHARACTER_ARCHETYPES.join(', ')}`,
     );
   }
@@ -209,6 +522,38 @@ function parseStaticGeometry(
   });
 }
 
+function requireUniqueId(
+  record: UnknownRecord,
+  seenIds: Set<string>,
+  source: string,
+  path: string,
+): string {
+  const id = requireNonEmptyString(record, 'id', source, path);
+  if (seenIds.has(id)) {
+    fail(source, `${path}.id`, `must be unique; received duplicate "${id}"`);
+  }
+  seenIds.add(id);
+  return id;
+}
+
+function parseBounds(
+  record: UnknownRecord,
+  source: string,
+  path: string,
+  world: LevelWorldData,
+): Pick<StaticGeometryData, 'x' | 'y' | 'width' | 'height'> {
+  const x = requireFiniteNumber(record, 'x', source, path);
+  const y = requireFiniteNumber(record, 'y', source, path);
+  const width = requirePositiveNumber(record, 'width', source, path);
+  const height = requirePositiveNumber(record, 'height', source, path);
+
+  if (x < 0 || y < 0 || x + width > world.width || y + height > world.height) {
+    fail(source, path, 'must fit entirely inside $.world bounds');
+  }
+
+  return { x, y, width, height };
+}
+
 function requireSurfaceKind(
   record: UnknownRecord,
   source: string,
@@ -289,6 +634,21 @@ function requirePositiveNumber(
 
   if (value <= 0) {
     fail(source, `${path}.${key}`, 'must be greater than zero');
+  }
+
+  return value;
+}
+
+function requireBoolean(
+  record: UnknownRecord,
+  key: string,
+  source: string,
+  path: string,
+): boolean {
+  const value = record[key];
+
+  if (typeof value !== 'boolean') {
+    fail(source, `${path}.${key}`, 'must be a boolean');
   }
 
   return value;

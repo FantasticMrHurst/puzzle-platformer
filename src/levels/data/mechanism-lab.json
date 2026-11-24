@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 6,
+  "id": "mechanism-lab",
+  "name": "Tinkerer Mechanism Lab",
+  "world": {
+    "width": 1800,
+    "height": 720,
+    "backgroundColor": "#071525"
+  },
+  "characters": [
+    {
+      "id": "tinkerer-prototype",
+      "archetype": "tinkerer",
+      "spawn": { "x": 120, "y": 560 }
+    },
+    {
+      "id": "brute-support",
+      "archetype": "brute",
+      "spawn": { "x": 220, "y": 560 }
+    },
+    {
+      "id": "pet-support",
+      "archetype": "pet",
+      "spawn": { "x": 310, "y": 590 }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1480,
+    "y": 440,
+    "width": 220,
+    "height": 200
+  },
+  "staticGeometry": [
+    {
+      "id": "left-ground",
+      "x": 0,
+      "y": 640,
+      "width": 720,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Console approach and roster staging area"
+    },
+    {
+      "id": "right-ground",
+      "x": 1100,
+      "y": 640,
+      "width": 700,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Shared exit side"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1760,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [
+    {
+      "id": "bridge-console",
+      "x": 580,
+      "y": 576,
+      "width": 48,
+      "height": 64,
+      "channel": "gap-bridge-power",
+      "requiredArchetype": "tinkerer",
+      "interactionRange": 72,
+      "initiallyPowered": false
+    }
+  ],
+  "poweredBridges": [
+    {
+      "id": "gap-bridge",
+      "x": 720,
+      "y": 608,
+      "width": 380,
+      "height": 32,
+      "channel": "gap-bridge-power",
+      "purpose": "Tinkerer extends a route for the full roster"
+    }
+  ],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": []
+}

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 6,
+  "id": "ranger-lab",
+  "name": "Ranger Ranged-Action Lab",
+  "world": {
+    "width": 1800,
+    "height": 720,
+    "backgroundColor": "#15120a"
+  },
+  "characters": [
+    {
+      "id": "ranger-prototype",
+      "archetype": "ranger",
+      "spawn": { "x": 120, "y": 560 }
+    },
+    {
+      "id": "brute-support",
+      "archetype": "brute",
+      "spawn": { "x": 220, "y": 560 }
+    },
+    {
+      "id": "pet-support",
+      "archetype": "pet",
+      "spawn": { "x": 310, "y": 590 }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1480,
+    "y": 440,
+    "width": 220,
+    "height": 200
+  },
+  "staticGeometry": [
+    {
+      "id": "left-ground",
+      "x": 0,
+      "y": 640,
+      "width": 720,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Ranger firing line and roster staging area"
+    },
+    {
+      "id": "right-ground",
+      "x": 1100,
+      "y": 640,
+      "width": 700,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Remote target and shared exit side"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1760,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [],
+  "poweredBridges": [
+    {
+      "id": "shot-bridge",
+      "x": 720,
+      "y": 608,
+      "width": 380,
+      "height": 32,
+      "channel": "ranger-target-hit",
+      "purpose": "Ranger activates a route for the full roster"
+    }
+  ],
+  "rangedTargets": [
+    {
+      "id": "remote-bridge-target",
+      "x": 1180,
+      "y": 568,
+      "width": 48,
+      "height": 72,
+      "channel": "ranger-target-hit",
+      "initiallyActive": false
+    }
+  ],
+  "growthNodes": [],
+  "plantStructures": []
+}
