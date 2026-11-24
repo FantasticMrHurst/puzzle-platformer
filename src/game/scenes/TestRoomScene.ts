@@ -2,10 +2,21 @@ import Phaser from 'phaser';
 
 import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
 import { calculateExitProgress } from '../../environment/ExitProgress';
+import { GrowthNode } from '../../environment/GrowthNode';
 import { LevelExit } from '../../environment/LevelExit';
+import { MechanismConsole } from '../../environment/MechanismConsole';
+import { PoweredBridge } from '../../environment/PoweredBridge';
+import { PlantStructure } from '../../environment/PlantStructure';
+import { PressurePlate } from '../../environment/PressurePlate';
+import { PushableBlock } from '../../environment/PushableBlock';
 import { getCharacterDefinition } from '../../entities/CharacterCatalog';
 import { CharacterRoster } from '../../entities/CharacterRoster';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
+import { RangerShot } from '../../entities/RangerShot';
+import { RangedTarget } from '../../environment/RangedTarget';
+import { NEUTRAL_AIM_INTENT, type AimIntent } from '../../input/AimIntent';
+import { KeyboardAimInput } from '../../input/KeyboardAimInput';
+import { KeyboardAbilityInput } from '../../input/KeyboardAbilityInput';
 import { KeyboardCharacterSelectionInput } from '../../input/KeyboardCharacterSelectionInput';
 import { KeyboardInput } from '../../input/KeyboardInput';
 import { KeyboardRoomInput } from '../../input/KeyboardRoomInput';
@@ -13,7 +24,7 @@ import {
   NEUTRAL_PLAYER_INTENT,
   type PlayerIntent,
 } from '../../input/PlayerIntent';
-import testRoomSource from '../../levels/data/test-room.json';
+import { getLevelSource } from '../../levels/LevelCatalog';
 import { loadLevelData } from '../../levels/LevelLoader';
 import type {
   LevelData,
@@ -36,10 +47,20 @@ export class TestRoomScene extends Phaser.Scene {
   private staticGeometry!: Phaser.Physics.Arcade.StaticGroup;
   private roster!: CharacterRoster<PlayerCharacter>;
   private keyboardInput!: KeyboardInput;
+  private aimInput!: KeyboardAimInput;
+  private abilityInput!: KeyboardAbilityInput;
   private selectionInput!: KeyboardCharacterSelectionInput;
   private roomInput!: KeyboardRoomInput;
   private level!: LevelData;
   private exitPresentation!: LevelExit;
+  private pressurePlates: PressurePlate[] = [];
+  private pushableBlocks: PushableBlock[] = [];
+  private mechanismConsoles: MechanismConsole[] = [];
+  private poweredBridges: PoweredBridge[] = [];
+  private rangedTargets: RangedTarget[] = [];
+  private rangerShots: RangerShot[] = [];
+  private growthNodes: GrowthNode[] = [];
+  private plantStructures: PlantStructure[] = [];
   private completionText!: Phaser.GameObjects.Text;
   private pendingIntent: PlayerIntent = {
     moveX: 0,
@@ -60,19 +81,27 @@ export class TestRoomScene extends Phaser.Scene {
   private totalRenderedFrames = 0;
   private exitArrivedCount = 0;
   private roomComplete = false;
+  private primaryAbilityHeld = false;
+  private primaryAbilityPressed = false;
+  private aimIntent: AimIntent = NEUTRAL_AIM_INTENT;
 
   public constructor() {
     super('test-room');
   }
 
   public create(): void {
-    this.level = loadLevelData(testRoomSource, 'test-room.json');
+    const selectedLevel = getLevelSource(
+      new URLSearchParams(window.location.search).get('level'),
+    );
+    this.level = loadLevelData(selectedLevel.data, selectedLevel.source);
     this.fixedStepClock.reset();
 
     if (this.input.keyboard === null) {
       throw new Error('Keyboard input is unavailable');
     }
     this.keyboardInput = new KeyboardInput(this.input.keyboard);
+    this.aimInput = new KeyboardAimInput(this.input.keyboard);
+    this.abilityInput = new KeyboardAbilityInput(this.input.keyboard);
     this.selectionInput = new KeyboardCharacterSelectionInput(
       this.input.keyboard,
     );
@@ -86,6 +115,27 @@ export class TestRoomScene extends Phaser.Scene {
     this.createBackdrop(this.level);
     this.level.staticGeometry.forEach((geometry) =>
       this.createStaticGeometry(geometry),
+    );
+    this.pressurePlates = this.level.pressurePlates.map(
+      (plate) => new PressurePlate(this, plate),
+    );
+    this.pushableBlocks = this.level.pushableBlocks.map(
+      (block) => new PushableBlock(this, block),
+    );
+    this.mechanismConsoles = this.level.mechanismConsoles.map(
+      (consoleData) => new MechanismConsole(this, consoleData),
+    );
+    this.poweredBridges = this.level.poweredBridges.map(
+      (bridge) => new PoweredBridge(this, bridge),
+    );
+    this.rangedTargets = this.level.rangedTargets.map(
+      (target) => new RangedTarget(this, target),
+    );
+    this.growthNodes = this.level.growthNodes.map(
+      (node) => new GrowthNode(this, node),
+    );
+    this.plantStructures = this.level.plantStructures.map(
+      (structure) => new PlantStructure(this, structure),
     );
     this.exitPresentation = new LevelExit(
       this,
@@ -110,11 +160,16 @@ export class TestRoomScene extends Phaser.Scene {
 
     this.captureSelectionInput();
     this.captureMovementInput();
+    this.aimIntent = this.aimInput.readIntent();
+    this.primaryAbilityHeld = this.abilityInput.readPrimaryHeld();
+    this.primaryAbilityPressed =
+      this.primaryAbilityPressed || this.abilityInput.readPrimaryPressed();
 
     this.stepsThisFrame = this.fixedStepClock.advance(
       this.game.loop.rawDelta / 1_000,
       () => {
         const activeCharacter = this.roster.getActive();
+        this.applyPrimaryAbility(activeCharacter);
         this.roster.getMembers().forEach((character) => {
           character.prepareSimulationStep(
             GAMEPLAY_STEP_SECONDS,
@@ -123,6 +178,32 @@ export class TestRoomScene extends Phaser.Scene {
               : NEUTRAL_PLAYER_INTENT,
           );
         });
+        this.pushableBlocks.forEach((block) =>
+          block.prepareStep(
+            this.isSignalActive(block.data.channel),
+            activeCharacter,
+            this.pendingIntent.moveX,
+            this.primaryAbilityHeld,
+          ),
+        );
+        this.mechanismConsoles.forEach((consoleObject) =>
+          consoleObject.update(activeCharacter),
+        );
+        this.growthNodes.forEach((node) => node.update(activeCharacter));
+        this.rangerShots = this.rangerShots.filter((shot) =>
+          shot.advance(GAMEPLAY_STEP_SECONDS, this.rangedTargets),
+        );
+        this.poweredBridges.forEach((bridge) =>
+          bridge.setExtended(this.isSignalActive(bridge.data.channel)),
+        );
+        this.plantStructures.forEach((structure) =>
+          structure.setGrown(
+            this.growthNodes.some(
+              (node) =>
+                node.data.channel === structure.data.channel && node.isGrown(),
+            ),
+          ),
+        );
         this.clearConsumedInputEdges();
         this.totalSimulationSteps += 1;
 
@@ -130,6 +211,10 @@ export class TestRoomScene extends Phaser.Scene {
         this.roster
           .getMembers()
           .forEach((character) => character.completeSimulationStep());
+        this.pushableBlocks.forEach((block) => block.completeStep());
+        this.pressurePlates.forEach((plate) =>
+          plate.update(this.roster.getMembers()),
+        );
 
         if (
           this.roster
@@ -248,10 +333,40 @@ export class TestRoomScene extends Phaser.Scene {
         getCharacterDefinition(archetype),
       );
       this.physics.add.collider(character.physicsObject, this.staticGeometry);
+      this.pushableBlocks.forEach((block) =>
+        this.physics.add.collider(character.physicsObject, block.physicsObject),
+      );
+      this.poweredBridges.forEach((bridge) =>
+        this.physics.add.collider(
+          character.physicsObject,
+          bridge.physicsObject,
+        ),
+      );
+      this.plantStructures.forEach((structure) =>
+        this.physics.add.collider(
+          character.physicsObject,
+          structure.physicsObject,
+        ),
+      );
       return character;
     });
 
     this.roster = new CharacterRoster(characters);
+    const brute = characters.find(
+      (character) => character.getArchetype() === 'brute',
+    );
+    if (brute !== undefined) {
+      characters
+        .filter((character) => character !== brute)
+        .forEach((character) =>
+          this.physics.add.collider(
+            character.physicsObject,
+            brute.physicsObject,
+            undefined,
+            () => this.canUseBruteAsPlatform(character, brute),
+          ),
+        );
+    }
     this.applyActiveSelection();
     this.cameras.main.setDeadzone(360, 220);
   }
@@ -272,7 +387,7 @@ export class TestRoomScene extends Phaser.Scene {
       .text(
         24,
         78,
-        'Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Switch: 1–3 or Q/E  ·  Reset: R',
+        'Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Ability: F  ·  Aim: I/J/K/L  ·  Switch: 1–3 or Q/E  ·  Reset: R',
         {
           backgroundColor: '#080b16cc',
           color: '#cbd5e1',
@@ -287,7 +402,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.completionText = this.add
       .text(
         this.scale.width / 2,
-        168,
+        196,
         'ROOM COMPLETE · ALL CHARACTERS ARRIVED',
         {
           backgroundColor: '#14532ddd',
@@ -317,6 +432,75 @@ export class TestRoomScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(10);
+
+    if (this.pressurePlates.length > 0) {
+      this.add
+        .text(
+          24,
+          148,
+          'Sequence: Scout holds plate  ·  Brute holds F to push/pull ↔ or taps F to brace  ·  Pet takes low tunnel',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#fde68a',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
+    if (this.mechanismConsoles.length > 0) {
+      this.add
+        .text(
+          24,
+          148,
+          'Sequence: Tinkerer approaches console and presses F  ·  Powered bridge carries the full roster',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#93c5fd',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
+    if (this.rangedTargets.length > 0) {
+      this.add
+        .text(
+          24,
+          148,
+          'Sequence: Ranger holds L and presses F  ·  Hit the remote target  ·  Cross with the full roster',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#fde047',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
+    if (this.growthNodes.length > 0) {
+      this.add
+        .text(
+          24,
+          148,
+          'Sequence: Gardener approaches seed bed and presses F  ·  Living platform creates a team route',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#bef264',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
   }
 
   private captureSelectionInput(): void {
@@ -330,6 +514,9 @@ export class TestRoomScene extends Phaser.Scene {
     if (changed) {
       this.pendingIntent = { ...NEUTRAL_PLAYER_INTENT };
       this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
+      this.primaryAbilityHeld = false;
+      this.primaryAbilityPressed = false;
+      this.abilityInput.suppressUntilReleased();
       this.applyActiveSelection();
     }
   }
@@ -351,6 +538,83 @@ export class TestRoomScene extends Phaser.Scene {
       jumpPressed: false,
       jumpReleased: false,
     };
+    this.primaryAbilityPressed = false;
+  }
+
+  private applyPrimaryAbility(activeCharacter: PlayerCharacter): void {
+    if (!this.primaryAbilityPressed) {
+      return;
+    }
+
+    if (activeCharacter.getArchetype() === 'tinkerer') {
+      this.mechanismConsoles.some((consoleObject) =>
+        consoleObject.tryToggle(activeCharacter),
+      );
+      return;
+    }
+
+    if (activeCharacter.getArchetype() === 'ranger') {
+      if (this.aimIntent.x !== 0 || this.aimIntent.y !== 0) {
+        const origin = activeCharacter.getDebugState().position;
+        this.rangerShots.push(
+          new RangerShot(
+            this,
+            origin.x + this.aimIntent.x * 32,
+            origin.y + this.aimIntent.y * 32,
+            this.aimIntent,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (activeCharacter.getArchetype() === 'gardener') {
+      this.growthNodes.some((node) => node.tryToggle(activeCharacter));
+      return;
+    }
+
+    if (activeCharacter.getArchetype() !== 'brute') {
+      return;
+    }
+
+    const canGripBlock =
+      !activeCharacter.isBraced() &&
+      this.pushableBlocks.some((block) =>
+        block.canStartGrip(
+          this.isSignalActive(block.data.channel),
+          activeCharacter,
+        ),
+      );
+    if (!canGripBlock) {
+      activeCharacter.toggleBraceStance();
+    }
+  }
+
+  private canUseBruteAsPlatform(
+    character: PlayerCharacter,
+    brute: PlayerCharacter,
+  ): boolean {
+    if (!brute.isBraced()) {
+      return false;
+    }
+
+    const characterBody = character.physicsObject.body;
+    const bruteBody = brute.physicsObject.body;
+    if (
+      !(characterBody instanceof Phaser.Physics.Arcade.Body) ||
+      !(bruteBody instanceof Phaser.Physics.Arcade.Body)
+    ) {
+      return false;
+    }
+
+    const landingTolerance = Math.max(
+      12,
+      characterBody.velocity.y * GAMEPLAY_STEP_SECONDS + 2,
+    );
+    return (
+      characterBody.velocity.y >= 0 &&
+      characterBody.bottom <= bruteBody.top + landingTolerance
+    );
   }
 
   private applyActiveSelection(): void {
@@ -372,10 +636,38 @@ export class TestRoomScene extends Phaser.Scene {
     this.cameras.main.centerOn(initialSpawn.x, initialSpawn.y);
     this.pendingIntent = { ...NEUTRAL_PLAYER_INTENT };
     this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
+    this.primaryAbilityHeld = false;
+    this.primaryAbilityPressed = false;
+    this.abilityInput.suppressUntilReleased();
     this.exitArrivedCount = 0;
     this.roomComplete = false;
     this.exitPresentation.reset();
+    this.pressurePlates.forEach((plate) => plate.reset());
+    this.pushableBlocks.forEach((block) => block.reset());
+    this.mechanismConsoles.forEach((consoleObject) => consoleObject.reset());
+    this.poweredBridges.forEach((bridge) => bridge.reset());
+    this.rangedTargets.forEach((target) => target.reset());
+    this.growthNodes.forEach((node) => node.reset());
+    this.plantStructures.forEach((structure) => structure.reset());
+    this.rangerShots.forEach((shot) => shot.destroy());
+    this.rangerShots = [];
+    this.aimIntent = NEUTRAL_AIM_INTENT;
     this.completionText?.setVisible(false);
+  }
+
+  private isSignalActive(channel: string): boolean {
+    return (
+      this.pressurePlates.some(
+        (plate) => plate.data.channel === channel && plate.isPressed(),
+      ) ||
+      this.mechanismConsoles.some(
+        (consoleObject) =>
+          consoleObject.data.channel === channel && consoleObject.isPowered(),
+      ) ||
+      this.rangedTargets.some(
+        (target) => target.data.channel === channel && target.isActive(),
+      )
+    );
   }
 
   private updateExitProgress(): void {

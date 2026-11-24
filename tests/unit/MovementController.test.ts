@@ -161,4 +161,89 @@ describe('MovementController', () => {
     expect(result.velocity.y).toBe(-270);
     expect(result.state.mode).toBe('rising');
   });
+
+  it('preserves baseline falling behavior when wall movement is disabled', () => {
+    const result = controller.update({
+      deltaSeconds: STEP_SECONDS,
+      intent: { ...NEUTRAL_PLAYER_INTENT, jumpPressed: true },
+      contacts: { ...AIRBORNE, wallDirection: 1 },
+      velocity: { x: 0, y: 500 },
+    });
+
+    expect(result.jumped).toBe(false);
+    expect(result.velocity.y).toBe(500);
+    expect(result.state.mode).toBe('falling');
+  });
+
+  it('clings during a wall slide and jumps away on any jump press', () => {
+    const wallConfig = {
+      ...DEFAULT_MOVEMENT_CONFIG,
+      wallMovement: {
+        slideMaxFallSpeed: 110,
+        clingSpeed: 30,
+        jumpHorizontalSpeed: 420,
+        jumpVerticalSpeed: 850,
+        jumpControlLockSeconds: 0.14,
+        contactGraceSeconds: 0.18,
+      },
+    };
+    const wallController = new MovementController(wallConfig);
+    const contacts = { ...AIRBORNE, wallDirection: 1 as const };
+
+    const sliding = wallController.update({
+      deltaSeconds: STEP_SECONDS,
+      intent: NEUTRAL_PLAYER_INTENT,
+      contacts,
+      velocity: { x: 0, y: 500 },
+    });
+    const continuedSlide = wallController.update({
+      deltaSeconds: STEP_SECONDS,
+      intent: NEUTRAL_PLAYER_INTENT,
+      contacts: AIRBORNE,
+      velocity: { x: 0, y: 500 },
+    });
+    const jumping = wallController.update({
+      deltaSeconds: STEP_SECONDS,
+      intent: {
+        ...NEUTRAL_PLAYER_INTENT,
+        // Input toward the contacted wall must not block the wall jump.
+        moveX: 1,
+        jumpPressed: true,
+        jumpHeld: true,
+      },
+      contacts: AIRBORNE,
+      velocity: continuedSlide.velocity,
+    });
+
+    expect(sliding.velocity.y).toBe(110);
+    expect(sliding.velocity.x).toBe(30);
+    expect(sliding.state.mode).toBe('wall-sliding');
+    expect(continuedSlide.velocity).toEqual({ x: 30, y: 110 });
+    expect(continuedSlide.state.mode).toBe('wall-sliding');
+    expect(jumping.jumped).toBe(true);
+    expect(jumping.velocity).toEqual({ x: -420, y: -850 });
+    expect(jumping.state.jumpBufferRemainingSeconds).toBe(0);
+    expect(jumping.state.wallJumpControlLockRemainingSeconds).toBe(0.14);
+
+    let steering = wallController.update({
+      deltaSeconds: STEP_SECONDS,
+      intent: { ...NEUTRAL_PLAYER_INTENT, moveX: 1 },
+      // The collision boundary may report the prior wall for one more step.
+      contacts,
+      velocity: jumping.velocity,
+    });
+    expect(steering.velocity.x).toBe(-420);
+
+    for (let index = 0; index < 8; index += 1) {
+      steering = wallController.update({
+        deltaSeconds: STEP_SECONDS,
+        intent: { ...NEUTRAL_PLAYER_INTENT, moveX: 1 },
+        contacts: AIRBORNE,
+        velocity: steering.velocity,
+      });
+    }
+
+    expect(steering.state.wallJumpControlLockRemainingSeconds).toBe(0);
+    expect(steering.velocity.x).toBeGreaterThan(-420);
+  });
 });

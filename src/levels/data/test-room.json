@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 6,
   "id": "movement-test-room",
   "name": "Movement Test Room",
   "world": {
@@ -131,5 +131,12 @@
       "surface": "wall",
       "purpose": "Right world boundary"
     }
-  ]
+  ],
+  "pressurePlates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [],
+  "poweredBridges": [],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": []
 }

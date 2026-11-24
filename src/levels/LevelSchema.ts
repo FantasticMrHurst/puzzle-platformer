@@ -1,4 +1,4 @@
-export const LEVEL_SCHEMA_VERSION = 2 as const;
+export const LEVEL_SCHEMA_VERSION = 6 as const;
 
 export const CHARACTER_ARCHETYPES = [
   'brute',
@@ -48,6 +48,82 @@ export interface StaticGeometryData {
   readonly purpose?: string;
 }
 
+export interface PressurePlateData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+}
+
+export interface PushableBlockData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly requiredArchetype: CharacterArchetype;
+  readonly maxPushX: number;
+  readonly pushSpeed: number;
+  readonly purpose?: string;
+}
+
+export interface MechanismConsoleData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly requiredArchetype: CharacterArchetype;
+  readonly interactionRange: number;
+  readonly initiallyPowered: boolean;
+}
+
+export interface PoweredBridgeData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly purpose?: string;
+}
+
+export interface RangedTargetData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly initiallyActive: boolean;
+}
+
+export interface GrowthNodeData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly requiredArchetype: CharacterArchetype;
+  readonly interactionRange: number;
+  readonly initiallyGrown: boolean;
+}
+
+export interface PlantStructureData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly channel: string;
+  readonly purpose?: string;
+}
+
 export interface LevelData {
   readonly schemaVersion: typeof LEVEL_SCHEMA_VERSION;
   readonly id: string;
@@ -56,4 +132,11 @@ export interface LevelData {
   readonly characters: readonly CharacterSpawnData[];
   readonly exit: ExitData;
   readonly staticGeometry: readonly StaticGeometryData[];
+  readonly pressurePlates: readonly PressurePlateData[];
+  readonly pushableBlocks: readonly PushableBlockData[];
+  readonly mechanismConsoles: readonly MechanismConsoleData[];
+  readonly poweredBridges: readonly PoweredBridgeData[];
+  readonly rangedTargets: readonly RangedTargetData[];
+  readonly growthNodes: readonly GrowthNodeData[];
+  readonly plantStructures: readonly PlantStructureData[];
 }

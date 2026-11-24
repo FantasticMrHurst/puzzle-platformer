@@ -15,6 +15,7 @@ import {
   type Position,
 } from '../rendering/interpolatePosition';
 import type { CharacterDefinition } from './CharacterCatalog';
+import type { CharacterArchetype } from '../levels/LevelSchema';
 
 export interface CharacterDebugState {
   readonly position: DebugPosition;
@@ -34,6 +35,7 @@ export class PlayerCharacter {
   private lastResult: MovementResult;
   private previousPosition: Position;
   private currentPosition: Position;
+  private braced = false;
 
   public constructor(
     scene: Phaser.Scene,
@@ -90,6 +92,10 @@ export class PlayerCharacter {
     intent: PlayerIntent,
   ): void {
     this.previousPosition = { ...this.currentPosition };
+    if (this.braced) {
+      this.bodyAdapter.applyVelocity({ x: 0, y: 0 });
+      return;
+    }
     this.lastResult = this.controller.update({
       deltaSeconds,
       intent,
@@ -118,7 +124,9 @@ export class PlayerCharacter {
 
   public setActive(active: boolean): void {
     this.labelObject.setText(
-      active ? `▼ ${this.definition.label}` : this.definition.label,
+      `${active ? '▼ ' : ''}${this.definition.label}${
+        this.braced ? ' · BRACED' : ''
+      }`,
     );
     this.visualObject.setDepth(active ? 7 : 5);
     this.labelObject.setDepth(8).setVisible(active);
@@ -136,7 +144,38 @@ export class PlayerCharacter {
     return this.definition.label;
   }
 
+  public getArchetype(): CharacterArchetype {
+    return this.definition.archetype;
+  }
+
+  public isBraced(): boolean {
+    return this.braced;
+  }
+
+  public toggleBraceStance(): boolean {
+    if (this.definition.archetype !== 'brute') {
+      return false;
+    }
+    if (!this.braced && !this.bodyAdapter.readContacts().grounded) {
+      return false;
+    }
+
+    this.braced = !this.braced;
+    this.bodyAdapter.setImmovable(this.braced);
+    this.bodyAdapter.setAllowGravity(!this.braced);
+    this.bodyAdapter.applyVelocity({ x: 0, y: 0 });
+    this.controller.reset();
+    this.visualObject.setFillStyle(
+      this.braced ? 0xfacc15 : this.definition.fillColor,
+    );
+    this.setActive(true);
+    return true;
+  }
+
   public reset(x: number, y: number): void {
+    this.braced = false;
+    this.bodyAdapter.setImmovable(false);
+    this.bodyAdapter.setAllowGravity(true);
     this.controller.reset();
     this.bodyAdapter.reset(x, y);
     this.lastResult = {
@@ -154,6 +193,7 @@ export class PlayerCharacter {
       this.currentPosition.x,
       this.currentPosition.y - this.definition.height / 2 - 8,
     );
+    this.visualObject.setFillStyle(this.definition.fillColor);
   }
 
   public isBelow(y: number): boolean {

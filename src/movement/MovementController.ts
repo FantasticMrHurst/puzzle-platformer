@@ -51,12 +51,18 @@ export class MovementController {
       ? this.config.groundDeceleration
       : this.config.airDeceleration;
     const targetVelocityX = moveX * this.config.maxRunSpeed;
-    const velocityX = moveTowards(
-      frame.velocity.x,
-      targetVelocityX,
-      (moveX === 0 ? horizontalDeceleration : horizontalAcceleration) *
-        deltaSeconds,
-    );
+    let wallJumpControlLockRemainingSeconds = contacts.grounded
+      ? 0
+      : tickTimer(this.state.wallJumpControlLockRemainingSeconds, deltaSeconds);
+    const wallJumpControlLocked = wallJumpControlLockRemainingSeconds > 0;
+    let velocityX = wallJumpControlLocked
+      ? frame.velocity.x
+      : moveTowards(
+          frame.velocity.x,
+          targetVelocityX,
+          (moveX === 0 ? horizontalDeceleration : horizontalAcceleration) *
+            deltaSeconds,
+        );
 
     let coyoteTimeRemainingSeconds = contacts.grounded
       ? this.config.coyoteTimeSeconds
@@ -64,25 +70,99 @@ export class MovementController {
     let jumpBufferRemainingSeconds = intent.jumpPressed
       ? this.config.jumpBufferSeconds
       : tickTimer(this.state.jumpBufferRemainingSeconds, deltaSeconds);
+    let wallContactGraceRemainingSeconds = 0;
+    let lastWallDirection: -1 | 0 | 1 = 0;
+    if (this.config.wallMovement !== undefined && !contacts.grounded) {
+      if (contacts.wallDirection !== 0) {
+        wallContactGraceRemainingSeconds =
+          this.config.wallMovement.contactGraceSeconds;
+        lastWallDirection = contacts.wallDirection;
+      } else {
+        wallContactGraceRemainingSeconds = tickTimer(
+          this.state.wallContactGraceRemainingSeconds,
+          deltaSeconds,
+        );
+        lastWallDirection =
+          wallContactGraceRemainingSeconds > 0
+            ? this.state.lastWallDirection
+            : 0;
+      }
+    }
     let velocityY = frame.velocity.y;
     let jumped = false;
 
     const canUseGroundJump =
       contacts.grounded || coyoteTimeRemainingSeconds > 0;
     const wantsToJump = intent.jumpPressed || jumpBufferRemainingSeconds > 0;
+    const effectiveWallDirection =
+      contacts.wallDirection !== 0 ? contacts.wallDirection : lastWallDirection;
+    const hasWallJumpContact =
+      !wallJumpControlLocked &&
+      (contacts.wallDirection !== 0 || wallContactGraceRemainingSeconds > 0);
+    const canUseWallJump =
+      this.config.wallMovement !== undefined &&
+      !contacts.grounded &&
+      hasWallJumpContact;
     if (wantsToJump && canUseGroundJump) {
       velocityY = -this.config.jumpSpeed;
       jumpBufferRemainingSeconds = 0;
       coyoteTimeRemainingSeconds = 0;
       jumped = true;
+    } else if (wantsToJump && canUseWallJump) {
+      velocityX =
+        -effectiveWallDirection * this.config.wallMovement!.jumpHorizontalSpeed;
+      velocityY = -this.config.wallMovement!.jumpVerticalSpeed;
+      wallJumpControlLockRemainingSeconds =
+        this.config.wallMovement!.jumpControlLockSeconds;
+      jumpBufferRemainingSeconds = 0;
+      coyoteTimeRemainingSeconds = 0;
+      wallContactGraceRemainingSeconds = 0;
+      lastWallDirection = 0;
+      jumped = true;
     } else if (intent.jumpReleased && velocityY < 0) {
       velocityY *= this.config.jumpCutMultiplier;
     }
 
-    const mode = resolveMovementMode(contacts.grounded, velocityY, jumped);
+    const wallSliding =
+      this.config.wallMovement !== undefined &&
+      !contacts.grounded &&
+      hasWallJumpContact &&
+      velocityY > 0 &&
+      !jumped;
+    if (wallSliding) {
+      velocityY = Math.min(
+        velocityY,
+        this.config.wallMovement!.slideMaxFallSpeed,
+      );
+    }
+
+    const wallClinging =
+      this.config.wallMovement !== undefined &&
+      !contacts.grounded &&
+      hasWallJumpContact &&
+      effectiveWallDirection !== 0 &&
+      !jumped;
+    if (wallClinging) {
+      const intentionallyLeavingWall =
+        moveX !== 0 && Math.sign(moveX) === -effectiveWallDirection;
+      if (!intentionallyLeavingWall) {
+        velocityX =
+          effectiveWallDirection * this.config.wallMovement!.clingSpeed;
+      }
+    }
+
+    const mode = resolveMovementMode(
+      contacts.grounded,
+      velocityY,
+      jumped,
+      wallSliding,
+    );
     this.state = {
       coyoteTimeRemainingSeconds,
       jumpBufferRemainingSeconds,
+      wallJumpControlLockRemainingSeconds,
+      wallContactGraceRemainingSeconds,
+      lastWallDirection,
       mode,
     };
 
@@ -106,9 +186,14 @@ function resolveMovementMode(
   grounded: boolean,
   velocityY: number,
   jumped: boolean,
+  wallSliding: boolean,
 ): MovementMode {
   if (grounded && !jumped) {
     return 'grounded';
+  }
+
+  if (wallSliding) {
+    return 'wall-sliding';
   }
 
   return velocityY < 0 ? 'rising' : 'falling';

@@ -161,6 +161,8 @@ Characters should share the same controller implementation and differ through co
 
 Avoid deep class hierarchies such as a base character with a subclass for every ability. Prefer small interfaces and composition once multiple characters exist.
 
+The approved baseline omits advanced wall traversal. A character profile may opt into a typed wall-movement configuration containing slide speed and wall-jump launch values; the shared controller applies those rules without checking character identity. Body width and height likewise belong to the character definition and feed the same Arcade body construction path.
+
 The Milestone 2 candidate lab adds three requirements without selecting final implementations prematurely:
 
 - Body dimensions belong to character configuration so the Pet can test half-height passages without forking movement rules.
@@ -193,9 +195,11 @@ Levels should be data, not imperative scene code. The first schema only needs wh
 - one shared exit rectangle with a stable ID;
 - static collision geometry or a reference to tile data;
 
-Later revisions can add typed component configuration, signal connections, and checkpoint entities.
+Schema v3 added the first typed puzzle connection required by the cooperation lab: pressure plates publish state on a named channel, and archetype-gated pushable blocks consume that state. Schema v4 added Tinkerer-operated consoles as latched signal sources and powered bridges as collision-bearing receivers. Schema v5 adds ranged targets as another latched source; powered bridges can consume either authored console or target channels. These remain narrow source-to-receiver contracts rather than a general event bus. Later revisions can add other typed component configurations and checkpoint entities when a designed puzzle requires them.
 
 Directly authored, validated JSON remains the Milestone 2 format. Add only fields required by a current character chamber or cooperation scenario. Tiled and custom editors remain deferred until direct authoring produces specific, repeated friction.
+
+Schema v6 adds seed beds that publish a persistent growth state and connected plant structures that gain collision when grown. The room reset restores the authored seed bed state.
 
 Validation should run when loading a level in development and produce a message containing the level, entity, and invalid field. The schema must be versioned before compatibility matters. Whether validation uses a small handwritten validator or a library remains open; do not add a schema dependency until the data warrants it.
 
@@ -208,7 +212,15 @@ Puzzle components should communicate through explicit, inspectable connections r
 - level data declares the connection using stable entity IDs or channels;
 - reset behavior is part of each component's contract.
 
-The first real plate-and-door puzzle should validate whether signals are stateful, event-based, or a small combination. Do not build a general event bus before that use case exists.
+The cooperation lab validates the first stateful signal: a plate continuously publishes whether it is occupied, and the connected wall block is movable only while that signal is active. Future switches and doors should reuse this explicit channel model where it fits, but event-style behavior remains unresolved. Do not build a general event bus before another use case requires it.
+
+The Brute grip prototype consumes a device-mapped primary-ability hold rather than reading the `F` key inside the environment component. Control transfer suppresses an already-held ability until release, so switching cannot accidentally attach the newly active character. The block owns its grip state and releases it on lost contact, lost permission, jumping, input release, reset, or character switching.
+
+The Brute brace experiment uses the pressed edge of that same mapped action. Away from a grippable block, a grounded Brute toggles an immovable stance that persists across character switching. Character-to-Brute collision is enabled only when the Brute is braced and the other character is descending onto the top surface, making the stance a one-way platform without introducing ordinary character-to-character collision.
+
+The Tinkerer mechanism prototype also consumes the mapped primary-action press. A nearby archetype-gated console owns a persistent powered state and exposes it on an authored channel. The connected bridge independently maps that signal to presentation and static collision. Reset restores both components from level data, and input suppression prevents switching from retriggering the console.
+
+The Ranger prototype adds a separate device-independent `AimIntent`. The initial keyboard adapter maps `I`/`J`/`K`/`L` to a normalized vector, while the shot consumes only that vector and the mapped primary-action press. Shots have a small visual, fixed speed, and lifetime; they can toggle authored ranged targets but have no combat, damage, inventory, or character-hit behavior. Reset destroys in-flight shots and restores target state.
 
 ## Debugging and observability
 

@@ -19,6 +19,23 @@ export interface MovementConfig {
   readonly coyoteTimeSeconds: number;
   /** Time a jump press remains queued, in seconds. */
   readonly jumpBufferSeconds: number;
+  /** Optional advanced wall traversal. Omit to preserve baseline behavior. */
+  readonly wallMovement?: WallMovementConfig;
+}
+
+export interface WallMovementConfig {
+  /** Maximum downward speed while touching a wall in pixels per second. */
+  readonly slideMaxFallSpeed: number;
+  /** Small inward speed that preserves airborne contact with a wall. */
+  readonly clingSpeed: number;
+  /** Horizontal speed applied away from the contacted wall. */
+  readonly jumpHorizontalSpeed: number;
+  /** Upward speed applied by a wall jump. */
+  readonly jumpVerticalSpeed: number;
+  /** Time after a wall jump before horizontal air steering resumes. */
+  readonly jumpControlLockSeconds: number;
+  /** Time after leaving a wall during which a wall jump remains valid. */
+  readonly contactGraceSeconds: number;
 }
 
 export const DEFAULT_MOVEMENT_CONFIG: MovementConfig = {
@@ -27,8 +44,8 @@ export const DEFAULT_MOVEMENT_CONFIG: MovementConfig = {
   groundDeceleration: 3_000,
   airAcceleration: 900,
   airDeceleration: 250,
-  jumpSpeed: 650,
-  maxFallSpeed: 900,
+  jumpSpeed: 810,
+  maxFallSpeed: 1_200,
   jumpCutMultiplier: 0.45,
   coyoteTimeSeconds: 0.1,
   jumpBufferSeconds: 0.12,
@@ -45,6 +62,30 @@ export function validateMovementConfig(config: MovementConfig): void {
   requireNonNegative(config.coyoteTimeSeconds, 'coyoteTimeSeconds');
   requireNonNegative(config.jumpBufferSeconds, 'jumpBufferSeconds');
 
+  if (config.wallMovement !== undefined) {
+    requirePositiveWallValue(
+      config.wallMovement.slideMaxFallSpeed,
+      'slideMaxFallSpeed',
+    );
+    requirePositiveWallValue(config.wallMovement.clingSpeed, 'clingSpeed');
+    requirePositiveWallValue(
+      config.wallMovement.jumpHorizontalSpeed,
+      'jumpHorizontalSpeed',
+    );
+    requirePositiveWallValue(
+      config.wallMovement.jumpVerticalSpeed,
+      'jumpVerticalSpeed',
+    );
+    requireNonNegativeWallValue(
+      config.wallMovement.jumpControlLockSeconds,
+      'jumpControlLockSeconds',
+    );
+    requireNonNegativeWallValue(
+      config.wallMovement.contactGraceSeconds,
+      'contactGraceSeconds',
+    );
+  }
+
   if (
     !Number.isFinite(config.jumpCutMultiplier) ||
     config.jumpCutMultiplier <= 0 ||
@@ -53,6 +94,26 @@ export function validateMovementConfig(config: MovementConfig): void {
     throw new RangeError(
       'jumpCutMultiplier must be greater than 0 and less than 1',
     );
+  }
+}
+
+function requireNonNegativeWallValue(
+  value: number,
+  name: keyof WallMovementConfig,
+): void {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new RangeError(
+      `${name} must be a finite number greater than or equal to 0`,
+    );
+  }
+}
+
+function requirePositiveWallValue(
+  value: number,
+  name: keyof WallMovementConfig,
+): void {
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new RangeError(`${name} must be a finite number greater than 0`);
   }
 }
 

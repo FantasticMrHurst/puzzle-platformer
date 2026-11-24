@@ -54,7 +54,9 @@ Once the first deployment completes, the playable build will be available at
 
 The application currently provides a three-character prototype roster in the validated, data-driven movement test room. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
 
-Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
+Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. `F` is the contextual ability: the Brute grips or braces, the Tinkerer operates nearby powered consoles, and the Ranger fires along the current `I`/`J`/`K`/`L` aim direction. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
+
+Focused labs are selected with a query parameter: `?level=traversal-lab` for Scout, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
 
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
@@ -64,6 +66,10 @@ See the project documents for current direction:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap and proposed issues](docs/ROADMAP.md)
 - [Movement test-room measurements](docs/TEST_ROOM.md)
+- [Scout, Brute, and Pet cooperation lab](docs/CHARACTER_LAB.md)
+- [Tinkerer powered-mechanism lab](docs/TINKERER_LAB.md)
+- [Ranger ranged-action lab](docs/RANGER_LAB.md)
+- [Gardener growth lab](docs/GARDENER_LAB.md)
 - [Movement-controller contracts and timing](docs/MOVEMENT_CONTROLLER.md)
 - [Physics integration and fixed-step ordering](docs/PHYSICS_INTEGRATION.md)
 - [Movement tuning baseline](docs/MOVEMENT_TUNING.md)

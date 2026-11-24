@@ -16,6 +16,7 @@ interface TestProbe {
   }[];
   readonly movement: {
     readonly position: { readonly x: number; readonly y: number };
+    readonly profileName: string;
   };
 }
 
@@ -36,6 +37,21 @@ test('boots the movement room and toggles diagnostics', async ({ page }) => {
       debugOverlayVisible: true,
     });
   await page.keyboard.up('F3');
+
+  await page.goto('/?level=traversal-lab');
+  const traversalLab = await waitForProbe(page);
+  expect(traversalLab.roster.map(({ id }) => id)).toEqual([
+    'scout-prototype',
+    'pet-prototype',
+    'brute-prototype',
+  ]);
+  expect(traversalLab.movement.profileName).toBe('scout-prototype-v2');
+
+  await page.keyboard.down('Digit2');
+  await expect
+    .poll(async () => (await readProbe(page)).movement.profileName)
+    .toBe('pet-prototype-v2');
+  await page.keyboard.up('Digit2');
 });
 
 test('responds to movement input', async ({ page }) => {
