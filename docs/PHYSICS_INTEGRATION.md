@@ -51,6 +51,8 @@ The camera follows the interpolated visual with a dead zone and smoothing, const
 
 Characters do not collide with the world's bottom edge. When any roster member falls 64 pixels below the declared world height, every member returns to its authored spawn and active selection returns to slot one. The reset clears body position, velocity, controller timers, pending input edges, both interpolation endpoints, and visible objects before recentering the camera. The physical-key edge tracker is intentionally not reset, so a jump key held through a fall cannot become a new press after respawn.
 
+The `R` action requests the same recovery path. Room recovery also clears exit progress and completion state; future checkpoint and puzzle entities must join this shared reset contract rather than implement unrelated partial resets.
+
 ## Validation observations
 
 - Automated clock tests cover synthetic 30, 60, and 120 Hz render deltas and produce 60 simulation steps per elapsed second.

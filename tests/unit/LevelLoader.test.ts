@@ -18,6 +18,7 @@ const validLevel = {
       spawn: { x: 100, y: 100 },
     },
   ],
+  exit: { id: 'exit', x: 650, y: 350, width: 100, height: 150 },
   staticGeometry: [
     {
       id: 'floor',
@@ -109,6 +110,17 @@ describe('loadLevelData', () => {
 
     expect(() => loadLevelData(outsideWorldLevel, 'outside.json')).toThrow(
       'outside.json: $.staticGeometry[0] must fit entirely inside $.world bounds',
+    );
+  });
+
+  it('rejects an exit outside the world bounds', () => {
+    const outsideWorldLevel = {
+      ...validLevel,
+      exit: { ...validLevel.exit, x: 750, width: 100 },
+    };
+
+    expect(() => loadLevelData(outsideWorldLevel, 'outside-exit.json')).toThrow(
+      'outside-exit.json: $.exit must fit entirely inside $.world bounds',
     );
   });
 });

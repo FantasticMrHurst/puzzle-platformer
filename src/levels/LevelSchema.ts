@@ -30,6 +30,14 @@ export interface CharacterSpawnData {
   readonly spawn: PointData;
 }
 
+export interface ExitData {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 export interface StaticGeometryData {
   readonly id: string;
   readonly x: number;
@@ -46,5 +54,6 @@ export interface LevelData {
   readonly name: string;
   readonly world: LevelWorldData;
   readonly characters: readonly CharacterSpawnData[];
+  readonly exit: ExitData;
   readonly staticGeometry: readonly StaticGeometryData[];
 }

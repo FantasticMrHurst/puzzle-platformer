@@ -3,6 +3,7 @@ import {
   LEVEL_SCHEMA_VERSION,
   type CharacterArchetype,
   type CharacterSpawnData,
+  type ExitData,
   type LevelData,
   type LevelWorldData,
   type PointData,
@@ -44,6 +45,7 @@ export function loadLevelData(
   const name = requireNonEmptyString(root, 'name', source, '$');
   const world = parseWorld(root.world, source);
   const characters = parseCharacters(root.characters, source, world);
+  const exit = parseExit(root.exit, source, world);
   const staticGeometry = parseStaticGeometry(
     root.staticGeometry,
     source,
@@ -56,8 +58,29 @@ export function loadLevelData(
     name,
     world,
     characters,
+    exit,
     staticGeometry,
   };
+}
+
+function parseExit(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): ExitData {
+  const path = '$.exit';
+  const exit = requireRecord(input, source, path);
+  const id = requireNonEmptyString(exit, 'id', source, path);
+  const x = requireFiniteNumber(exit, 'x', source, path);
+  const y = requireFiniteNumber(exit, 'y', source, path);
+  const width = requirePositiveNumber(exit, 'width', source, path);
+  const height = requirePositiveNumber(exit, 'height', source, path);
+
+  if (x < 0 || y < 0 || x + width > world.width || y + height > world.height) {
+    fail(source, path, 'must fit entirely inside $.world bounds');
+  }
+
+  return { id, x, y, width, height };
 }
 
 function parseCharacters(
