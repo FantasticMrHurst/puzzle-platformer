@@ -4,6 +4,11 @@ interface PuzzlePlatformerTestState {
   readonly scene: string;
   readonly debugOverlayVisible: boolean;
   readonly activeCharacterId: string;
+  readonly roomComplete: boolean;
+  readonly exit: {
+    readonly arrivedCount: number;
+    readonly requiredCount: number;
+  };
   readonly roster: readonly {
     readonly id: string;
     readonly active: boolean;

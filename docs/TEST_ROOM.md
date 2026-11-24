@@ -9,6 +9,7 @@ Coordinates use pixels with the origin at the world's top-left. Static rectangle
 - World bounds: 3600 × 1080 px.
 - Nominal floor top: y = 920 px.
 - Roster spawn markers: (160, 840), (240, 840), and (320, 840).
+- Shared exit: 260 × 180 px at (3280, 740).
 - Grid spacing: 64 px.
 
 ## Diagnostic obstacles
@@ -24,6 +25,7 @@ Coordinates use pixels with the origin at the world's top-left. Static rectangle
 | Wall pair | x 2320 and 2540, 220 px apart | Collision checks and future wall-movement tuning |
 | Recovery gap | x 2720–2900 | 180 px gap before the end ground |
 | World boundaries | 40 px walls at each horizontal edge | Camera and collision boundary checks |
+| Shared exit | 260 × 180 at (3280, 740) | Requires all three roster members to enter before completion |
 
 The dimensions are initial measurement fixtures, not final movement targets. Adjusting an obstacle to match a controller profile should be an explicit tuning change with updated documentation.
 
@@ -35,5 +37,7 @@ The dimensions are initial measurement fixtures, not final movement targets. Adj
 - Inactive characters continue through physics with neutral movement input and do not collide with one another.
 - The camera follows the selected character, whose label and heavier outline indicate active control.
 - If any roster member falls below the room, all three return to their authored spawns and selection returns to slot one.
+- `R` invokes the same whole-room reset path manually.
+- Exit progress displays the number of roster members currently inside and latches completion when all three arrive.
 - All authored geometry remains fully solid. One-way platforms are not part of schema version 2.
 

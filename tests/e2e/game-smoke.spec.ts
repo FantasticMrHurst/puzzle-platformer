@@ -4,6 +4,11 @@ interface TestProbe {
   readonly scene: string;
   readonly debugOverlayVisible: boolean;
   readonly activeCharacterId: string;
+  readonly roomComplete: boolean;
+  readonly exit: {
+    readonly arrivedCount: number;
+    readonly requiredCount: number;
+  };
   readonly roster: readonly {
     readonly id: string;
     readonly active: boolean;
@@ -56,6 +61,18 @@ test('responds to movement input', async ({ page }) => {
         findRosterMember(await readProbe(page), 'scout-prototype').position.x,
     )
     .toBeGreaterThan(initialScout.position.x + 80);
+
+  await page.keyboard.down('KeyR');
+  await expect
+    .poll(async () => (await readProbe(page)).activeCharacterId)
+    .toBe('brute-prototype');
+  await expect
+    .poll(
+      async () =>
+        findRosterMember(await readProbe(page), 'scout-prototype').position.x,
+    )
+    .toBeLessThanOrEqual(initialScout.position.x + 1);
+  await page.keyboard.up('KeyR');
 });
 
 function findRosterMember(

@@ -24,6 +24,13 @@
       "spawn": { "x": 320, "y": 840 }
     }
   ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 3280,
+    "y": 740,
+    "width": 260,
+    "height": 180
+  },
   "staticGeometry": [
     {
       "id": "left-boundary",

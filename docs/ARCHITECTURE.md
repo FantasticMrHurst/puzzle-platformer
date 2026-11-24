@@ -190,9 +190,10 @@ Levels should be data, not imperative scene code. The first schema only needs wh
 - schema version and level identifier;
 - world bounds and optional presentation metadata;
 - one to three character entries with stable IDs, archetypes, and spawn points;
+- one shared exit rectangle with a stable ID;
 - static collision geometry or a reference to tile data;
 
-Later revisions can add entities with stable IDs, typed component configuration, signal connections, checkpoints, and exits.
+Later revisions can add typed component configuration, signal connections, and checkpoint entities.
 
 Directly authored, validated JSON remains the Milestone 2 format. Add only fields required by a current character chamber or cooperation scenario. Tiled and custom editors remain deferred until direct authoring produces specific, repeated friction.
 

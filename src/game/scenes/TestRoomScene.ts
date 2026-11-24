@@ -1,11 +1,14 @@
 import Phaser from 'phaser';
 
 import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
+import { calculateExitProgress } from '../../environment/ExitProgress';
+import { LevelExit } from '../../environment/LevelExit';
 import { getCharacterDefinition } from '../../entities/CharacterCatalog';
 import { CharacterRoster } from '../../entities/CharacterRoster';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
 import { KeyboardCharacterSelectionInput } from '../../input/KeyboardCharacterSelectionInput';
 import { KeyboardInput } from '../../input/KeyboardInput';
+import { KeyboardRoomInput } from '../../input/KeyboardRoomInput';
 import {
   NEUTRAL_PLAYER_INTENT,
   type PlayerIntent,
@@ -34,7 +37,10 @@ export class TestRoomScene extends Phaser.Scene {
   private roster!: CharacterRoster<PlayerCharacter>;
   private keyboardInput!: KeyboardInput;
   private selectionInput!: KeyboardCharacterSelectionInput;
+  private roomInput!: KeyboardRoomInput;
   private level!: LevelData;
+  private exitPresentation!: LevelExit;
+  private completionText!: Phaser.GameObjects.Text;
   private pendingIntent: PlayerIntent = {
     moveX: 0,
     jumpPressed: false,
@@ -52,6 +58,8 @@ export class TestRoomScene extends Phaser.Scene {
   private stepsThisFrame = 0;
   private totalSimulationSteps = 0;
   private totalRenderedFrames = 0;
+  private exitArrivedCount = 0;
+  private roomComplete = false;
 
   public constructor() {
     super('test-room');
@@ -68,6 +76,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.selectionInput = new KeyboardCharacterSelectionInput(
       this.input.keyboard,
     );
+    this.roomInput = new KeyboardRoomInput(this.input.keyboard);
     this.debugToggleKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.F3,
     );
@@ -77,6 +86,11 @@ export class TestRoomScene extends Phaser.Scene {
     this.createBackdrop(this.level);
     this.level.staticGeometry.forEach((geometry) =>
       this.createStaticGeometry(geometry),
+    );
+    this.exitPresentation = new LevelExit(
+      this,
+      this.level.exit,
+      this.level.characters.length,
     );
     this.createSpawnMarkers(this.level);
     this.createCharacters(this.level);
@@ -89,6 +103,9 @@ export class TestRoomScene extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(this.debugToggleKey)) {
       this.debugOverlay.toggle();
+    }
+    if (this.roomInput.readIntent().resetPressed) {
+      this.resetRoomToCheckpoint();
     }
 
     this.captureSelectionInput();
@@ -121,7 +138,9 @@ export class TestRoomScene extends Phaser.Scene {
               character.isBelow(this.level.world.height + 64),
             )
         ) {
-          this.resetRoster();
+          this.resetRoomToCheckpoint();
+        } else {
+          this.updateExitProgress();
         }
       },
     );
@@ -136,6 +155,11 @@ export class TestRoomScene extends Phaser.Scene {
       scene: this.scene.key,
       debugOverlayVisible: this.debugOverlay.isVisible(),
       activeCharacterId: this.roster.getActive().id,
+      roomComplete: this.roomComplete,
+      exit: {
+        arrivedCount: this.exitArrivedCount,
+        requiredCount: this.roster.getMembers().length,
+      },
       roster: this.roster.getMembers().map((character) => ({
         id: character.id,
         active: character === this.roster.getActive(),
@@ -248,7 +272,7 @@ export class TestRoomScene extends Phaser.Scene {
       .text(
         24,
         78,
-        'Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Switch: 1–3 or Q/E',
+        'Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Switch: 1–3 or Q/E  ·  Reset: R',
         {
           backgroundColor: '#080b16cc',
           color: '#cbd5e1',
@@ -259,6 +283,25 @@ export class TestRoomScene extends Phaser.Scene {
       )
       .setScrollFactor(0)
       .setDepth(10);
+
+    this.completionText = this.add
+      .text(
+        this.scale.width / 2,
+        168,
+        'ROOM COMPLETE · ALL CHARACTERS ARRIVED',
+        {
+          backgroundColor: '#14532ddd',
+          color: '#dcfce7',
+          fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+          fontSize: '24px',
+          fontStyle: 'bold',
+          padding: { x: 18, y: 10 },
+        },
+      )
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(20)
+      .setVisible(false);
 
     const rosterText = this.roster
       .getMembers()
@@ -318,7 +361,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.cameras.main.startFollow(active.visualObject, true, 0.12, 0.12);
   }
 
-  private resetRoster(): void {
+  private resetRoomToCheckpoint(): void {
     this.roster.getMembers().forEach((character, index) => {
       const spawn = this.level.characters[index]!.spawn;
       character.reset(spawn.x, spawn.y);
@@ -329,6 +372,31 @@ export class TestRoomScene extends Phaser.Scene {
     this.cameras.main.centerOn(initialSpawn.x, initialSpawn.y);
     this.pendingIntent = { ...NEUTRAL_PLAYER_INTENT };
     this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
+    this.exitArrivedCount = 0;
+    this.roomComplete = false;
+    this.exitPresentation.reset();
+    this.completionText?.setVisible(false);
+  }
+
+  private updateExitProgress(): void {
+    if (this.roomComplete) {
+      return;
+    }
+
+    const progress = calculateExitProgress(
+      this.level.exit,
+      this.roster.getMembers().map((character) => ({
+        id: character.id,
+        position: character.getDebugState().position,
+      })),
+    );
+    this.exitArrivedCount = progress.arrivedCount;
+    this.exitPresentation.setProgress(progress.arrivedCount, progress.complete);
+
+    if (progress.complete) {
+      this.roomComplete = true;
+      this.completionText.setVisible(true);
+    }
   }
 
   private createDebugSnapshot(): MovementDebugSnapshot {
