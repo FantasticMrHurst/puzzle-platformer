@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 6,
+  "id": "cooperation-lab",
+  "name": "Mixed-Team Cooperation Lab",
+  "world": {
+    "width": 3000,
+    "height": 720,
+    "backgroundColor": "#0b1720"
+  },
+  "characters": [
+    {
+      "id": "ranger",
+      "archetype": "ranger",
+      "spawn": {
+        "x": 120,
+        "y": 604
+      }
+    },
+    {
+      "id": "gardener",
+      "archetype": "gardener",
+      "spawn": {
+        "x": 220,
+        "y": 604
+      }
+    },
+    {
+      "id": "tinkerer",
+      "archetype": "tinkerer",
+      "spawn": {
+        "x": 320,
+        "y": 604
+      }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 2700,
+    "y": 220,
+    "width": 220,
+    "height": 180
+  },
+  "staticGeometry": [
+    {
+      "id": "launch-bank",
+      "x": 0,
+      "y": 640,
+      "width": 720,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Ranger: hold L and tap F to reach the distant target"
+    },
+    {
+      "id": "garden-bank",
+      "x": 1100,
+      "y": 640,
+      "width": 620,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Gardener: grow a step to the upper ledge"
+    },
+    {
+      "id": "console-ledge",
+      "x": 1720,
+      "y": 400,
+      "width": 400,
+      "height": 320,
+      "surface": "platform",
+      "purpose": "Tinkerer: power the final crossing"
+    },
+    {
+      "id": "exit-bank",
+      "x": 2500,
+      "y": 400,
+      "width": 500,
+      "height": 320,
+      "surface": "ground"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 2960,
+      "y": 0,
+      "width": 40,
+      "height": 400,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [
+    {
+      "id": "upper-console",
+      "x": 1960,
+      "y": 336,
+      "width": 48,
+      "height": 64,
+      "channel": "final-crossing",
+      "requiredArchetype": "tinkerer",
+      "interactionRange": 72,
+      "initiallyPowered": false
+    }
+  ],
+  "poweredBridges": [
+    {
+      "id": "target-bridge",
+      "x": 720,
+      "y": 640,
+      "width": 380,
+      "height": 32,
+      "channel": "first-crossing"
+    },
+    {
+      "id": "console-bridge",
+      "x": 2120,
+      "y": 400,
+      "width": 380,
+      "height": 32,
+      "channel": "final-crossing"
+    }
+  ],
+  "rangedTargets": [
+    {
+      "id": "far-bank-target",
+      "x": 1180,
+      "y": 568,
+      "width": 48,
+      "height": 72,
+      "channel": "first-crossing",
+      "initiallyActive": false
+    }
+  ],
+  "growthNodes": [
+    {
+      "id": "ledge-seed-bed",
+      "x": 1450,
+      "y": 600,
+      "width": 70,
+      "height": 40,
+      "channel": "ledge-growth",
+      "requiredArchetype": "gardener",
+      "interactionRange": 72,
+      "initiallyGrown": false
+    }
+  ],
+  "plantStructures": [
+    {
+      "id": "ledge-step",
+      "x": 1560,
+      "y": 520,
+      "width": 140,
+      "height": 120,
+      "channel": "ledge-growth"
+    }
+  ]
+}

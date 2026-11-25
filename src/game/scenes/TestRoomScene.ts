@@ -433,6 +433,26 @@ export class TestRoomScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(10);
 
+    const mixedLabHint =
+      level.id === 'cooperation-lab'
+        ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
+        : level.id === 'scout-brute-ranger-lab'
+          ? 'Scout: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
+          : undefined;
+    if (mixedLabHint !== undefined) {
+      this.add
+        .text(24, 148, mixedLabHint, {
+          backgroundColor: '#080b16cc',
+          color: '#cbd5e1',
+          fontFamily: 'ui-monospace, monospace',
+          fontSize: '13px',
+          padding: { x: 10, y: 6 },
+        })
+        .setScrollFactor(0)
+        .setDepth(10);
+      return;
+    }
+
     if (this.pressurePlates.length > 0) {
       this.add
         .text(

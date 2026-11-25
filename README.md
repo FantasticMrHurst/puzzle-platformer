@@ -70,6 +70,7 @@ See the project documents for current direction:
 - [Tinkerer powered-mechanism lab](docs/TINKERER_LAB.md)
 - [Ranger ranged-action lab](docs/RANGER_LAB.md)
 - [Gardener growth lab](docs/GARDENER_LAB.md)
+- [Mixed-team cooperation lab and roster evaluation](docs/ROSTER_EVALUATION.md)
 - [Movement-controller contracts and timing](docs/MOVEMENT_CONTROLLER.md)
 - [Physics integration and fixed-step ordering](docs/PHYSICS_INTEGRATION.md)
 - [Movement tuning baseline](docs/MOVEMENT_TUNING.md)

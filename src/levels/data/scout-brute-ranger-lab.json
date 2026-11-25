@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 6,
+  "id": "scout-brute-ranger-lab",
+  "name": "Scout, Brute & Ranger Lab",
+  "world": {
+    "width": 2300,
+    "height": 720,
+    "backgroundColor": "#101528"
+  },
+  "characters": [
+    {
+      "id": "scout",
+      "archetype": "scout",
+      "spawn": {
+        "x": 600,
+        "y": 566
+      }
+    },
+    {
+      "id": "brute",
+      "archetype": "brute",
+      "spawn": {
+        "x": 280,
+        "y": 564
+      }
+    },
+    {
+      "id": "ranger",
+      "archetype": "ranger",
+      "spawn": {
+        "x": 170,
+        "y": 564
+      }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1990,
+    "y": 420,
+    "width": 230,
+    "height": 180
+  },
+  "staticGeometry": [
+    {
+      "id": "start-bank",
+      "x": 0,
+      "y": 600,
+      "width": 1350,
+      "height": 120,
+      "surface": "ground"
+    },
+    {
+      "id": "exit-bank",
+      "x": 1730,
+      "y": 600,
+      "width": 570,
+      "height": 120,
+      "surface": "ground"
+    },
+    {
+      "id": "scout-shelf",
+      "x": 380,
+      "y": 300,
+      "width": 180,
+      "height": 220,
+      "surface": "platform",
+      "purpose": "Wall-jump left to the plate"
+    },
+    {
+      "id": "split-wall",
+      "x": 700,
+      "y": 0,
+      "width": 40,
+      "height": 500,
+      "surface": "wall"
+    },
+    {
+      "id": "ranger-firing-line",
+      "x": 1150,
+      "y": 600,
+      "width": 140,
+      "height": 20,
+      "surface": "platform"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 2260,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [
+    {
+      "id": "scout-plate",
+      "x": 410,
+      "y": 288,
+      "width": 130,
+      "height": 12,
+      "channel": "split-wall-lock"
+    }
+  ],
+  "pushableBlocks": [
+    {
+      "id": "wall-block",
+      "x": 700,
+      "y": 520,
+      "width": 60,
+      "height": 80,
+      "channel": "split-wall-lock",
+      "requiredArchetype": "brute",
+      "maxPushX": 850,
+      "pushSpeed": 320
+    }
+  ],
+  "mechanismConsoles": [],
+  "poweredBridges": [
+    {
+      "id": "target-bridge",
+      "x": 1350,
+      "y": 600,
+      "width": 380,
+      "height": 32,
+      "channel": "exit-crossing"
+    }
+  ],
+  "rangedTargets": [
+    {
+      "id": "high-target",
+      "x": 1650,
+      "y": 468,
+      "width": 54,
+      "height": 48,
+      "channel": "exit-crossing",
+      "initiallyActive": false
+    }
+  ],
+  "growthNodes": [],
+  "plantStructures": []
+}

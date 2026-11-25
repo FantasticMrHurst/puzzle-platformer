@@ -234,7 +234,7 @@ These issues are ordered to minimize overlapping work. They are proposals for re
 4. Prototype the Brute's deliberate grip/push/pull and brace-platform interactions (implemented in the cooperation lab), then the Tinkerer's contextual powered-bridge interaction (implemented in the mechanism lab; Issue 13).
 5. Add device-independent aiming for the Ranger's environmental action (implemented in the ranged-action lab; Issue 14).
 6. Add resettable world creation for the Gardener's first growth action (implemented in the growth lab, Issue 15).
-7. Assemble at least one cooperation scenario, compare all six candidates with the shared play-test criteria, and record the roster recommendation.
+7. Compare the traversal and mixed-team labs and review the provisional roster recommendation in [Roster Evaluation](ROSTER_EVALUATION.md) under Issue 17.
 
 Each candidate ability should remain independently reviewable. Split an implementation step into separate GitHub Issues when its candidates do not share a small prerequisite or test chamber.
 

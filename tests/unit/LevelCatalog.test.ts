@@ -44,11 +44,28 @@ describe('getLevelSource', () => {
     );
     expect(gardenerLab.characters[0]?.archetype).toBe('gardener');
     expect(gardenerLab.growthNodes).toHaveLength(1);
+
+    const cooperationSource = getLevelSource('cooperation-lab');
+    const cooperationLab = loadLevelData(
+      cooperationSource.data,
+      cooperationSource.source,
+    );
+    expect(cooperationLab.characters.map(({ archetype }) => archetype)).toEqual(
+      ['ranger', 'gardener', 'tinkerer'],
+    );
+
+    const trioSource = getLevelSource('scout-brute-ranger-lab');
+    const trioLab = loadLevelData(trioSource.data, trioSource.source);
+    expect(trioLab.characters.map(({ archetype }) => archetype)).toEqual([
+      'scout',
+      'brute',
+      'ranger',
+    ]);
   });
 
   it('reports available IDs for an unknown level', () => {
     expect(() => getLevelSource('missing')).toThrow(
-      'Unknown level "missing". Available levels: gardener-lab, movement-test-room, mechanism-lab, ranger-lab, traversal-lab',
+      'Unknown level "missing". Available levels: cooperation-lab, gardener-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab',
     );
   });
 });
