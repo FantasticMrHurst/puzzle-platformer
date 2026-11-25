@@ -22,7 +22,7 @@ An absent `level` query continues to load the original movement test room. Unkno
 | ---: | --- | --- | ---: | --- |
 | 1 | Scout | `scout-prototype-v2` | 44 × 68 px | 340 px/s run speed, 860 px/s jump, stronger air acceleration, wall cling and wall jump |
 | 2 | Pet | `pet-prototype-v2` | 48 × 36 px | Half baseline height, 350 px/s run speed, quicker ground acceleration, lower 650 px/s jump |
-| 3 | Brute | `baseline-v2` | 48 × 72 px | Shared higher-gravity baseline for comparison |
+| 3 | Brute | `brute-prototype-v1` | 48 × 72 px | 300 px/s run speed, slower acceleration and air steering, 680 px/s jump |
 
 These are deliberately distinct test values, not final balance.
 

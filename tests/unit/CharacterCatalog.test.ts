@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { getCharacterDefinition } from '../../src/entities/CharacterCatalog';
 
 describe('CharacterCatalog', () => {
-  it('keeps the Brute on the approved shared baseline', () => {
+  it('gives the Brute a heavier, lower-jumping movement profile', () => {
     const brute = getCharacterDefinition('brute');
 
-    expect(brute.movementProfileName).toBe('baseline-v2');
+    expect(brute.movementProfileName).toBe('brute-prototype-v1');
+    expect(brute.movementConfig.maxRunSpeed).toBeLessThan(320);
+    expect(brute.movementConfig.groundAcceleration).toBeLessThan(2_400);
+    expect(brute.movementConfig.jumpSpeed).toBeLessThan(860);
     expect(brute.movementConfig.wallMovement).toBeUndefined();
   });
 
