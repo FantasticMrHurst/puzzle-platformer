@@ -25,7 +25,7 @@ export class PressurePlate {
       .setStrokeStyle(2, 0xfef3c7)
       .setDepth(4);
     this.statusText = scene.add
-      .text(data.x + data.width / 2, data.y - 8, 'SCOUT PLATE', {
+      .text(data.x + data.width / 2, data.y - 8, 'PRESSURE PLATE', {
         backgroundColor: '#080b16cc',
         color: '#fde68a',
         fontFamily: 'ui-monospace, monospace',
@@ -56,7 +56,7 @@ export class PressurePlate {
     this.pressed = pressed;
     this.presentation.setFillStyle(pressed ? 0x22c55e : 0xf59e0b);
     this.statusText
-      .setText(pressed ? 'PLATE ACTIVE · WALL UNLOCKED' : 'SCOUT PLATE')
+      .setText(pressed ? 'PLATE ACTIVE' : 'PRESSURE PLATE')
       .setColor(pressed ? '#dcfce7' : '#fde68a');
   }
 
@@ -67,6 +67,6 @@ export class PressurePlate {
   public reset(): void {
     this.pressed = false;
     this.presentation.setFillStyle(0xf59e0b);
-    this.statusText.setText('SCOUT PLATE').setColor('#fde68a');
+    this.statusText.setText('PRESSURE PLATE').setColor('#fde68a');
   }
 }

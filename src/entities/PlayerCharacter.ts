@@ -14,6 +14,7 @@ import {
   interpolatePosition,
   type Position,
 } from '../rendering/interpolatePosition';
+import { ScoutPosePreview } from '../rendering/ScoutPosePreview';
 import type { CharacterDefinition } from './CharacterCatalog';
 import type { CharacterArchetype } from '../levels/LevelSchema';
 
@@ -32,6 +33,7 @@ export class PlayerCharacter {
   private readonly bodyAdapter: ArcadeBodyAdapter;
   private readonly controller: MovementController;
   private readonly labelObject: Phaser.GameObjects.Text;
+  private readonly scoutPreview?: ScoutPosePreview;
   private lastResult: MovementResult;
   private previousPosition: Position;
   private currentPosition: Position;
@@ -60,6 +62,18 @@ export class PlayerCharacter {
       )
       .setStrokeStyle(3, definition.strokeColor)
       .setDepth(5);
+    if (definition.archetype === 'scout') {
+      this.scoutPreview = ScoutPosePreview.create(
+        scene,
+        x,
+        y + definition.height / 2,
+      );
+      if (this.scoutPreview !== undefined) {
+        this.scoutPreview.setDepth(5);
+        // Keep the interpolated camera target even when the art replaces its rectangle.
+        this.visualObject.setVisible(false);
+      }
+    }
     this.labelObject = scene.add
       .text(x, y - definition.height / 2 - 8, definition.label, {
         backgroundColor: '#080b16cc',
@@ -105,8 +119,14 @@ export class PlayerCharacter {
     this.bodyAdapter.applyVelocity(this.lastResult.velocity);
   }
 
-  public completeSimulationStep(): void {
+  public completeSimulationStep(deltaSeconds: number): void {
     this.currentPosition = this.bodyAdapter.readPosition();
+    this.scoutPreview?.update(
+      deltaSeconds,
+      this.bodyAdapter.readContacts(),
+      this.bodyAdapter.readVelocity(),
+      this.lastResult,
+    );
   }
 
   public render(interpolationAlpha: number): void {
@@ -116,6 +136,10 @@ export class PlayerCharacter {
       interpolationAlpha,
     );
     this.visualObject.setPosition(position.x, position.y);
+    this.scoutPreview?.render({
+      x: position.x,
+      y: position.y + this.definition.height / 2,
+    });
     this.labelObject.setPosition(
       position.x,
       position.y - this.definition.height / 2 - 8,
@@ -129,6 +153,7 @@ export class PlayerCharacter {
       }`,
     );
     this.visualObject.setDepth(active ? 7 : 5);
+    this.scoutPreview?.setDepth(active ? 7 : 5);
     this.labelObject.setDepth(8).setVisible(active);
     this.visualObject.setStrokeStyle(
       active ? 5 : 2,
@@ -173,6 +198,7 @@ export class PlayerCharacter {
   }
 
   public reset(x: number, y: number): void {
+    this.scoutPreview?.reset();
     this.braced = false;
     this.bodyAdapter.setImmovable(false);
     this.bodyAdapter.setAllowGravity(true);

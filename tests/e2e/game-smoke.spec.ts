@@ -20,8 +20,9 @@ interface TestProbe {
   };
 }
 
-test('boots the movement room and toggles diagnostics', async ({ page }) => {
+test('opens labs from the menu and toggles diagnostics', async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('link', { name: 'Movement Test Room' }).click();
 
   await expect(page.locator('canvas')).toBeVisible();
   const initial = await waitForProbe(page);
@@ -38,7 +39,8 @@ test('boots the movement room and toggles diagnostics', async ({ page }) => {
     });
   await page.keyboard.up('F3');
 
-  await page.goto('/?level=traversal-lab');
+  await page.getByRole('link', { name: 'All play labs' }).click();
+  await page.getByRole('link', { name: 'Character Traversal Lab' }).click();
   const traversalLab = await waitForProbe(page);
   expect(traversalLab.roster.map(({ id }) => id)).toEqual([
     'scout-prototype',
@@ -55,7 +57,7 @@ test('boots the movement room and toggles diagnostics', async ({ page }) => {
 });
 
 test('responds to movement input', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?level=movement-test-room');
   await waitForProbe(page);
 
   await page.keyboard.down('Digit2');

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
 import { calculateExitProgress } from '../../environment/ExitProgress';
+import { Gate } from '../../environment/Gate';
 import { GrowthNode } from '../../environment/GrowthNode';
 import { LevelExit } from '../../environment/LevelExit';
 import { MechanismConsole } from '../../environment/MechanismConsole';
@@ -9,6 +10,7 @@ import { PoweredBridge } from '../../environment/PoweredBridge';
 import { PlantStructure } from '../../environment/PlantStructure';
 import { PressurePlate } from '../../environment/PressurePlate';
 import { PushableBlock } from '../../environment/PushableBlock';
+import { ToggleSwitch } from '../../environment/ToggleSwitch';
 import { getCharacterDefinition } from '../../entities/CharacterCatalog';
 import { CharacterRoster } from '../../entities/CharacterRoster';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
@@ -54,6 +56,8 @@ export class TestRoomScene extends Phaser.Scene {
   private level!: LevelData;
   private exitPresentation!: LevelExit;
   private pressurePlates: PressurePlate[] = [];
+  private toggleSwitches: ToggleSwitch[] = [];
+  private gates: Gate[] = [];
   private pushableBlocks: PushableBlock[] = [];
   private mechanismConsoles: MechanismConsole[] = [];
   private poweredBridges: PoweredBridge[] = [];
@@ -119,6 +123,10 @@ export class TestRoomScene extends Phaser.Scene {
     this.pressurePlates = this.level.pressurePlates.map(
       (plate) => new PressurePlate(this, plate),
     );
+    this.toggleSwitches = this.level.toggleSwitches.map(
+      (toggle) => new ToggleSwitch(this, toggle),
+    );
+    this.gates = this.level.gates.map((gate) => new Gate(this, gate));
     this.pushableBlocks = this.level.pushableBlocks.map(
       (block) => new PushableBlock(this, block),
     );
@@ -144,6 +152,7 @@ export class TestRoomScene extends Phaser.Scene {
     );
     this.createSpawnMarkers(this.level);
     this.createCharacters(this.level);
+    this.updateGates();
     this.createHud(this.level);
     this.debugOverlay = new MovementDebugOverlay(this);
   }
@@ -170,6 +179,7 @@ export class TestRoomScene extends Phaser.Scene {
       () => {
         const activeCharacter = this.roster.getActive();
         this.applyPrimaryAbility(activeCharacter);
+        this.toggleSwitches.forEach((toggle) => toggle.update(activeCharacter));
         this.roster.getMembers().forEach((character) => {
           character.prepareSimulationStep(
             GAMEPLAY_STEP_SECONDS,
@@ -210,11 +220,14 @@ export class TestRoomScene extends Phaser.Scene {
         this.physics.world.singleStep();
         this.roster
           .getMembers()
-          .forEach((character) => character.completeSimulationStep());
+          .forEach((character) =>
+            character.completeSimulationStep(GAMEPLAY_STEP_SECONDS),
+          );
         this.pushableBlocks.forEach((block) => block.completeStep());
         this.pressurePlates.forEach((plate) =>
           plate.update(this.roster.getMembers()),
         );
+        this.updateGates();
 
         if (
           this.roster
@@ -333,6 +346,9 @@ export class TestRoomScene extends Phaser.Scene {
         getCharacterDefinition(archetype),
       );
       this.physics.add.collider(character.physicsObject, this.staticGeometry);
+      this.gates.forEach((gate) =>
+        this.physics.add.collider(character.physicsObject, gate.physicsObject),
+      );
       this.pushableBlocks.forEach((block) =>
         this.physics.add.collider(character.physicsObject, block.physicsObject),
       );
@@ -438,7 +454,9 @@ export class TestRoomScene extends Phaser.Scene {
         ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
         : level.id === 'scout-brute-ranger-lab'
           ? 'Scout: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
-          : undefined;
+          : level.id === 'gate-lab'
+            ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
+            : undefined;
     if (mixedLabHint !== undefined) {
       this.add
         .text(24, 148, mixedLabHint, {
@@ -566,6 +584,14 @@ export class TestRoomScene extends Phaser.Scene {
       return;
     }
 
+    if (
+      this.toggleSwitches.some((toggle) => toggle.tryToggle(activeCharacter))
+    ) {
+      this.primaryAbilityHeld = false;
+      this.abilityInput.suppressUntilReleased();
+      return;
+    }
+
     if (activeCharacter.getArchetype() === 'tinkerer') {
       this.mechanismConsoles.some((consoleObject) =>
         consoleObject.tryToggle(activeCharacter),
@@ -663,12 +689,14 @@ export class TestRoomScene extends Phaser.Scene {
     this.roomComplete = false;
     this.exitPresentation.reset();
     this.pressurePlates.forEach((plate) => plate.reset());
+    this.toggleSwitches.forEach((toggle) => toggle.reset());
     this.pushableBlocks.forEach((block) => block.reset());
     this.mechanismConsoles.forEach((consoleObject) => consoleObject.reset());
     this.poweredBridges.forEach((bridge) => bridge.reset());
     this.rangedTargets.forEach((target) => target.reset());
     this.growthNodes.forEach((node) => node.reset());
     this.plantStructures.forEach((structure) => structure.reset());
+    this.updateGates();
     this.rangerShots.forEach((shot) => shot.destroy());
     this.rangerShots = [];
     this.aimIntent = NEUTRAL_AIM_INTENT;
@@ -680,6 +708,9 @@ export class TestRoomScene extends Phaser.Scene {
       this.pressurePlates.some(
         (plate) => plate.data.channel === channel && plate.isPressed(),
       ) ||
+      this.toggleSwitches.some(
+        (toggle) => toggle.data.channel === channel && toggle.isActive(),
+      ) ||
       this.mechanismConsoles.some(
         (consoleObject) =>
           consoleObject.data.channel === channel && consoleObject.isPowered(),
@@ -687,6 +718,15 @@ export class TestRoomScene extends Phaser.Scene {
       this.rangedTargets.some(
         (target) => target.data.channel === channel && target.isActive(),
       )
+    );
+  }
+
+  private updateGates(): void {
+    this.gates.forEach((gate) =>
+      gate.update(
+        this.isSignalActive(gate.data.channel),
+        this.roster.getMembers(),
+      ),
     );
   }
 
