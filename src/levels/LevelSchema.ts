@@ -1,4 +1,4 @@
-export const LEVEL_SCHEMA_VERSION = 6 as const;
+export const LEVEL_SCHEMA_VERSION = 7 as const;
 
 export const CHARACTER_ARCHETYPES = [
   'brute',
@@ -48,13 +48,21 @@ export interface StaticGeometryData {
   readonly purpose?: string;
 }
 
-export interface PressurePlateData {
+interface SignalBoundsData {
   readonly id: string;
   readonly x: number;
   readonly y: number;
   readonly width: number;
   readonly height: number;
   readonly channel: string;
+}
+
+export type PressurePlateData = SignalBoundsData;
+export type GateData = SignalBoundsData;
+
+export interface ToggleSwitchData extends SignalBoundsData {
+  readonly interactionRange: number;
+  readonly initiallyActive: boolean;
 }
 
 export interface PushableBlockData {
@@ -125,7 +133,7 @@ export interface PlantStructureData {
 }
 
 export interface LevelData {
-  readonly schemaVersion: typeof LEVEL_SCHEMA_VERSION;
+  readonly schemaVersion: 6 | typeof LEVEL_SCHEMA_VERSION;
   readonly id: string;
   readonly name: string;
   readonly world: LevelWorldData;
@@ -133,6 +141,8 @@ export interface LevelData {
   readonly exit: ExitData;
   readonly staticGeometry: readonly StaticGeometryData[];
   readonly pressurePlates: readonly PressurePlateData[];
+  readonly toggleSwitches: readonly ToggleSwitchData[];
+  readonly gates: readonly GateData[];
   readonly pushableBlocks: readonly PushableBlockData[];
   readonly mechanismConsoles: readonly MechanismConsoleData[];
   readonly poweredBridges: readonly PoweredBridgeData[];

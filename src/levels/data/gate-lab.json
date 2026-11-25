@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 7,
+  "id": "gate-lab",
+  "name": "Plate & Switch Gate Lab",
+  "world": {
+    "width": 1280,
+    "height": 720,
+    "backgroundColor": "#101528"
+  },
+  "characters": [
+    {
+      "id": "brute",
+      "archetype": "brute",
+      "spawn": {
+        "x": 150,
+        "y": 564
+      }
+    },
+    {
+      "id": "scout",
+      "archetype": "scout",
+      "spawn": {
+        "x": 220,
+        "y": 566
+      }
+    },
+    {
+      "id": "pet",
+      "archetype": "pet",
+      "spawn": {
+        "x": 290,
+        "y": 582
+      }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1010,
+    "y": 430,
+    "width": 200,
+    "height": 170
+  },
+  "staticGeometry": [
+    {
+      "id": "floor",
+      "x": 0,
+      "y": 600,
+      "width": 1280,
+      "height": 120,
+      "surface": "ground"
+    },
+    {
+      "id": "gate-header",
+      "x": 600,
+      "y": 0,
+      "width": 64,
+      "height": 350,
+      "surface": "wall"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1240,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [
+    {
+      "id": "approach-plate",
+      "x": 350,
+      "y": 588,
+      "width": 120,
+      "height": 12,
+      "channel": "crossing"
+    }
+  ],
+  "toggleSwitches": [
+    {
+      "id": "far-switch",
+      "x": 814,
+      "y": 546,
+      "width": 44,
+      "height": 54,
+      "channel": "crossing",
+      "interactionRange": 68,
+      "initiallyActive": false
+    }
+  ],
+  "gates": [
+    {
+      "id": "team-gate",
+      "x": 600,
+      "y": 350,
+      "width": 64,
+      "height": 250,
+      "channel": "crossing"
+    }
+  ],
+  "pushableBlocks": [],
+  "mechanismConsoles": [],
+  "poweredBridges": [],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": []
+}

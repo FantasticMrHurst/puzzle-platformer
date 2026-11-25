@@ -10,17 +10,70 @@
   box-sizing: border-box;
 }
 
-html,
-body,
-#game {
-  width: 100%;
-  min-width: 320px;
-  height: 100%;
+body {
   margin: 0;
 }
 
-body {
+body.playing-lab {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100dvh;
   overflow: hidden;
+}
+
+#lab-nav {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid #334155;
+  background: #101528;
+}
+
+#lab-nav a {
+  color: #bfdbfe;
+  text-underline-offset: 0.2em;
+}
+
+.lab-menu {
+  width: min(100%, 58rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 5vw, 4rem) 1.25rem;
+}
+
+.lab-menu h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3rem);
+}
+
+.lab-menu p {
+  margin: 0.5rem 0 1.5rem;
+  color: #b9c5dc;
+}
+
+.lab-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-list a {
+  display: flex;
+  align-items: center;
+  min-height: 3.5rem;
+  height: 100%;
+  padding: 0.75rem 1rem;
+  color: inherit;
+  background: #101528;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.lab-list a:hover,
+.lab-list a:focus-visible {
+  background: #172449;
+  border-color: #93c5fd;
 }
 
 canvas {

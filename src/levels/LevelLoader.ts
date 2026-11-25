@@ -4,6 +4,7 @@ import {
   type CharacterArchetype,
   type CharacterSpawnData,
   type ExitData,
+  type GateData,
   type GrowthNodeData,
   type LevelData,
   type LevelWorldData,
@@ -16,6 +17,7 @@ import {
   type RangedTargetData,
   type StaticGeometryData,
   type SurfaceKind,
+  type ToggleSwitchData,
 } from './LevelSchema';
 
 const SURFACE_KINDS = new Set<SurfaceKind>(['ground', 'platform', 'wall']);
@@ -40,11 +42,11 @@ export function loadLevelData(
   const root = requireRecord(input, source, '$');
   const schemaVersion = requireNumber(root, 'schemaVersion', source, '$');
 
-  if (schemaVersion !== LEVEL_SCHEMA_VERSION) {
+  if (schemaVersion !== 6 && schemaVersion !== LEVEL_SCHEMA_VERSION) {
     fail(
       source,
       '$.schemaVersion',
-      `must be ${LEVEL_SCHEMA_VERSION}; received ${schemaVersion}`,
+      `must be 6 or ${LEVEL_SCHEMA_VERSION}; received ${schemaVersion}`,
     );
   }
 
@@ -85,6 +87,12 @@ export function loadLevelData(
     source,
     world,
   );
+  const toggleSwitches =
+    schemaVersion === 6
+      ? []
+      : parseToggleSwitches(root.toggleSwitches, source, world);
+  const gates =
+    schemaVersion === 6 ? [] : parseGates(root.gates, source, world);
 
   const plateChannels = new Set(pressurePlates.map(({ channel }) => channel));
   pushableBlocks.forEach(({ channel }, index) => {
@@ -102,6 +110,21 @@ export function loadLevelData(
   const rangedTargetChannels = new Set(
     rangedTargets.map(({ channel }) => channel),
   );
+  const switchChannels = new Set(toggleSwitches.map(({ channel }) => channel));
+  gates.forEach(({ channel }, index) => {
+    if (
+      !plateChannels.has(channel) &&
+      !switchChannels.has(channel) &&
+      !consoleChannels.has(channel) &&
+      !rangedTargetChannels.has(channel)
+    ) {
+      fail(
+        source,
+        `$.gates[${index}].channel`,
+        `must reference a signal source; received "${channel}"`,
+      );
+    }
+  });
   poweredBridges.forEach(({ channel }, index) => {
     if (!consoleChannels.has(channel) && !rangedTargetChannels.has(channel)) {
       fail(
@@ -123,7 +146,7 @@ export function loadLevelData(
   });
 
   return {
-    schemaVersion: LEVEL_SCHEMA_VERSION,
+    schemaVersion,
     id,
     name,
     world,
@@ -131,6 +154,8 @@ export function loadLevelData(
     exit,
     staticGeometry,
     pressurePlates,
+    toggleSwitches,
+    gates,
     pushableBlocks,
     mechanismConsoles,
     poweredBridges,
@@ -138,6 +163,53 @@ export function loadLevelData(
     growthNodes,
     plantStructures,
   };
+}
+
+function parseGates(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly GateData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.gates', 'must be an array');
+  }
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.gates[${index}]`;
+    const gate = requireRecord(entry, source, path);
+    return {
+      id: requireUniqueId(gate, seenIds, source, path),
+      ...parseBounds(gate, source, path, world),
+      channel: requireNonEmptyString(gate, 'channel', source, path),
+    };
+  });
+}
+
+function parseToggleSwitches(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly ToggleSwitchData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.toggleSwitches', 'must be an array');
+  }
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.toggleSwitches[${index}]`;
+    const toggle = requireRecord(entry, source, path);
+    return {
+      id: requireUniqueId(toggle, seenIds, source, path),
+      ...parseBounds(toggle, source, path, world),
+      channel: requireNonEmptyString(toggle, 'channel', source, path),
+      interactionRange: requirePositiveNumber(
+        toggle,
+        'interactionRange',
+        source,
+        path,
+      ),
+      initiallyActive: requireBoolean(toggle, 'initiallyActive', source, path),
+    };
+  });
 }
 
 function parseGrowthNodes(

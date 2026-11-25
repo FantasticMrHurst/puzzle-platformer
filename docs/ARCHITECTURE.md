@@ -201,6 +201,8 @@ Directly authored, validated JSON remains the Milestone 2 format. Add only field
 
 Schema v6 adds seed beds that publish a persistent growth state and connected plant structures that gain collision when grown. The room reset restores the authored seed bed state.
 
+Schema v7 adds roster-independent toggle switches and gates. Existing v6 rooms still load. A gate opens when any source on its channel is active. When the signal turns off, it waits for every character to clear the doorway before restoring collision. A nearby switch consumes the contextual action before character abilities and retains its state until toggled again or reset.
+
 Validation should run when loading a level in development and produce a message containing the level, entity, and invalid field. The schema must be versioned before compatibility matters. Whether validation uses a small handwritten validator or a library remains open; do not add a schema dependency until the data warrants it.
 
 ## Puzzle communication

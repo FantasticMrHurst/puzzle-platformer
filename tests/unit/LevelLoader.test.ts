@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import gateLabSource from '../../src/levels/data/gate-lab.json';
 import testRoomSource from '../../src/levels/data/test-room.json';
 import {
   LevelValidationError,
@@ -39,6 +40,25 @@ const validLevel = {
 };
 
 describe('loadLevelData', () => {
+  it('loads a gate with a shared plate and switch channel', () => {
+    const level = loadLevelData(gateLabSource, 'gate-lab.json');
+
+    expect(level.gates).toHaveLength(1);
+    expect(level.gates[0]?.channel).toBe(level.pressurePlates[0]?.channel);
+    expect(level.gates[0]?.channel).toBe(level.toggleSwitches[0]?.channel);
+  });
+
+  it('rejects gates with a channel that has no source', () => {
+    expect(() =>
+      loadLevelData(
+        { ...gateLabSource, pressurePlates: [], toggleSwitches: [] },
+        'gate-lab.json',
+      ),
+    ).toThrow(
+      'gate-lab.json: $.gates[0].channel must reference a signal source',
+    );
+  });
+
   it('loads the authored movement test room', () => {
     const level = loadLevelData(testRoomSource, 'test-room.json');
 

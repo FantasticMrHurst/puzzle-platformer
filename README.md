@@ -50,6 +50,8 @@ its Pages source under **Settings → Pages**.
 Once the first deployment completes, the playable build will be available at
 [fantasticmrhurst.github.io/puzzle-platformer](https://fantasticmrhurst.github.io/puzzle-platformer/).
 
+The home page lists all play labs. Each lab has an **All play labs** link back to the menu, and its URL can be shared directly.
+
 ## Current state
 
 The application currently provides a three-character prototype roster in the validated, data-driven movement test room. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
@@ -58,7 +60,11 @@ Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Mov
 
 Focused labs are selected with a query parameter: `?level=traversal-lab` for Scout, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
 
+Open `?level=gate-lab` to try shared environmental controls. Leave one character on the pressure plate, take another through the gate, then press `F` at the far-side switch to let the whole team through. The gate waits for occupied doorways to clear. Press `R` to reset.
+
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
+
+Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-frame run cycle and other key poses. Run and brake, take off and land, or jump against the wall to see the cling, slide, and kick.
 
 See the project documents for current direction:
 

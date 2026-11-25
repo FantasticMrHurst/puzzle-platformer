@@ -1,5 +1,6 @@
 import cooperationLab from './data/cooperation-lab.json';
 import gardenerLab from './data/gardener-lab.json';
+import gateLab from './data/gate-lab.json';
 import mechanismLab from './data/mechanism-lab.json';
 import movementTestRoom from './data/test-room.json';
 import rangerLab from './data/ranger-lab.json';
@@ -7,7 +8,7 @@ import scoutBruteRangerLab from './data/scout-brute-ranger-lab.json';
 import traversalLab from './data/traversal-lab.json';
 
 export interface LevelSource {
-  readonly data: unknown;
+  readonly data: { readonly name: string };
   readonly source: string;
 }
 
@@ -20,6 +21,10 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
   'gardener-lab': {
     data: gardenerLab,
     source: 'gardener-lab.json',
+  },
+  'gate-lab': {
+    data: gateLab,
+    source: 'gate-lab.json',
   },
   'movement-test-room': {
     data: movementTestRoom,
@@ -42,6 +47,13 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
     source: 'traversal-lab.json',
   },
 };
+
+export function getLabEntries(): readonly { id: string; name: string }[] {
+  return Object.entries(LEVEL_SOURCES).map(([id, { data }]) => ({
+    id,
+    name: data.name,
+  }));
+}
 
 export function getLevelSource(levelId: string | null): LevelSource {
   const selectedId = levelId ?? DEFAULT_LEVEL_ID;
