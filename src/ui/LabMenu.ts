@@ -21,6 +21,11 @@ export function showLabMenu(container: HTMLElement): void {
       level: 'scout-brute-ranger-lab',
       scoutArt: '1',
     }),
+    labLink('Brute Animation Preview', {
+      level: 'scout-brute-ranger-lab',
+      scoutArt: '1',
+      bruteArt: '1',
+    }),
   );
 
   container.replaceChildren(title, intro, list);
