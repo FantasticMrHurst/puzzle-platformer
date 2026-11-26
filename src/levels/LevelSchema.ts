@@ -1,4 +1,4 @@
-export const LEVEL_SCHEMA_VERSION = 7 as const;
+export const LEVEL_SCHEMA_VERSION = 8 as const;
 
 export const CHARACTER_ARCHETYPES = [
   'brute',
@@ -132,8 +132,16 @@ export interface PlantStructureData {
   readonly purpose?: string;
 }
 
+export interface TinkererPlugData {
+  readonly id: string;
+  readonly plugStart: PointData;
+  /** Center of the outlet prongs. */
+  readonly outlet: PointData;
+  readonly interactionRange: number;
+}
+
 export interface LevelData {
-  readonly schemaVersion: 6 | typeof LEVEL_SCHEMA_VERSION;
+  readonly schemaVersion: 6 | 7 | typeof LEVEL_SCHEMA_VERSION;
   readonly id: string;
   readonly name: string;
   readonly world: LevelWorldData;
@@ -149,4 +157,5 @@ export interface LevelData {
   readonly rangedTargets: readonly RangedTargetData[];
   readonly growthNodes: readonly GrowthNodeData[];
   readonly plantStructures: readonly PlantStructureData[];
+  readonly tinkererPlugs: readonly TinkererPlugData[];
 }

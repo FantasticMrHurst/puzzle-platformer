@@ -65,7 +65,7 @@ describe('getLevelSource', () => {
 
   it('reports available IDs for an unknown level', () => {
     expect(() => getLevelSource('missing')).toThrow(
-      'Unknown level "missing". Available levels: cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab',
+      'Unknown level "missing". Available levels: cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
     );
   });
 });

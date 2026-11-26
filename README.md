@@ -56,9 +56,9 @@ The home page lists all play labs. Each lab has an **All play labs** link back t
 
 The application currently provides a three-character prototype roster in the validated, data-driven movement test room. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
 
-Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. `F` is the contextual ability: the Brute grips or braces, the Tinkerer operates nearby powered consoles, and the Ranger fires along the current `I`/`J`/`K`/`L` aim direction. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
+Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. `F` is the contextual ability: the Brute grips or braces, the Tinkerer operates nearby powered consoles, and the Ranger fires along the current `I`/`J`/`K`/`L` aim direction. In the Tinkerer Plug Lab, press `C` to grab the plug and press it again to place it. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
 
-Focused labs are selected with a query parameter: `?level=traversal-lab` for Scout, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
+Focused labs are selected with a query parameter: `?level=traversal-lab` for Scout, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=tinkerer-plug-lab` for the Tinkerer-only plug-and-outlet puzzle, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
 
 Open `?level=gate-lab` to try shared environmental controls. Leave one character on the pressure plate, take another through the gate, then press `F` at the far-side switch to let the whole team through. The gate waits for occupied doorways to clear. Press `R` to reset.
 
@@ -74,6 +74,7 @@ See the project documents for current direction:
 - [Movement test-room measurements](docs/TEST_ROOM.md)
 - [Scout, Brute, and Pet cooperation lab](docs/CHARACTER_LAB.md)
 - [Tinkerer powered-mechanism lab](docs/TINKERER_LAB.md)
+- [Tinkerer plug lab](docs/TINKERER_PLUG_LAB.md)
 - [Ranger ranged-action lab](docs/RANGER_LAB.md)
 - [Gardener growth lab](docs/GARDENER_LAB.md)
 - [Mixed-team cooperation lab and roster evaluation](docs/ROSTER_EVALUATION.md)
