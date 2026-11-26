@@ -8,7 +8,11 @@ The mechanism lab is the smallest prototype of the Tinkerer's first verb: delibe
 2. Brute verifies that the resulting route supports a full-height character.
 3. Pet verifies that the route is useful to a differently sized teammate.
 
-All three use the shared `baseline-v2` movement profile except for the Pet's existing body and movement configuration.
+The Tinkerer uses the shared `baseline-v2` movement profile. The Brute and the existing playable Pet use their own prototype movement profiles.
+
+## Tinkerer companion
+
+Every Tinkerer has a small yellow block companion as a visual prototype for its eventual pet. It follows behind the Tinkerer with a 12 px gap and stays close during movement. When the Tinkerer jumps, the companion starts a shorter 64 px hop after a 0.1 second delay. The hop lasts 0.6 seconds. The companion is presentation-only: it does not collide with the level or count toward room completion. This block is separate from the existing playable Pet character.
 
 ## Cooperation sequence
 

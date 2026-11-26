@@ -8,17 +8,20 @@ import { LevelExit } from '../../environment/LevelExit';
 import { MechanismConsole } from '../../environment/MechanismConsole';
 import { PoweredBridge } from '../../environment/PoweredBridge';
 import { PlantStructure } from '../../environment/PlantStructure';
+import { TinkererPlugPuzzle } from '../../environment/TinkererPlugPuzzle';
 import { PressurePlate } from '../../environment/PressurePlate';
 import { PushableBlock } from '../../environment/PushableBlock';
 import { ToggleSwitch } from '../../environment/ToggleSwitch';
 import { getCharacterDefinition } from '../../entities/CharacterCatalog';
 import { CharacterRoster } from '../../entities/CharacterRoster';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
+import { TinkererCompanion } from '../../entities/TinkererCompanion';
 import { RangerShot } from '../../entities/RangerShot';
 import { RangedTarget } from '../../environment/RangedTarget';
 import { NEUTRAL_AIM_INTENT, type AimIntent } from '../../input/AimIntent';
 import { KeyboardAimInput } from '../../input/KeyboardAimInput';
 import { KeyboardAbilityInput } from '../../input/KeyboardAbilityInput';
+import { KeyboardGrabInput } from '../../input/KeyboardGrabInput';
 import { KeyboardCharacterSelectionInput } from '../../input/KeyboardCharacterSelectionInput';
 import { KeyboardInput } from '../../input/KeyboardInput';
 import { KeyboardRoomInput } from '../../input/KeyboardRoomInput';
@@ -48,9 +51,11 @@ export class TestRoomScene extends Phaser.Scene {
   private readonly fixedStepClock = new FixedStepClock();
   private staticGeometry!: Phaser.Physics.Arcade.StaticGroup;
   private roster!: CharacterRoster<PlayerCharacter>;
+  private tinkererCompanions: TinkererCompanion[] = [];
   private keyboardInput!: KeyboardInput;
   private aimInput!: KeyboardAimInput;
   private abilityInput!: KeyboardAbilityInput;
+  private grabInput!: KeyboardGrabInput;
   private selectionInput!: KeyboardCharacterSelectionInput;
   private roomInput!: KeyboardRoomInput;
   private level!: LevelData;
@@ -65,6 +70,7 @@ export class TestRoomScene extends Phaser.Scene {
   private rangerShots: RangerShot[] = [];
   private growthNodes: GrowthNode[] = [];
   private plantStructures: PlantStructure[] = [];
+  private tinkererPlugPuzzles: TinkererPlugPuzzle[] = [];
   private completionText!: Phaser.GameObjects.Text;
   private pendingIntent: PlayerIntent = {
     moveX: 0,
@@ -87,6 +93,7 @@ export class TestRoomScene extends Phaser.Scene {
   private roomComplete = false;
   private primaryAbilityHeld = false;
   private primaryAbilityPressed = false;
+  private grabPressed = false;
   private aimIntent: AimIntent = NEUTRAL_AIM_INTENT;
 
   public constructor() {
@@ -106,6 +113,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.keyboardInput = new KeyboardInput(this.input.keyboard);
     this.aimInput = new KeyboardAimInput(this.input.keyboard);
     this.abilityInput = new KeyboardAbilityInput(this.input.keyboard);
+    this.grabInput = new KeyboardGrabInput(this.input.keyboard);
     this.selectionInput = new KeyboardCharacterSelectionInput(
       this.input.keyboard,
     );
@@ -145,6 +153,22 @@ export class TestRoomScene extends Phaser.Scene {
     this.plantStructures = this.level.plantStructures.map(
       (structure) => new PlantStructure(this, structure),
     );
+    this.tinkererPlugPuzzles = this.level.tinkererPlugs.map((plug) => {
+      const groundY = this.level.staticGeometry
+        .filter(
+          (geometry) =>
+            geometry.surface === 'ground' &&
+            plug.plugStart.x >= geometry.x &&
+            plug.plugStart.x <= geometry.x + geometry.width,
+        )
+        .map(({ y }) => y)
+        .sort((a, b) => a - b)[0];
+      return new TinkererPlugPuzzle(
+        this,
+        plug,
+        groundY ?? this.level.world.height,
+      );
+    });
     this.exitPresentation = new LevelExit(
       this,
       this.level.exit,
@@ -173,6 +197,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.primaryAbilityHeld = this.abilityInput.readPrimaryHeld();
     this.primaryAbilityPressed =
       this.primaryAbilityPressed || this.abilityInput.readPrimaryPressed();
+    this.grabPressed = this.grabPressed || this.grabInput.readPressed();
 
     this.stepsThisFrame = this.fixedStepClock.advance(
       this.game.loop.rawDelta / 1_000,
@@ -191,6 +216,10 @@ export class TestRoomScene extends Phaser.Scene {
         const moveX = this.pendingIntent.moveX;
         let gripDirection: -1 | 0 | 1 = 0;
         for (const block of this.pushableBlocks) {
+        this.tinkererCompanions.forEach((companion) =>
+          companion.prepareSimulationStep(GAMEPLAY_STEP_SECONDS),
+        );
+        this.pushableBlocks.forEach((block) =>
           block.prepareStep(
             this.isSignalActive(block.data.channel),
             activeCharacter,
@@ -217,7 +246,6 @@ export class TestRoomScene extends Phaser.Scene {
             ),
           ),
         );
-        this.clearConsumedInputEdges();
         this.totalSimulationSteps += 1;
 
         this.physics.world.singleStep();
@@ -230,6 +258,17 @@ export class TestRoomScene extends Phaser.Scene {
               character === activeCharacter ? moveX : 0,
             ),
           );
+        this.tinkererCompanions.forEach((companion) =>
+          companion.completeSimulationStep(),
+        );
+        this.tinkererPlugPuzzles.forEach((puzzle) =>
+          puzzle.update(
+            activeCharacter,
+            this.grabPressed,
+            GAMEPLAY_STEP_SECONDS,
+          ),
+        );
+        this.clearConsumedInputEdges();
         this.pushableBlocks.forEach((block) => block.completeStep());
         this.pressurePlates.forEach((plate) =>
           plate.update(this.roster.getMembers()),
@@ -253,6 +292,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.roster
       .getMembers()
       .forEach((character) => character.render(interpolationAlpha));
+    this.tinkererCompanions.forEach((companion) => companion.render());
 
     const snapshot = this.createDebugSnapshot();
     this.debugOverlay.update(snapshot);
@@ -375,6 +415,9 @@ export class TestRoomScene extends Phaser.Scene {
     });
 
     this.roster = new CharacterRoster(characters);
+    this.tinkererCompanions = characters
+      .filter((character) => character.getArchetype() === 'tinkerer')
+      .map((tinkerer) => new TinkererCompanion(this, tinkerer));
     const brute = characters.find(
       (character) => character.getArchetype() === 'brute',
     );
@@ -410,7 +453,9 @@ export class TestRoomScene extends Phaser.Scene {
       .text(
         24,
         78,
-        'Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Ability: F  ·  Aim: I/J/K/L  ·  Switch: 1–3 or Q/E  ·  Reset: R',
+        `Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Ability: F${
+          this.tinkererPlugPuzzles.length > 0 ? '  ·  Grab/place: C' : ''
+        }  ·  Aim: I/J/K/L  ·  Switch: 1–3 or Q/E  ·  Reset: R`,
         {
           backgroundColor: '#080b16cc',
           color: '#cbd5e1',
@@ -546,6 +591,23 @@ export class TestRoomScene extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(10);
     }
+    if (this.tinkererPlugPuzzles.length > 0) {
+      this.add
+        .text(
+          24,
+          148,
+          'Sequence: Tinkerer presses C to grab · presses C again to place the red plug in the matching outlet',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#fca5a5',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
   }
 
   private captureSelectionInput(): void {
@@ -562,6 +624,8 @@ export class TestRoomScene extends Phaser.Scene {
       this.primaryAbilityHeld = false;
       this.primaryAbilityPressed = false;
       this.abilityInput.suppressUntilReleased();
+      this.grabPressed = false;
+      this.grabInput.suppressUntilReleased();
       this.applyActiveSelection();
     }
   }
@@ -584,6 +648,7 @@ export class TestRoomScene extends Phaser.Scene {
       jumpReleased: false,
     };
     this.primaryAbilityPressed = false;
+    this.grabPressed = false;
   }
 
   private applyPrimaryAbility(activeCharacter: PlayerCharacter): void {
@@ -683,6 +748,7 @@ export class TestRoomScene extends Phaser.Scene {
       const spawn = this.level.characters[index]!.spawn;
       character.reset(spawn.x, spawn.y);
     });
+    this.tinkererCompanions.forEach((companion) => companion.reset());
     this.roster.selectSlot(0);
     this.applyActiveSelection();
     const initialSpawn = this.level.characters[0]!.spawn;
@@ -692,6 +758,8 @@ export class TestRoomScene extends Phaser.Scene {
     this.primaryAbilityHeld = false;
     this.primaryAbilityPressed = false;
     this.abilityInput.suppressUntilReleased();
+    this.grabPressed = false;
+    this.grabInput.suppressUntilReleased();
     this.exitArrivedCount = 0;
     this.roomComplete = false;
     this.exitPresentation.reset();
@@ -703,6 +771,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.rangedTargets.forEach((target) => target.reset());
     this.growthNodes.forEach((node) => node.reset());
     this.plantStructures.forEach((structure) => structure.reset());
+    this.tinkererPlugPuzzles.forEach((puzzle) => puzzle.reset());
     this.updateGates();
     this.rangerShots.forEach((shot) => shot.destroy());
     this.rangerShots = [];

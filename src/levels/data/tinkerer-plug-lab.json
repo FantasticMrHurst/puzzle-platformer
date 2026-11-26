@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 8,
+  "id": "tinkerer-plug-lab",
+  "name": "Tinkerer Plug Lab",
+  "world": {
+    "width": 1800,
+    "height": 720,
+    "backgroundColor": "#10131d"
+  },
+  "characters": [
+    {
+      "id": "tinkerer-prototype",
+      "archetype": "tinkerer",
+      "spawn": { "x": 120, "y": 560 }
+    },
+    {
+      "id": "brute-observer",
+      "archetype": "brute",
+      "spawn": { "x": 220, "y": 560 }
+    },
+    {
+      "id": "scout-observer",
+      "archetype": "scout",
+      "spawn": { "x": 310, "y": 560 }
+    }
+  ],
+  "exit": {
+    "id": "shared-exit",
+    "x": 1650,
+    "y": 520,
+    "width": 120,
+    "height": 120
+  },
+  "staticGeometry": [
+    {
+      "id": "test-floor",
+      "x": 0,
+      "y": 640,
+      "width": 1800,
+      "height": 80,
+      "surface": "ground",
+      "purpose": "Open runway for dragging the plug"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 1760,
+      "y": 0,
+      "width": 40,
+      "height": 640,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [],
+  "toggleSwitches": [],
+  "gates": [],
+  "pushableBlocks": [],
+  "mechanismConsoles": [],
+  "poweredBridges": [],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": [],
+  "tinkererPlugs": [
+    {
+      "id": "main-power-plug",
+      "plugStart": { "x": 470, "y": 615 },
+      "outlet": { "x": 1420, "y": 615 },
+      "interactionRange": 36
+    }
+  ]
+}

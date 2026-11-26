@@ -39,6 +39,7 @@ export class PlayerCharacter {
   private previousPosition: Position;
   private currentPosition: Position;
   private braced = false;
+  private facingDirection: -1 | 1 = 1;
 
   public constructor(
     scene: Phaser.Scene,
@@ -111,6 +112,9 @@ export class PlayerCharacter {
     intent: PlayerIntent,
   ): void {
     this.previousPosition = { ...this.currentPosition };
+    if (intent.moveX !== 0) {
+      this.facingDirection = intent.moveX < 0 ? -1 : 1;
+    }
     if (this.braced) {
       this.bodyAdapter.applyVelocity({ x: 0, y: 0 });
       return;
@@ -181,6 +185,14 @@ export class PlayerCharacter {
 
   public getArchetype(): CharacterArchetype {
     return this.definition.archetype;
+  }
+
+  public getFacingDirection(): -1 | 1 {
+    return this.facingDirection;
+  }
+
+  public didJumpThisStep(): boolean {
+    return this.lastResult.jumped;
   }
 
   public isBraced(): boolean {

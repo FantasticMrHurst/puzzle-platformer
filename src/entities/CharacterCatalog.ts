@@ -21,7 +21,19 @@ const BASELINE_HEIGHT = 72;
 const CHARACTER_CATALOG: Readonly<
   Record<CharacterArchetype, CharacterDefinition>
 > = {
-  brute: createBaselineDefinition('brute', 'BRUTE', 0xf97316, 0xffedd5),
+  brute: {
+    ...createBaselineDefinition('brute', 'BRUTE', 0xf97316, 0xffedd5),
+    movementProfileName: 'brute-prototype-v1',
+    movementConfig: {
+      ...DEFAULT_MOVEMENT_CONFIG,
+      maxRunSpeed: 300,
+      groundAcceleration: 1_800,
+      groundDeceleration: 2_300,
+      airAcceleration: 650,
+      airDeceleration: 200,
+      jumpSpeed: 680,
+    },
+  },
   scout: {
     ...createBaselineDefinition('scout', 'SCOUT', 0x22c55e, 0xdcfce7),
     width: 44,
