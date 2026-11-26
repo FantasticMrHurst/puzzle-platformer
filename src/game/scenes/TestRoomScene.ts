@@ -213,13 +213,12 @@ export class TestRoomScene extends Phaser.Scene {
               : NEUTRAL_PLAYER_INTENT,
           );
         });
-        const moveX = this.pendingIntent.moveX;
-        let gripDirection: -1 | 0 | 1 = 0;
-        for (const block of this.pushableBlocks) {
         this.tinkererCompanions.forEach((companion) =>
           companion.prepareSimulationStep(GAMEPLAY_STEP_SECONDS),
         );
-        this.pushableBlocks.forEach((block) =>
+        const moveX = this.pendingIntent.moveX;
+        let gripDirection: -1 | 0 | 1 = 0;
+        for (const block of this.pushableBlocks) {
           block.prepareStep(
             this.isSignalActive(block.data.channel),
             activeCharacter,
