@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 
 import type { PlayerCharacter } from '../entities/PlayerCharacter';
 import type { TinkererPlugData } from '../levels/LevelSchema';
