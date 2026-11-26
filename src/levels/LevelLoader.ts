@@ -18,6 +18,7 @@ import {
   type StaticGeometryData,
   type SurfaceKind,
   type ToggleSwitchData,
+  type TinkererPlugData,
 } from './LevelSchema';
 
 const SURFACE_KINDS = new Set<SurfaceKind>(['ground', 'platform', 'wall']);
@@ -42,11 +43,15 @@ export function loadLevelData(
   const root = requireRecord(input, source, '$');
   const schemaVersion = requireNumber(root, 'schemaVersion', source, '$');
 
-  if (schemaVersion !== 6 && schemaVersion !== LEVEL_SCHEMA_VERSION) {
+  if (
+    schemaVersion !== 6 &&
+    schemaVersion !== 7 &&
+    schemaVersion !== LEVEL_SCHEMA_VERSION
+  ) {
     fail(
       source,
       '$.schemaVersion',
-      `must be 6 or ${LEVEL_SCHEMA_VERSION}; received ${schemaVersion}`,
+      `must be 6, 7, or ${LEVEL_SCHEMA_VERSION}; received ${schemaVersion}`,
     );
   }
 
@@ -87,6 +92,10 @@ export function loadLevelData(
     source,
     world,
   );
+  const tinkererPlugs =
+    schemaVersion === LEVEL_SCHEMA_VERSION
+      ? parseTinkererPlugs(root.tinkererPlugs, source, world)
+      : [];
   const toggleSwitches =
     schemaVersion === 6
       ? []
@@ -144,6 +153,12 @@ export function loadLevelData(
       );
     }
   });
+  if (
+    tinkererPlugs.length > 0 &&
+    !characters.some(({ archetype }) => archetype === 'tinkerer')
+  ) {
+    fail(source, '$.tinkererPlugs', 'requires a Tinkerer in $.characters');
+  }
 
   return {
     schemaVersion,
@@ -162,7 +177,41 @@ export function loadLevelData(
     rangedTargets,
     growthNodes,
     plantStructures,
+    tinkererPlugs,
   };
+}
+
+function parseTinkererPlugs(
+  input: unknown,
+  source: string,
+  world: LevelWorldData,
+): readonly TinkererPlugData[] {
+  if (!Array.isArray(input)) {
+    fail(source, '$.tinkererPlugs', 'must be an array');
+  }
+
+  const seenIds = new Set<string>();
+  return input.map((entry: unknown, index: number) => {
+    const path = `$.tinkererPlugs[${index}]`;
+    const puzzle = requireRecord(entry, source, path);
+    const id = requireUniqueId(puzzle, seenIds, source, path);
+    const plugStart = parsePoint(puzzle.plugStart, source, `${path}.plugStart`);
+    const outlet = parsePoint(puzzle.outlet, source, `${path}.outlet`);
+    assertPointInsideWorld(plugStart, world, source, `${path}.plugStart`);
+    assertPointInsideWorld(outlet, world, source, `${path}.outlet`);
+
+    return {
+      id,
+      plugStart,
+      outlet,
+      interactionRange: requirePositiveNumber(
+        puzzle,
+        'interactionRange',
+        source,
+        path,
+      ),
+    };
+  });
 }
 
 function parseGates(

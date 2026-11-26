@@ -5,6 +5,7 @@ import mechanismLab from './data/mechanism-lab.json';
 import movementTestRoom from './data/test-room.json';
 import rangerLab from './data/ranger-lab.json';
 import scoutBruteRangerLab from './data/scout-brute-ranger-lab.json';
+import tinkererPlugLab from './data/tinkerer-plug-lab.json';
 import traversalLab from './data/traversal-lab.json';
 
 export interface LevelSource {
@@ -45,6 +46,10 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
   'traversal-lab': {
     data: traversalLab,
     source: 'traversal-lab.json',
+  },
+  'tinkerer-plug-lab': {
+    data: tinkererPlugLab,
+    source: 'tinkerer-plug-lab.json',
   },
 };
 
