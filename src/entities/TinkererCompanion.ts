@@ -101,10 +101,6 @@ export class TinkererCompanion {
   }
 
   private getAlignedGroundY(leaderY: number): number {
-    return (
-      leaderY +
-      (this.tinkerer.visualObject.height - COMPANION_HEIGHT) / 2
-    );
+    return leaderY + (this.tinkerer.visualObject.height - COMPANION_HEIGHT) / 2;
   }
-
 }

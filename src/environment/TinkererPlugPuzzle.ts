@@ -177,10 +177,7 @@ export class TinkererPlugPuzzle {
     this.updatePresentation(undefined);
   }
 
-  private positionBeside(
-    character: PlayerCharacter,
-    side: GrabSide,
-  ): void {
+  private positionBeside(character: PlayerCharacter, side: GrabSide): void {
     const characterBounds = character.physicsObject.getBounds();
     const plugX =
       characterBounds.centerX +
@@ -313,7 +310,10 @@ export class TinkererPlugPuzzle {
     this.wirePoints.forEach((point, index) => {
       const t = index / (this.wirePoints.length - 1);
       point.x = anchor.x + (root.x - anchor.x) * t;
-      point.y = anchor.y + (root.y - anchor.y) * t + Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
+      point.y =
+        anchor.y +
+        (root.y - anchor.y) * t +
+        Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
       point.previousX = point.x;
       point.previousY = point.y;
     });
@@ -334,7 +334,9 @@ export class TinkererPlugPuzzle {
       const t = index / (this.wirePoints.length - 1);
       const targetX = anchor.x + (root.x - anchor.x) * t;
       const targetY =
-        anchor.y + (root.y - anchor.y) * t + Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
+        anchor.y +
+        (root.y - anchor.y) * t +
+        Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
       if (index === 0 || index === this.wirePoints.length - 1) {
         point.x = targetX;
         point.y = targetY;

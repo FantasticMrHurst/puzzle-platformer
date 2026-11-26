@@ -157,11 +157,7 @@ export function loadLevelData(
     tinkererPlugs.length > 0 &&
     !characters.some(({ archetype }) => archetype === 'tinkerer')
   ) {
-    fail(
-      source,
-      '$.tinkererPlugs',
-      'requires a Tinkerer in $.characters',
-    );
+    fail(source, '$.tinkererPlugs', 'requires a Tinkerer in $.characters');
   }
 
   return {
