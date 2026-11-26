@@ -188,14 +188,17 @@ export class TestRoomScene extends Phaser.Scene {
               : NEUTRAL_PLAYER_INTENT,
           );
         });
-        this.pushableBlocks.forEach((block) =>
+        const moveX = this.pendingIntent.moveX;
+        let gripDirection: -1 | 0 | 1 = 0;
+        for (const block of this.pushableBlocks) {
           block.prepareStep(
             this.isSignalActive(block.data.channel),
             activeCharacter,
-            this.pendingIntent.moveX,
+            moveX,
             this.primaryAbilityHeld,
-          ),
-        );
+          );
+          gripDirection ||= block.getGripDirection(activeCharacter.id);
+        }
         this.mechanismConsoles.forEach((consoleObject) =>
           consoleObject.update(activeCharacter),
         );
@@ -221,7 +224,11 @@ export class TestRoomScene extends Phaser.Scene {
         this.roster
           .getMembers()
           .forEach((character) =>
-            character.completeSimulationStep(GAMEPLAY_STEP_SECONDS),
+            character.completeSimulationStep(
+              GAMEPLAY_STEP_SECONDS,
+              character === activeCharacter ? gripDirection : 0,
+              character === activeCharacter ? moveX : 0,
+            ),
           );
         this.pushableBlocks.forEach((block) => block.completeStep());
         this.pressurePlates.forEach((plate) =>

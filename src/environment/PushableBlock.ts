@@ -118,6 +118,13 @@ export class PushableBlock {
     );
   }
 
+  public getGripDirection(characterId: string): -1 | 0 | 1 {
+    if (this.grippedCharacterId !== characterId || this.gripSide === null) {
+      return 0;
+    }
+    return this.gripSide === 'left' ? 1 : -1;
+  }
+
   public completeStep(): void {
     if (this.getLeft() < this.data.x) {
       this.body.reset(

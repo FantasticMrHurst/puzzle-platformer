@@ -1,0 +1,35 @@
+{
+  "canvas": [
+    96,
+    112
+  ],
+  "anchor": [
+    48,
+    96
+  ],
+  "standing_alpha_bbox": [
+    16,
+    16,
+    79,
+    96
+  ],
+  "scout_alpha_bbox": [
+    26,
+    28,
+    63,
+    96
+  ],
+  "wall_contact_x": 80,
+  "brace_surface_suggested_local_y": 31,
+  "brace_surface_suggested_x": [
+    22,
+    73
+  ],
+  "notes": [
+    "Collision and hand contact points are estimates for playtesting; use engine hitboxes rather than sprite outlines.",
+    "Wall kick faces left intentionally.",
+    "Push/pull/brace are action states; hold brace_04 while supporting another character.",
+    "No external props are intended; manually masked prop edges may need polish.",
+    "All pose alignment is approximate except idle lower boot pixels, which are locked."
+  ]
+}

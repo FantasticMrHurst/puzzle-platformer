@@ -64,7 +64,9 @@ Open `?level=gate-lab` to try shared environmental controls. Leave one character
 
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
-Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-frame run cycle and other key poses. Run and brake, take off and land, or jump against the wall to see the cling, slide, and kick.
+Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-frame idle loop, eight-frame run, and five jump poses. The jump follows the actual arc from liftoff through falling, followed by the existing landing pose. Jump against a wall to see the cling, slide, and kick.
+
+Choose **Brute Animation Preview** from the lab menu to see both animated characters. Press `2` to select the Brute. Tap `F` on open ground to brace or release. Once the Scout unlocks the block, hold `F` beside it and move toward it to push or away to pull. The preview uses the current collision bodies and movement rules.
 
 See the project documents for current direction:
 
