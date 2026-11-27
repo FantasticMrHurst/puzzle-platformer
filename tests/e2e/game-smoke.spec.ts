@@ -43,11 +43,11 @@ test('opens labs from the menu and toggles diagnostics', async ({ page }) => {
   await page.getByRole('link', { name: 'Character Traversal Lab' }).click();
   const traversalLab = await waitForProbe(page);
   expect(traversalLab.roster.map(({ id }) => id)).toEqual([
-    'scout-prototype',
+    'pilot-prototype',
     'pet-prototype',
     'brute-prototype',
   ]);
-  expect(traversalLab.movement.profileName).toBe('scout-prototype-v2');
+  expect(traversalLab.movement.profileName).toBe('pilot-prototype-v2');
 
   await page.keyboard.down('Digit2');
   await expect
@@ -63,11 +63,11 @@ test('responds to movement input', async ({ page }) => {
   await page.keyboard.down('Digit2');
   await expect
     .poll(async () => (await readProbe(page)).activeCharacterId)
-    .toBe('scout-prototype');
+    .toBe('pilot-prototype');
   await page.keyboard.up('Digit2');
 
   const initial = await readProbe(page);
-  const initialScout = findRosterMember(initial, 'scout-prototype');
+  const initialPilot = findRosterMember(initial, 'pilot-prototype');
 
   await page.keyboard.down('KeyD');
   await page.waitForTimeout(500);
@@ -76,9 +76,9 @@ test('responds to movement input', async ({ page }) => {
   await expect
     .poll(
       async () =>
-        findRosterMember(await readProbe(page), 'scout-prototype').position.x,
+        findRosterMember(await readProbe(page), 'pilot-prototype').position.x,
     )
-    .toBeGreaterThan(initialScout.position.x + 80);
+    .toBeGreaterThan(initialPilot.position.x + 80);
 
   await page.keyboard.down('KeyR');
   await expect
@@ -87,9 +87,9 @@ test('responds to movement input', async ({ page }) => {
   await expect
     .poll(
       async () =>
-        findRosterMember(await readProbe(page), 'scout-prototype').position.x,
+        findRosterMember(await readProbe(page), 'pilot-prototype').position.x,
     )
-    .toBeLessThanOrEqual(initialScout.position.x + 1);
+    .toBeLessThanOrEqual(initialPilot.position.x + 1);
   await page.keyboard.up('KeyR');
 });
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "id": "scout-brute-ranger-lab",
-  "name": "Scout, Brute & Ranger Lab",
+  "id": "pilot-brute-ranger-lab",
+  "name": "Pilot, Brute & Ranger Lab",
   "world": {
     "width": 2300,
     "height": 720,
@@ -9,8 +9,8 @@
   },
   "characters": [
     {
-      "id": "scout",
-      "archetype": "scout",
+      "id": "pilot",
+      "archetype": "pilot",
       "spawn": {
         "x": 600,
         "y": 566
@@ -58,7 +58,7 @@
       "surface": "ground"
     },
     {
-      "id": "scout-shelf",
+      "id": "pilot-shelf",
       "x": 380,
       "y": 300,
       "width": 180,
@@ -101,7 +101,7 @@
   ],
   "pressurePlates": [
     {
-      "id": "scout-plate",
+      "id": "pilot-plate",
       "x": 410,
       "y": 288,
       "width": 130,

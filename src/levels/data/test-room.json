@@ -14,8 +14,8 @@
       "spawn": { "x": 160, "y": 840 }
     },
     {
-      "id": "scout-prototype",
-      "archetype": "scout",
+      "id": "pilot-prototype",
+      "archetype": "pilot",
       "spawn": { "x": 240, "y": 840 }
     },
     {

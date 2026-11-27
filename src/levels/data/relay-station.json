@@ -9,8 +9,8 @@
   },
   "characters": [
     {
-      "id": "scout",
-      "archetype": "scout",
+      "id": "pilot",
+      "archetype": "pilot",
       "spawn": {
         "x": 600,
         "y": 566

@@ -11,12 +11,12 @@ Open `?level=cooperation-lab` with the local development server running.
 
 The browser run reached the shared exit with all three characters. After a manual reset, the first target and bridge returned to their inactive states. Walking into the unbridged gap triggered a whole-room reset.
 
-## Scout, Brute, and Ranger playtest
+## Pilot, Brute, and Ranger playtest
 
-Open `?level=scout-brute-ranger-lab` to try the Ranger as the third member of the Scout and Brute team.
+Open `?level=pilot-brute-ranger-lab` to try the Ranger as the third member of the Pilot and Brute team.
 
-1. As Scout (`1`), jump right into the purple wall. Release and press jump again to kick left onto the plate. Leave the Scout on the plate.
-2. As Brute (`2`), approach the unlocked block, hold `F`, and push right until it stops. The block stays shifted when the Scout leaves the plate. Jump over the shifted block after clearing the overhead wall.
+1. As Pilot (`1`), jump right into the purple wall. Release and press jump again to kick left onto the plate. Leave the Pilot on the plate.
+2. As Brute (`2`), approach the unlocked block, hold `F`, and push right until it stops. The block stays shifted when the Pilot leaves the plate. Jump over the shifted block after clearing the overhead wall.
 3. Move Brute onto the teal strip and tap `F` to brace. Switch to Ranger (`3`), jump onto Brute, then hold `L` and tap `F` to hit the target straight across.
 4. Once the bridge turns green, switch back to Brute and tap `F` to release the brace. Bring all three to the exit. Press `R` to restart.
 
@@ -26,7 +26,7 @@ The target lines up with a horizontal shot from the Ranger while standing on the
 
 These are preliminary observations from the focused labs and the mixed-team run. During developer playtests, note which actions you understood without guidance, which you wanted to repeat, when switching felt useful, and whether a mistake was easy to undo.
 
-- **Scout.** Wall clinging makes vertical exploration a distinct movement role. Reaching the plate turns that access into a team benefit. Wall timing and chamber geometry still shape how forgiving the route feels.
+- **Pilot.** Wall clinging makes vertical exploration a distinct movement role. Reaching the plate turns that access into a team benefit. Wall timing and chamber geometry still shape how forgiving the route feels.
 - **Brute.** Grip, pull, and brace offer several ways to help a teammate. The same contextual key handles grip and brace, so clear feedback matters when switching between them.
 - **Pet.** The small body makes its route easy to read. The current tunnel demonstrates access for the Pet. Letting the Pet open a route for someone else would test its contribution to the team.
 - **Tinkerer.** The nearby console is easy to understand and easy to reverse. A single console and bridge give the Tinkerer few decisions after reaching the console. Routing power between competing devices would test a broader role.
@@ -35,18 +35,18 @@ These are preliminary observations from the focused labs and the mixed-team run.
 
 ## Provisional recommendation
 
-Advance **Scout, Brute, and Gardener** as the first trio to test together. They cover vertical access, object manipulation, and route creation. Before locking the roster, try a short puzzle where the plant stays in place to support the team while the Brute repositions a block or braces elsewhere. If the plant and brace feel interchangeable, test Ranger in the Gardener slot for a distinct remote interaction.
+Advance **Pilot, Brute, and Gardener** as the first trio to test together. They cover vertical access, object manipulation, and route creation. Before locking the roster, try a short puzzle where the plant stays in place to support the team while the Brute repositions a block or braces elsewhere. If the plant and brace feel interchangeable, test Ranger in the Gardener slot for a distinct remote interaction.
 
 ## Current working roster
 
-Scout, Brute, and Tinkerer are the working trio for **Relay Station**. The room is available from the lab menu as a test of this combination. Keep the roster open for both developers to review after playing it.
+Pilot, Brute, and Tinkerer are the working trio for **Relay Station**. The room is available from the lab menu as a test of this combination. Keep the roster open for both developers to review after playing it.
 
 Play the room without a walkthrough first. Note where you first understand what each device needs, whether you can recover when a teammate is in the wrong place, and which character you most want to use again.
 
 <details>
 <summary>Relay Station design and intended route</summary>
 
-- The Scout wall-jumps to the freight interlock and stays on the plate until the Brute slides the counterweight out of the bulkhead. The cleared passage persists after the Scout leaves the plate.
+- The Pilot wall-jumps to the freight interlock and stays on the plate until the Brute slides the counterweight out of the bulkhead. The cleared passage persists after the Pilot leaves the plate.
 - The Brute braces beside the relay balcony so the Tinkerer can take two jumps to reach it. The Tinkerer powers the service bridge at the console.
 - A teammate holds the plate near the exit airlock. Someone else crosses and latches the gate from the far side, freeing the character on the plate. The whole crew must reach the exit.
 - A fall into the bridge shaft resets everyone. The same room reset is available with `R`.

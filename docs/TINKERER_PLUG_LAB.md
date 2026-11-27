@@ -9,7 +9,7 @@ The plug lab explores a deliberate carry-and-connect interaction for the Tinkere
 3. Move across the room to drag the plug; the wire base stays at the first pickup point while the cable extends or retracts with a little slack.
 4. Press `C` again to place the plug. If its prongs are aligned with the outlet, it snaps in and the outlet reads `POWERED`.
 
-Only the active Tinkerer can grab or place the plug. Brute and Scout see a `TINKERER ONLY` prompt near the object. Switching characters or leaving the ground releases the plug. Press `R` to reset it to its starting location.
+Only the active Tinkerer can grab or place the plug. Brute and Pilot see a `TINKERER ONLY` prompt near the object. Switching characters or leaving the ground releases the plug. Press `R` to reset it to its starting location.
 
 ## Prototype behavior
 

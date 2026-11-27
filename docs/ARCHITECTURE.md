@@ -150,6 +150,8 @@ The exact Phaser hook for each step is an implementation question. The invariant
 
 ## Character composition
 
+See the [character development standard](CHARACTER_DEVELOPMENT.md) for the current implementation, art registration, and playtest workflow.
+
 Characters should share the same controller implementation and differ through configuration and composed abilities. A character consists conceptually of:
 
 - identity and current gameplay state;

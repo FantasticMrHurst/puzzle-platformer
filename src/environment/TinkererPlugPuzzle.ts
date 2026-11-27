@@ -113,11 +113,11 @@ export class TinkererPlugPuzzle {
 
     const wasGrabbedByActive = this.grabbedById === activeCharacter.id;
     const adjacentSide = this.findAdjacentSide(activeCharacter);
-    const isTinkerer = activeCharacter.getArchetype() === 'tinkerer';
+    const canRoutePower = activeCharacter.hasAbility('route-power');
     const isGrounded = activeCharacter.getContacts().grounded;
 
     if (this.grabbedById === null) {
-      if (grabPressed && isTinkerer && isGrounded && adjacentSide !== null) {
+      if (grabPressed && canRoutePower && isGrounded && adjacentSide !== null) {
         this.grabbedById = activeCharacter.id;
         this.grabSide = adjacentSide;
         this.plugOrientation = adjacentSide;
@@ -131,7 +131,7 @@ export class TinkererPlugPuzzle {
       }
     } else if (
       this.grabbedById !== activeCharacter.id ||
-      !isTinkerer ||
+      !canRoutePower ||
       !isGrounded
     ) {
       this.release();
@@ -175,6 +175,10 @@ export class TinkererPlugPuzzle {
     this.resetWirePoints();
     this.drawWire();
     this.updatePresentation(undefined);
+  }
+
+  public isPowered(): boolean {
+    return this.pluggedIn;
   }
 
   private positionBeside(character: PlayerCharacter, side: GrabSide): void {
@@ -273,7 +277,7 @@ export class TinkererPlugPuzzle {
     const isNearby = this.findAdjacentSide(activeCharacter) !== null;
     if (!isNearby) {
       this.statusText.setText('MATCH RED PLUG TO OUTLET').setColor('#fee2e2');
-    } else if (activeCharacter.getArchetype() === 'tinkerer') {
+    } else if (activeCharacter.hasAbility('route-power')) {
       this.statusText.setText('PRESS C TO GRAB').setColor('#fee2e2');
     } else {
       this.statusText.setText('TINKERER ONLY').setColor('#fde68a');

@@ -2,7 +2,7 @@
   "canvas": [96, 112],
   "anchor": [48, 96],
   "standing_alpha_bbox": [16, 16, 79, 96],
-  "scout_alpha_bbox": [26, 28, 63, 96],
+  "pilot_alpha_bbox": [26, 28, 63, 96],
   "wall_contact_x": 80,
   "brace_surface_suggested_local_y": 31,
   "brace_surface_suggested_x": [22, 73],

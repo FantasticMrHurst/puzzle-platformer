@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 
-import { BrutePosePreview } from '../../rendering/BrutePosePreview';
-import { ScoutPosePreview } from '../../rendering/ScoutPosePreview';
+import { CHARACTER_ART } from '../../rendering/CharacterArt';
 
 export class BootScene extends Phaser.Scene {
   public constructor() {
@@ -9,8 +8,12 @@ export class BootScene extends Phaser.Scene {
   }
 
   public preload(): void {
-    ScoutPosePreview.preload(this);
-    BrutePosePreview.preload(this);
+    const params = new URLSearchParams(window.location.search);
+    for (const art of Object.values(CHARACTER_ART)) {
+      if (params.get(art.previewFlag) === '1') {
+        this.load.atlas(art.textureKey, art.textureUrl, art.atlasUrl);
+      }
+    }
   }
 
   public create(): void {

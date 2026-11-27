@@ -9,8 +9,8 @@
   },
   "characters": [
     {
-      "id": "scout-prototype",
-      "archetype": "scout",
+      "id": "pilot-prototype",
+      "archetype": "pilot",
       "spawn": { "x": 120, "y": 520 }
     },
     {
@@ -57,7 +57,7 @@
       "width": 40,
       "height": 260,
       "surface": "wall",
-      "purpose": "Scout wall-jump chamber"
+      "purpose": "Pilot wall-jump chamber"
     },
     {
       "id": "wall-lab-right",
@@ -75,7 +75,7 @@
       "width": 300,
       "height": 40,
       "surface": "platform",
-      "purpose": "Scout wall-jump landing"
+      "purpose": "Pilot wall-jump landing"
     },
     {
       "id": "pet-tunnel-ceiling",
@@ -98,7 +98,7 @@
   ],
   "pressurePlates": [
     {
-      "id": "scout-wall-plate",
+      "id": "pilot-wall-plate",
       "x": 820,
       "y": 208,
       "width": 110,
@@ -117,7 +117,7 @@
       "requiredArchetype": "brute",
       "maxPushX": 850,
       "pushSpeed": 320,
-      "purpose": "Scout plate unlocks · Brute holds F to push or pull"
+      "purpose": "Pilot plate unlocks · Brute holds F to push or pull"
     }
   ],
   "mechanismConsoles": [],
