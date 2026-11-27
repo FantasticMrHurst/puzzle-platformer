@@ -1,6 +1,10 @@
 import Phaser from 'phaser';
 
-import type { PlayerInputSource, PlayerIntent } from './PlayerIntent';
+import type {
+  PlayerInputSource,
+  PlayerIntent,
+  RawPlayerInput,
+} from './PlayerIntent';
 import { PlayerIntentMapper } from './PlayerIntentMapper';
 
 interface KeyboardBindings {
@@ -29,16 +33,23 @@ export class KeyboardInput implements PlayerInputSource {
     };
   }
 
-  public readIntent(): PlayerIntent {
+  public readIntent(additionalInput?: RawPlayerInput): PlayerIntent {
     const { bindings } = this;
 
     return this.mapper.map({
-      moveLeft: bindings.leftArrow.isDown || bindings.keyA.isDown,
-      moveRight: bindings.rightArrow.isDown || bindings.keyD.isDown,
+      moveLeft:
+        bindings.leftArrow.isDown ||
+        bindings.keyA.isDown ||
+        additionalInput?.moveLeft === true,
+      moveRight:
+        bindings.rightArrow.isDown ||
+        bindings.keyD.isDown ||
+        additionalInput?.moveRight === true,
       jump:
         bindings.upArrow.isDown ||
         bindings.keyW.isDown ||
-        bindings.space.isDown,
+        bindings.space.isDown ||
+        additionalInput?.jump === true,
     });
   }
 

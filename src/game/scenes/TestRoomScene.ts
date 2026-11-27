@@ -28,7 +28,9 @@ import { KeyboardRoomInput } from '../../input/KeyboardRoomInput';
 import {
   NEUTRAL_PLAYER_INTENT,
   type PlayerIntent,
+  type RawPlayerInput,
 } from '../../input/PlayerIntent';
+import { StandardGamepadInput } from '../../input/StandardGamepadInput';
 import { getLevelSource } from '../../levels/LevelCatalog';
 import { loadLevelData } from '../../levels/LevelLoader';
 import type {
@@ -58,6 +60,8 @@ export class TestRoomScene extends Phaser.Scene {
   private grabInput!: KeyboardGrabInput;
   private selectionInput!: KeyboardCharacterSelectionInput;
   private roomInput!: KeyboardRoomInput;
+  private gamepadInput?: StandardGamepadInput;
+  private gamepadPrimaryHeld = false;
   private level!: LevelData;
   private exitPresentation!: LevelExit;
   private pressurePlates: PressurePlate[] = [];
@@ -105,6 +109,10 @@ export class TestRoomScene extends Phaser.Scene {
       new URLSearchParams(window.location.search).get('level'),
     );
     this.level = loadLevelData(selectedLevel.data, selectedLevel.source);
+    this.gamepadInput =
+      this.level.id === 'relay-station'
+        ? new StandardGamepadInput()
+        : undefined;
     this.fixedStepClock.reset();
 
     if (this.input.keyboard === null) {
@@ -183,20 +191,30 @@ export class TestRoomScene extends Phaser.Scene {
 
   public override update(): void {
     this.totalRenderedFrames += 1;
+    const gamepad = this.gamepadInput?.sample();
+    this.gamepadPrimaryHeld = gamepad?.primaryHeld ?? false;
 
     if (Phaser.Input.Keyboard.JustDown(this.debugToggleKey)) {
       this.debugOverlay.toggle();
     }
-    if (this.roomInput.readIntent().resetPressed) {
+    const reset =
+      this.roomInput.readIntent().resetPressed || gamepad?.resetPressed;
+    if (reset) {
       this.resetRoomToCheckpoint();
     }
 
-    this.captureSelectionInput();
-    this.captureMovementInput();
+    this.captureSelectionInput(reset ? 0 : gamepad?.cycleDirection);
+    this.captureMovementInput(gamepad?.movement);
     this.aimIntent = this.aimInput.readIntent();
-    this.primaryAbilityHeld = this.abilityInput.readPrimaryHeld();
-    this.primaryAbilityPressed =
-      this.primaryAbilityPressed || this.abilityInput.readPrimaryPressed();
+    const wasPrimaryHeld = this.primaryAbilityHeld;
+    this.primaryAbilityHeld = this.abilityInput.readPrimaryHeld(
+      this.gamepadPrimaryHeld,
+    );
+    const primaryPressed = this.abilityInput.readPrimaryPressed(
+      gamepad?.primaryPressed,
+    );
+    this.primaryAbilityPressed ||=
+      primaryPressed && (!wasPrimaryHeld || !this.gamepadPrimaryHeld);
     this.grabPressed = this.grabPressed || this.grabInput.readPressed();
 
     this.stepsThisFrame = this.fixedStepClock.advance(
@@ -504,6 +522,24 @@ export class TestRoomScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(10);
 
+    if (this.gamepadInput !== undefined) {
+      this.add
+        .text(
+          24,
+          176,
+          'Controller: D-pad/stick move · Cross jump · Square ability · L1/R1 switch · Options reset',
+          {
+            backgroundColor: '#080b16cc',
+            color: '#cbd5e1',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '13px',
+            padding: { x: 10, y: 6 },
+          },
+        )
+        .setScrollFactor(0)
+        .setDepth(10);
+    }
+
     const mixedLabHint =
       level.id === 'relay-station'
         ? 'Restore the service crossing and get the whole crew through the exit airlock.'
@@ -615,12 +651,12 @@ export class TestRoomScene extends Phaser.Scene {
     }
   }
 
-  private captureSelectionInput(): void {
+  private captureSelectionInput(gamepadDirection: -1 | 0 | 1 = 0): void {
     const selection = this.selectionInput.readIntent();
+    const direction = selection.cycleDirection || gamepadDirection;
     const changed =
       selection.directSlot === undefined
-        ? selection.cycleDirection !== 0 &&
-          this.roster.cycle(selection.cycleDirection)
+        ? direction !== 0 && this.roster.cycle(direction)
         : this.roster.selectSlot(selection.directSlot);
 
     if (changed) {
@@ -628,15 +664,15 @@ export class TestRoomScene extends Phaser.Scene {
       this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
       this.primaryAbilityHeld = false;
       this.primaryAbilityPressed = false;
-      this.abilityInput.suppressUntilReleased();
+      this.abilityInput.suppressUntilReleased(this.gamepadPrimaryHeld);
       this.grabPressed = false;
       this.grabInput.suppressUntilReleased();
       this.applyActiveSelection();
     }
   }
 
-  private captureMovementInput(): void {
-    const intent = this.keyboardInput.readIntent();
+  private captureMovementInput(additionalInput?: RawPlayerInput): void {
+    const intent = this.keyboardInput.readIntent(additionalInput);
     this.lastSampledIntent = intent;
     this.pendingIntent = {
       moveX: intent.moveX,
@@ -665,7 +701,7 @@ export class TestRoomScene extends Phaser.Scene {
       this.toggleSwitches.some((toggle) => toggle.tryToggle(activeCharacter))
     ) {
       this.primaryAbilityHeld = false;
-      this.abilityInput.suppressUntilReleased();
+      this.abilityInput.suppressUntilReleased(this.gamepadPrimaryHeld);
       return;
     }
 
@@ -762,7 +798,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
     this.primaryAbilityHeld = false;
     this.primaryAbilityPressed = false;
-    this.abilityInput.suppressUntilReleased();
+    this.abilityInput.suppressUntilReleased(this.gamepadPrimaryHeld);
     this.grabPressed = false;
     this.grabInput.suppressUntilReleased();
     this.exitArrivedCount = 0;
