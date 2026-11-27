@@ -8,8 +8,18 @@ import {
 } from '../movement/MovementController';
 import { ArcadeBodyAdapter } from '../physics/ArcadeBodyAdapter';
 import {
-  createExplorerArt,
-  type ExplorerPose,
+  APEX_POSE,
+  CARRY_IDLE_POSE,
+  CARRY_POSES,
+  CLIMB_POSES,
+  EXPLORER_ART_SCALE,
+  EXPLORER_FOOT_ORIGIN,
+  FALL_POSE,
+  IDLE_POSES,
+  LAND_POSE,
+  RISE_POSE,
+  RUN_POSES,
+  WALL_POSE,
 } from '../rendering/RedExplorerArt';
 import {
   interpolatePosition,
@@ -20,6 +30,12 @@ const WIDTH = 24;
 const HEIGHT = 40;
 const CLIMB_SPEED = 155;
 const LADDER_REACH = 18;
+const IDLE_FRAME_SECONDS = 0.22;
+const LAND_SECONDS = 0.09;
+const RUN_PIXELS_PER_FRAME = 14;
+const CARRY_PIXELS_PER_FRAME = 16;
+const CLIMB_PIXELS_PER_FRAME = 10;
+const APEX_SPEED = 75;
 
 const MOVEMENT = {
   ...DEFAULT_MOVEMENT_CONFIG,
@@ -48,6 +64,9 @@ export class RedExplorer {
   private previousPosition: Position;
   private position: Position;
   private stride = 0;
+  private idleSeconds = 0;
+  private airborneSeconds = 0;
+  private landingSeconds = 0;
   private climbTravel = 0;
   private result?: MovementResult;
 
@@ -66,10 +85,10 @@ export class RedExplorer {
       MOVEMENT.maxFallSpeed,
     );
     this.previousPosition = this.position = this.adapter.readPosition();
-    createExplorerArt(scene);
     this.sprite = scene.add
-      .image(x, feetY, 'red-explorer-idle')
-      .setOrigin(0.5, 1)
+      .image(x, feetY, IDLE_POSES[0])
+      .setOrigin(EXPLORER_FOOT_ORIGIN.x, EXPLORER_FOOT_ORIGIN.y)
+      .setScale(EXPLORER_ART_SCALE)
       .setDepth(5);
   }
 
@@ -128,12 +147,27 @@ export class RedExplorer {
     this.adapter.applyVelocity(this.result.velocity);
   }
 
-  public complete(): void {
+  public complete(deltaSeconds: number): void {
     this.position = this.adapter.readPosition();
     this.stride += Math.abs(this.position.x - this.previousPosition.x);
     if (this.climbing) {
       this.climbTravel += Math.abs(this.position.y - this.previousPosition.y);
+      this.airborneSeconds = 0;
+      this.landingSeconds = 0;
+    } else if (this.isGrounded()) {
+      this.landingSeconds =
+        this.airborneSeconds >= LAND_SECONDS
+          ? LAND_SECONDS
+          : Math.max(0, this.landingSeconds - deltaSeconds);
+      this.airborneSeconds = 0;
+    } else {
+      this.airborneSeconds += deltaSeconds;
+      this.landingSeconds = 0;
     }
+    this.idleSeconds =
+      this.isGrounded() && Math.abs(this.body.velocity.x) < 12
+        ? this.idleSeconds + deltaSeconds
+        : 0;
   }
 
   public render(alpha: number, carrying: boolean): void {
@@ -144,9 +178,9 @@ export class RedExplorer {
     );
     const pose = this.getPose(carrying);
     this.sprite.setPosition(Math.round(x), Math.round(y + HEIGHT / 2));
-    const key = `red-explorer-${pose}`;
-    if (this.sprite.texture.key !== key) this.sprite.setTexture(key);
-    this.sprite.setFlipX(this.facing < 0);
+    if (this.sprite.texture.key !== pose) this.sprite.setTexture(pose);
+    // Mirror around the common foot anchor, not the middle of the source canvas.
+    this.sprite.setScale(EXPLORER_ART_SCALE * this.facing, EXPLORER_ART_SCALE);
   }
 
   public isGrounded(): boolean {
@@ -161,6 +195,9 @@ export class RedExplorer {
     this.climbing = false;
     this.facing = 1;
     this.stride = 0;
+    this.idleSeconds = 0;
+    this.airborneSeconds = 0;
+    this.landingSeconds = 0;
     this.climbTravel = 0;
     this.result = undefined;
     this.controller.reset();
@@ -169,22 +206,28 @@ export class RedExplorer {
     this.previousPosition = this.position = this.adapter.readPosition();
   }
 
-  private getPose(carrying: boolean): ExplorerPose {
-    if (this.climbing) {
-      return Math.floor(this.climbTravel / 8) % 2 === 0 ? 'climb-0' : 'climb-1';
-    }
+  private getPose(carrying: boolean): string {
     if (carrying) {
-      const frame =
-        Math.abs(this.body.velocity.x) < 12
-          ? 1
-          : Math.floor(this.stride / 10) % 4;
-      return (['carry-0', 'carry-1', 'carry-2', 'carry-3'] as const)[frame]!;
+      return Math.abs(this.body.velocity.x) < 12
+        ? CARRY_IDLE_POSE
+        : cyclePose(CARRY_POSES, this.stride / CARRY_PIXELS_PER_FRAME);
     }
-    if (this.getMode() === 'wall-sliding') return 'wall';
-    if (!this.isGrounded()) return this.body.velocity.y < 0 ? 'rise' : 'fall';
-    if (Math.abs(this.body.velocity.x) < 12) return 'idle';
-    return (['run-0', 'run-1', 'run-2', 'run-3'] as const)[
-      Math.floor(this.stride / 10) % 4
-    ]!;
+    if (this.climbing) {
+      return cyclePose(CLIMB_POSES, this.climbTravel / CLIMB_PIXELS_PER_FRAME);
+    }
+    if (this.getMode() === 'wall-sliding') return WALL_POSE;
+    if (!this.isGrounded()) {
+      const verticalSpeed = this.body.velocity.y;
+      if (verticalSpeed < -APEX_SPEED) return RISE_POSE;
+      return verticalSpeed > APEX_SPEED ? FALL_POSE : APEX_POSE;
+    }
+    if (this.landingSeconds > 0) return LAND_POSE;
+    return Math.abs(this.body.velocity.x) < 12
+      ? cyclePose(IDLE_POSES, this.idleSeconds / IDLE_FRAME_SECONDS)
+      : cyclePose(RUN_POSES, this.stride / RUN_PIXELS_PER_FRAME);
   }
+}
+
+function cyclePose(poses: readonly string[], frames: number): string {
+  return poses[Math.floor(frames) % poses.length]!;
 }

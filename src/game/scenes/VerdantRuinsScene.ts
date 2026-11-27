@@ -27,6 +27,7 @@ import {
   preloadForestArt,
   VerdantRuinsArt,
 } from '../../rendering/VerdantRuinsArt';
+import { preloadExplorerArt } from '../../rendering/RedExplorerArt';
 import { FixedStepClock, GAMEPLAY_STEP_SECONDS } from '../FixedStepClock';
 
 const SAFE_LANDING_SPEED = 475;
@@ -76,6 +77,7 @@ export class VerdantRuinsScene extends Phaser.Scene {
 
   public preload(): void {
     preloadForestArt(this);
+    preloadExplorerArt(this);
   }
 
   public create(): void {
@@ -225,7 +227,7 @@ export class VerdantRuinsScene extends Phaser.Scene {
       this.step(Number(down) - Number(up)),
     );
     this.explorer.render(this.clock.getInterpolationAlpha(), this.crate.held);
-    this.crate.render(this.explorer);
+    this.crate.render();
     this.art.update(this.cameras.main.scrollX);
     this.updateStatus();
   }
@@ -248,7 +250,7 @@ export class VerdantRuinsScene extends Phaser.Scene {
     const descentSpeed = body.velocity.y;
     this.pending = { ...this.pending, jumpPressed: false, jumpReleased: false };
     this.physics.world.singleStep();
-    this.explorer.complete();
+    this.explorer.complete(GAMEPLAY_STEP_SECONDS);
     this.updateSignals();
 
     if (

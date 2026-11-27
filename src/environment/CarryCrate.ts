@@ -60,10 +60,15 @@ export class CarryCrate {
     this.body.reset(x, y);
   }
 
-  public render(explorer: RedExplorer): void {
-    const x = this.held ? explorer.sprite.x : this.body.center.x;
-    const y = this.held ? explorer.sprite.y - 46 : this.body.center.y;
-    this.sprite.setPosition(Math.round(x), Math.round(y));
+  public render(): void {
+    // The explorer's carry frames already show the lifted crate.
+    this.sprite.setVisible(!this.held);
+    if (!this.held) {
+      this.sprite.setPosition(
+        Math.round(this.body.center.x),
+        Math.round(this.body.center.y),
+      );
+    }
   }
 
   public reset(): void {
