@@ -3,6 +3,16 @@ import {
   DEFAULT_MOVEMENT_CONFIG,
   type MovementConfig,
 } from '../movement/MovementConfig';
+import type { CharacterArtId } from '../rendering/CharacterArt';
+
+export type CharacterAbility =
+  | 'break-barrier'
+  | 'deploy-rope'
+  | 'route-power'
+  | 'reconfigure-machine'
+  | 'prototype-brace';
+
+export const CREW_ARCHETYPES = ['pilot', 'brute', 'tinkerer'] as const;
 
 export interface CharacterDefinition {
   readonly archetype: CharacterArchetype;
@@ -13,6 +23,8 @@ export interface CharacterDefinition {
   readonly strokeColor: number;
   readonly movementProfileName: string;
   readonly movementConfig: MovementConfig;
+  readonly abilities: readonly CharacterAbility[];
+  readonly art?: CharacterArtId;
 }
 
 const BASELINE_WIDTH = 48;
@@ -23,6 +35,8 @@ const CHARACTER_CATALOG: Readonly<
 > = {
   brute: {
     ...createBaselineDefinition('brute', 'BRUTE', 0xf97316, 0xffedd5),
+    abilities: ['break-barrier', 'prototype-brace'],
+    art: 'brute',
     movementProfileName: 'brute-prototype-v1',
     movementConfig: {
       ...DEFAULT_MOVEMENT_CONFIG,
@@ -34,11 +48,13 @@ const CHARACTER_CATALOG: Readonly<
       jumpSpeed: 680,
     },
   },
-  scout: {
-    ...createBaselineDefinition('scout', 'PILOT', 0x22c55e, 0xdcfce7),
+  pilot: {
+    ...createBaselineDefinition('pilot', 'PILOT', 0x22c55e, 0xdcfce7),
+    abilities: ['deploy-rope'],
+    art: 'pilot',
     width: 44,
     height: 68,
-    movementProfileName: 'scout-prototype-v2',
+    movementProfileName: 'pilot-prototype-v2',
     movementConfig: {
       ...DEFAULT_MOVEMENT_CONFIG,
       maxRunSpeed: 340,
@@ -56,6 +72,7 @@ const CHARACTER_CATALOG: Readonly<
   },
   tinkerer: {
     ...createBaselineDefinition('tinkerer', 'TINKERER', 0x3b82f6, 0xdbeafe),
+    abilities: ['route-power', 'reconfigure-machine'],
     movementProfileName: 'tinkerer-heavy-v1',
     movementConfig: {
       ...DEFAULT_MOVEMENT_CONFIG,
@@ -104,5 +121,6 @@ function createBaselineDefinition(
     strokeColor,
     movementProfileName: 'baseline-v2',
     movementConfig: DEFAULT_MOVEMENT_CONFIG,
+    abilities: [],
   };
 }

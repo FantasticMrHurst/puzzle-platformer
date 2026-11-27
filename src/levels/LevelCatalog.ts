@@ -1,4 +1,5 @@
 import cooperationLab from './data/cooperation-lab.json';
+import crewAbilitiesLab from './data/crew-abilities-lab.json';
 import gardenerLab from './data/gardener-lab.json';
 import gateLab from './data/gate-lab.json';
 import mechanismLab from './data/mechanism-lab.json';
@@ -19,6 +20,10 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
   'relay-station': {
     data: relayStation,
     source: 'relay-station.json',
+  },
+  'crew-abilities-lab': {
+    data: crewAbilitiesLab,
+    source: 'crew-abilities-lab.json',
   },
   'cooperation-lab': {
     data: cooperationLab,

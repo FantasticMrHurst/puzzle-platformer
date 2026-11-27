@@ -9,15 +9,17 @@ import {
   type MovementVelocity,
 } from '../movement/MovementController';
 import type { MovementState } from '../movement/MovementState';
+import type { MovementConfig } from '../movement/MovementConfig';
 import { ArcadeBodyAdapter } from '../physics/ArcadeBodyAdapter';
-import { BrutePosePreview } from '../rendering/BrutePosePreview';
+import { CHARACTER_ART } from '../rendering/CharacterArt';
+import { CharacterPosePlayer } from '../rendering/CharacterPosePlayer';
 import {
   interpolatePosition,
   type Position,
 } from '../rendering/interpolatePosition';
-import { ScoutPosePreview } from '../rendering/ScoutPosePreview';
 import { TinkererArt } from '../rendering/TinkererArt';
-import type { CharacterDefinition } from './CharacterCatalog';
+import type { PoseTuning } from '../rendering/PoseTuning';
+import type { CharacterAbility, CharacterDefinition } from './CharacterCatalog';
 import type { CharacterArchetype } from '../levels/LevelSchema';
 
 export interface CharacterDebugState {
@@ -25,6 +27,11 @@ export interface CharacterDebugState {
   readonly velocity: MovementVelocity;
   readonly contacts: MovementContacts;
   readonly movementState: MovementState;
+}
+
+export interface LadderMotion {
+  readonly x: number;
+  readonly velocityY: number;
 }
 
 export class PlayerCharacter {
@@ -35,12 +42,12 @@ export class PlayerCharacter {
   private readonly bodyAdapter: ArcadeBodyAdapter;
   private readonly controller: MovementController;
   private readonly labelObject: Phaser.GameObjects.Text;
-  private readonly posePreview?:
-    ScoutPosePreview | BrutePosePreview | TinkererArt;
+  private readonly posePreview?: CharacterPosePlayer | TinkererArt;
   private lastResult: MovementResult;
   private previousPosition: Position;
   private currentPosition: Position;
   private braced = false;
+  private climbing = false;
   private facingDirection: -1 | 1 = 1;
 
   public constructor(
@@ -67,11 +74,10 @@ export class PlayerCharacter {
       .setStrokeStyle(3, definition.strokeColor)
       .setDepth(5);
     const feetY = y + definition.height / 2;
-    if (definition.archetype === 'scout') {
-      this.posePreview = ScoutPosePreview.create(scene, x, feetY);
-    } else if (definition.archetype === 'brute') {
-      this.posePreview = BrutePosePreview.create(
+    if (definition.art !== undefined) {
+      this.posePreview = CharacterPosePlayer.create(
         scene,
+        CHARACTER_ART[definition.art],
         x,
         feetY,
         definition.height,
@@ -114,6 +120,7 @@ export class PlayerCharacter {
   public prepareSimulationStep(
     deltaSeconds: number,
     intent: PlayerIntent,
+    climb?: LadderMotion,
   ): void {
     this.previousPosition = { ...this.currentPosition };
     if (intent.moveX !== 0) {
@@ -122,6 +129,27 @@ export class PlayerCharacter {
     if (this.braced) {
       this.bodyAdapter.applyVelocity({ x: 0, y: 0 });
       return;
+    }
+    if (climb !== undefined) {
+      if (!this.climbing) {
+        this.bodyAdapter.setAllowGravity(false);
+        this.controller.reset();
+        this.climbing = true;
+      }
+      if (this.currentPosition.x !== climb.x) {
+        this.bodyAdapter.reset(climb.x, this.currentPosition.y);
+      }
+      this.lastResult = {
+        velocity: { x: 0, y: climb.velocityY },
+        state: this.controller.getState(),
+        jumped: false,
+      };
+      this.bodyAdapter.applyVelocity(this.lastResult.velocity);
+      return;
+    }
+    if (this.climbing) {
+      this.climbing = false;
+      this.bodyAdapter.setAllowGravity(true);
     }
     this.lastResult = this.controller.update({
       deltaSeconds,
@@ -183,12 +211,30 @@ export class PlayerCharacter {
     return this.definition.movementProfileName;
   }
 
+  public setMovementConfig(config: MovementConfig): void {
+    this.controller.setConfig(config);
+    this.bodyAdapter.setMaximumVelocity(
+      config.maxRunSpeed,
+      config.maxFallSpeed,
+    );
+  }
+
+  public setPoseTuning(tuning: PoseTuning): void {
+    if (this.posePreview instanceof CharacterPosePlayer) {
+      this.posePreview.setTuning(tuning);
+    }
+  }
+
   public getLabel(): string {
     return this.definition.label;
   }
 
   public getArchetype(): CharacterArchetype {
     return this.definition.archetype;
+  }
+
+  public hasAbility(ability: CharacterAbility): boolean {
+    return this.definition.abilities.includes(ability);
   }
 
   public getFacingDirection(): -1 | 1 {
@@ -222,7 +268,7 @@ export class PlayerCharacter {
   }
 
   public toggleBraceStance(): boolean {
-    if (this.definition.archetype !== 'brute') {
+    if (!this.hasAbility('prototype-brace')) {
       return false;
     }
     if (!this.braced && !this.bodyAdapter.readContacts().grounded) {
@@ -245,6 +291,7 @@ export class PlayerCharacter {
     this.posePreview?.reset();
     this.facingDirection = 1;
     this.braced = false;
+    this.climbing = false;
     this.bodyAdapter.setImmovable(false);
     this.bodyAdapter.setAllowGravity(true);
     this.controller.reset();
@@ -265,6 +312,11 @@ export class PlayerCharacter {
       this.currentPosition.y - this.definition.height / 2 - 8,
     );
     this.visualObject.setFillStyle(this.definition.fillColor);
+  }
+
+  public placeFeetAt(x: number, y: number): void {
+    this.bodyAdapter.reset(x, y - this.definition.height / 2);
+    this.currentPosition = this.bodyAdapter.readPosition();
   }
 
   public isBelow(y: number): boolean {

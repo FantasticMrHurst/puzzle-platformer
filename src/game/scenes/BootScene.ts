@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
 
 import { TinkererCompanion } from '../../entities/TinkererCompanion';
-import { BrutePosePreview } from '../../rendering/BrutePosePreview';
-import { ScoutPosePreview } from '../../rendering/ScoutPosePreview';
+import { CHARACTER_ART } from '../../rendering/CharacterArt';
 import { TinkererArt } from '../../rendering/TinkererArt';
 
 export class BootScene extends Phaser.Scene {
@@ -11,8 +10,15 @@ export class BootScene extends Phaser.Scene {
   }
 
   public preload(): void {
-    ScoutPosePreview.preload(this);
-    BrutePosePreview.preload(this);
+    const params = new URLSearchParams(window.location.search);
+    for (const art of Object.values(CHARACTER_ART)) {
+      const enabled =
+        params.get(art.previewFlag) ??
+        (art.previewFlag === 'pilotArt' ? params.get('scoutArt') : null);
+      if (enabled === '1') {
+        this.load.atlas(art.textureKey, art.textureUrl, art.atlasUrl);
+      }
+    }
     TinkererArt.preload(this);
     TinkererCompanion.preload(this);
   }

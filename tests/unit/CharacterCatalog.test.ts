@@ -13,14 +13,14 @@ describe('CharacterCatalog', () => {
     expect(brute.movementConfig.wallMovement).toBeUndefined();
   });
 
-  it('gives the Scout a distinct wall-traversal profile', () => {
-    const scout = getCharacterDefinition('scout');
+  it('gives the Pilot a distinct wall-traversal profile', () => {
+    const pilot = getCharacterDefinition('pilot');
 
-    expect(scout.movementProfileName).toBe('scout-prototype-v2');
-    expect(scout.movementConfig.jumpSpeed).toBeGreaterThan(
+    expect(pilot.movementProfileName).toBe('pilot-prototype-v2');
+    expect(pilot.movementConfig.jumpSpeed).toBeGreaterThan(
       getCharacterDefinition('brute').movementConfig.jumpSpeed,
     );
-    expect(scout.movementConfig.wallMovement).toBeDefined();
+    expect(pilot.movementConfig.wallMovement).toBeDefined();
   });
 
   it('gives the Pet a half-height body and distinct profile', () => {

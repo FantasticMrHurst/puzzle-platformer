@@ -20,7 +20,7 @@ An absent `level` query continues to load the original movement test room. Unkno
 
 | Slot | Candidate | Profile | Body | Initial differences |
 | ---: | --- | --- | ---: | --- |
-| 1 | Pilot | `scout-prototype-v2` | 44 × 68 px | 340 px/s run speed, 860 px/s jump, stronger air acceleration, wall cling and wall jump |
+| 1 | Pilot | `pilot-prototype-v2` | 44 × 68 px | 340 px/s run speed, 860 px/s jump, stronger air acceleration, wall cling and wall jump |
 | 2 | Pet | `pet-prototype-v2` | 48 × 36 px | Half baseline height, 350 px/s run speed, quicker ground acceleration, lower 650 px/s jump |
 | 3 | Brute | `brute-prototype-v1` | 48 × 72 px | 300 px/s run speed, slower acceleration and air steering, 680 px/s jump |
 

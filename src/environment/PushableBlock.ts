@@ -14,6 +14,7 @@ export class PushableBlock {
   private readonly statusText: Phaser.GameObjects.Text;
   private grippedCharacterId: string | null = null;
   private gripSide: GripSide | null = null;
+  private falling = false;
 
   public constructor(
     scene: Phaser.Scene,
@@ -58,6 +59,7 @@ export class PushableBlock {
     primaryAbilityHeld: boolean,
   ): void {
     const canGrip =
+      !this.falling &&
       signalActive &&
       activeCharacter.getArchetype() === this.data.requiredArchetype &&
       activeCharacter.getContacts().grounded &&
@@ -111,6 +113,7 @@ export class PushableBlock {
     character: PlayerCharacter,
   ): boolean {
     return (
+      !this.falling &&
       signalActive &&
       character.getArchetype() === this.data.requiredArchetype &&
       character.getContacts().grounded &&
@@ -126,17 +129,17 @@ export class PushableBlock {
   }
 
   public completeStep(): void {
+    if (this.falling && this.body.blocked.down) {
+      this.stopFalling();
+    }
     if (this.getLeft() < this.data.x) {
-      this.body.reset(
-        this.data.x + this.data.width / 2,
-        this.data.y + this.data.height / 2,
-      );
+      this.body.reset(this.data.x + this.data.width / 2, this.body.center.y);
       this.body.setVelocity(0, 0);
     }
     if (this.getLeft() > this.data.maxPushX) {
       this.body.reset(
         this.data.maxPushX + this.data.width / 2,
-        this.data.y + this.data.height / 2,
+        this.body.center.y,
       );
       this.body.setVelocity(0, 0);
     }
@@ -144,6 +147,7 @@ export class PushableBlock {
   }
 
   public reset(): void {
+    this.stopFalling();
     this.body.reset(
       this.data.x + this.data.width / 2,
       this.data.y + this.data.height / 2,
@@ -153,6 +157,18 @@ export class PushableBlock {
     this.statusText.setPosition(this.physicsObject.x, this.physicsObject.y);
     this.statusText.setText('LOCKED');
     this.releaseGrip();
+  }
+
+  public drop(): void {
+    this.falling = true;
+    this.body.setImmovable(false).setAllowGravity(true);
+    this.body.setMaxVelocity(this.data.pushSpeed, 1_000);
+  }
+
+  private stopFalling(): void {
+    this.falling = false;
+    this.body.setImmovable(true).setAllowGravity(false).setVelocityY(0);
+    this.body.setMaxVelocity(this.data.pushSpeed, 0);
   }
 
   private getLeft(): number {

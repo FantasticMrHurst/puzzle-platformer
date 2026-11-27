@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
 import { calculateExitProgress } from '../../environment/ExitProgress';
+import { BreakableBarrier } from '../../environment/BreakableBarrier';
 import { Gate } from '../../environment/Gate';
 import { GrowthNode } from '../../environment/GrowthNode';
 import { LevelExit } from '../../environment/LevelExit';
@@ -11,8 +12,13 @@ import { PlantStructure } from '../../environment/PlantStructure';
 import { TinkererPlugPuzzle } from '../../environment/TinkererPlugPuzzle';
 import { PressurePlate } from '../../environment/PressurePlate';
 import { PushableBlock } from '../../environment/PushableBlock';
+import { RopeLadder } from '../../environment/RopeLadder';
+import { ServiceLift } from '../../environment/ServiceLift';
 import { ToggleSwitch } from '../../environment/ToggleSwitch';
-import { getCharacterDefinition } from '../../entities/CharacterCatalog';
+import {
+  CREW_ARCHETYPES,
+  getCharacterDefinition,
+} from '../../entities/CharacterCatalog';
 import { CharacterRoster } from '../../entities/CharacterRoster';
 import { PlayerCharacter } from '../../entities/PlayerCharacter';
 import { TinkererCompanion } from '../../entities/TinkererCompanion';
@@ -32,6 +38,10 @@ import {
 } from '../../input/PlayerIntent';
 import { StandardGamepadInput } from '../../input/StandardGamepadInput';
 import { getLevelSource } from '../../levels/LevelCatalog';
+import {
+  CREW_ABILITIES_LAB_ID,
+  CREW_ABILITIES_LAYOUT,
+} from '../../levels/crewAbilitiesLab';
 import { loadLevelData } from '../../levels/LevelLoader';
 import type {
   LevelData,
@@ -75,6 +85,10 @@ export class TestRoomScene extends Phaser.Scene {
   private growthNodes: GrowthNode[] = [];
   private plantStructures: PlantStructure[] = [];
   private tinkererPlugPuzzles: TinkererPlugPuzzle[] = [];
+  private ropeLadder?: RopeLadder;
+  private breakableFloor?: BreakableBarrier;
+  private counterweight?: PushableBlock;
+  private serviceLift?: ServiceLift;
   private completionText!: Phaser.GameObjects.Text;
   private pendingIntent: PlayerIntent = {
     moveX: 0,
@@ -105,12 +119,12 @@ export class TestRoomScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const selectedLevel = getLevelSource(
-      new URLSearchParams(window.location.search).get('level'),
-    );
+    const params = new URLSearchParams(window.location.search);
+    const selectedLevel = getLevelSource(params.get('level'));
     this.level = loadLevelData(selectedLevel.data, selectedLevel.source);
     this.gamepadInput =
-      this.level.id === 'relay-station'
+      this.level.id === 'relay-station' ||
+      this.level.id === CREW_ABILITIES_LAB_ID
         ? new StandardGamepadInput()
         : undefined;
     this.fixedStepClock.reset();
@@ -146,6 +160,22 @@ export class TestRoomScene extends Phaser.Scene {
     this.pushableBlocks = this.level.pushableBlocks.map(
       (block) => new PushableBlock(this, block),
     );
+    if (this.level.id === CREW_ABILITIES_LAB_ID) {
+      const { rope, barrier, counterweight, lift } = CREW_ABILITIES_LAYOUT;
+      this.ropeLadder = new RopeLadder(this, rope);
+      this.breakableFloor = new BreakableBarrier(this, barrier);
+      this.counterweight = new PushableBlock(this, counterweight);
+      this.serviceLift = new ServiceLift(this, lift);
+      this.pushableBlocks.push(this.counterweight);
+      this.physics.add.collider(
+        this.counterweight.physicsObject,
+        this.staticGeometry,
+      );
+      this.physics.add.collider(
+        this.counterweight.physicsObject,
+        this.breakableFloor.physicsObject,
+      );
+    }
     this.mechanismConsoles = this.level.mechanismConsoles.map(
       (consoleData) => new MechanismConsole(this, consoleData),
     );
@@ -187,6 +217,64 @@ export class TestRoomScene extends Phaser.Scene {
     this.updateGates();
     this.createHud(this.level);
     this.debugOverlay = new MovementDebugOverlay(this);
+
+    if (
+      import.meta.env.DEV &&
+      this.level.id === CREW_ABILITIES_LAB_ID &&
+      params.get('tune') === '1'
+    ) {
+      const keyboard = this.input.keyboard;
+      let closed = false;
+      let dispose: (() => void) | undefined;
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        closed = true;
+        dispose?.();
+      });
+      void import('../../dev/CrewTuningPanel').then(
+        ({ mountCrewTuningPanel }) => {
+          if (closed) return;
+          dispose = mountCrewTuningPanel({
+            gravity: this.physics.world.gravity.y,
+            apply: ({ movement, art, room }) => {
+              for (const character of this.roster.getMembers()) {
+                const member = CREW_ARCHETYPES.find(
+                  (id) => id === character.getArchetype(),
+                );
+                if (member === undefined) continue;
+                character.setMovementConfig(movement[member]);
+                const tuning = art[member];
+                if (tuning !== undefined) character.setPoseTuning(tuning);
+              }
+              this.physics.world.gravity.y = room.gravity;
+              if (this.ropeLadder !== undefined)
+                this.ropeLadder.climbSpeed = room.climbSpeed;
+              if (this.breakableFloor !== undefined)
+                this.breakableFloor.breakReach = room.breakReach;
+              if (this.serviceLift !== undefined)
+                this.serviceLift.travelSpeed = room.liftSpeed;
+            },
+            restart: () => this.resetRoomToCheckpoint(),
+            setEditing: (editing) => {
+              if (keyboard.enabled === !editing) return;
+              keyboard.resetKeys();
+              keyboard.enabled = !editing;
+              if (editing) {
+                keyboard.disableGlobalCapture();
+                this.pendingIntent = { ...NEUTRAL_PLAYER_INTENT };
+                this.primaryAbilityPressed = false;
+                this.grabPressed = false;
+              } else {
+                keyboard.enableGlobalCapture();
+              }
+            },
+            resize: () => {
+              this.scale.getParentBounds();
+              this.scale.refresh();
+            },
+          });
+        },
+      );
+    }
   }
 
   public override update(): void {
@@ -215,7 +303,21 @@ export class TestRoomScene extends Phaser.Scene {
     );
     this.primaryAbilityPressed ||=
       primaryPressed && (!wasPrimaryHeld || !this.gamepadPrimaryHeld);
-    this.grabPressed = this.grabPressed || this.grabInput.readPressed();
+    const keyboardGrab = this.grabInput.readPressed();
+    this.grabPressed ||=
+      keyboardGrab ||
+      (gamepad?.grabPressed === true &&
+        this.serviceLift !== undefined &&
+        !reset);
+    const climbAxis =
+      this.ropeLadder === undefined
+        ? 0
+        : this.keyboardInput.readClimbAxis(gamepad?.climbAxis);
+    const characters = this.roster.getMembers();
+    const plateOccupants =
+      this.counterweight === undefined
+        ? characters
+        : [...characters, this.counterweight];
 
     this.stepsThisFrame = this.fixedStepClock.advance(
       this.game.loop.rawDelta / 1_000,
@@ -223,12 +325,18 @@ export class TestRoomScene extends Phaser.Scene {
         const activeCharacter = this.roster.getActive();
         this.applyPrimaryAbility(activeCharacter);
         this.toggleSwitches.forEach((toggle) => toggle.update(activeCharacter));
-        this.roster.getMembers().forEach((character) => {
+        characters.forEach((character) => {
+          const active = character === activeCharacter;
+          const intent = active ? this.pendingIntent : NEUTRAL_PLAYER_INTENT;
           character.prepareSimulationStep(
             GAMEPLAY_STEP_SECONDS,
-            character === activeCharacter
-              ? this.pendingIntent
-              : NEUTRAL_PLAYER_INTENT,
+            intent,
+            this.ropeLadder?.prepare(
+              character,
+              active ? climbAxis : 0,
+              intent.moveX,
+              GAMEPLAY_STEP_SECONDS,
+            ),
           );
         });
         this.tinkererCompanions.forEach((companion) =>
@@ -265,7 +373,12 @@ export class TestRoomScene extends Phaser.Scene {
         );
         this.totalSimulationSteps += 1;
 
+        this.serviceLift?.prepare(
+          this.tinkererPlugPuzzles.some((plug) => plug.isPowered()),
+          GAMEPLAY_STEP_SECONDS,
+        );
         this.physics.world.singleStep();
+        this.serviceLift?.complete();
         this.roster
           .getMembers()
           .forEach((character) =>
@@ -288,9 +401,7 @@ export class TestRoomScene extends Phaser.Scene {
         }
         this.clearConsumedInputEdges();
         this.pushableBlocks.forEach((block) => block.completeStep());
-        this.pressurePlates.forEach((plate) =>
-          plate.update(this.roster.getMembers()),
-        );
+        this.pressurePlates.forEach((plate) => plate.update(plateOccupants));
         this.updateGates();
 
         if (
@@ -412,6 +523,16 @@ export class TestRoomScene extends Phaser.Scene {
         getCharacterDefinition(archetype),
       );
       this.physics.add.collider(character.physicsObject, this.staticGeometry);
+      if (this.breakableFloor !== undefined && this.serviceLift !== undefined) {
+        this.physics.add.collider(
+          character.physicsObject,
+          this.breakableFloor.physicsObject,
+        );
+        this.physics.add.collider(
+          character.physicsObject,
+          this.serviceLift.physicsObject,
+        );
+      }
       this.gates.forEach((gate) =>
         this.physics.add.collider(character.physicsObject, gate.physicsObject),
       );
@@ -437,10 +558,10 @@ export class TestRoomScene extends Phaser.Scene {
     this.tinkererCompanions = characters
       .filter((character) => character.getArchetype() === 'tinkerer')
       .map((tinkerer) => new TinkererCompanion(this, tinkerer));
-    const brute = characters.find(
-      (character) => character.getArchetype() === 'brute',
+    const brute = characters.find((character) =>
+      character.hasAbility('prototype-brace'),
     );
-    if (brute !== undefined) {
+    if (brute !== undefined && this.breakableFloor === undefined) {
       characters
         .filter((character) => character !== brute)
         .forEach((character) =>
@@ -529,7 +650,7 @@ export class TestRoomScene extends Phaser.Scene {
         .text(
           24,
           176,
-          'Controller: D-pad/stick move · Cross jump · Square ability · L1/R1 switch · Options reset',
+          `Controller: D-pad/stick move · Cross jump · Square ability · L1/R1 switch · Options reset${this.ropeLadder === undefined ? '' : ' · ↑/↓ climb · Triangle plug'}`,
           {
             backgroundColor: '#080b16cc',
             color: '#cbd5e1',
@@ -543,15 +664,17 @@ export class TestRoomScene extends Phaser.Scene {
     }
 
     const mixedLabHint =
-      level.id === 'relay-station'
-        ? 'Restore the service crossing and get the whole crew through the exit airlock.'
-        : level.id === 'cooperation-lab'
-          ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
-          : level.id === 'pilot-brute-ranger-lab'
-            ? 'Pilot: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
-            : level.id === 'gate-lab'
-              ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
-              : undefined;
+      level.id === CREW_ABILITIES_LAB_ID
+        ? 'Pilot: wall jump, F at anchor, W/S or ↑/↓ to climb · Brute: F to break, hold F to grip · Tinkerer: C for plug, F on lift'
+        : level.id === 'relay-station'
+          ? 'Restore the service crossing and get the whole crew through the exit airlock.'
+          : level.id === 'cooperation-lab'
+            ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
+            : level.id === 'pilot-brute-ranger-lab'
+              ? 'Pilot: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
+              : level.id === 'gate-lab'
+                ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
+                : undefined;
     if (mixedLabHint !== undefined) {
       this.add
         .text(24, 148, mixedLabHint, {
@@ -707,10 +830,22 @@ export class TestRoomScene extends Phaser.Scene {
       return;
     }
 
-    if (activeCharacter.getArchetype() === 'tinkerer') {
+    if (
+      this.ropeLadder?.tryDeploy(activeCharacter) ||
+      this.serviceLift?.tryOperate(activeCharacter)
+    ) {
+      return;
+    }
+    if (this.breakableFloor?.tryBreak(activeCharacter)) {
+      this.counterweight?.drop();
+      return;
+    }
+
+    if (
       this.mechanismConsoles.some((consoleObject) =>
         consoleObject.tryToggle(activeCharacter),
-      );
+      )
+    ) {
       return;
     }
 
@@ -734,7 +869,10 @@ export class TestRoomScene extends Phaser.Scene {
       return;
     }
 
-    if (activeCharacter.getArchetype() !== 'brute') {
+    if (
+      !activeCharacter.hasAbility('prototype-brace') ||
+      this.breakableFloor !== undefined
+    ) {
       return;
     }
 
@@ -809,6 +947,9 @@ export class TestRoomScene extends Phaser.Scene {
     this.pressurePlates.forEach((plate) => plate.reset());
     this.toggleSwitches.forEach((toggle) => toggle.reset());
     this.pushableBlocks.forEach((block) => block.reset());
+    this.breakableFloor?.reset();
+    this.ropeLadder?.reset();
+    this.serviceLift?.reset();
     this.mechanismConsoles.forEach((consoleObject) => consoleObject.reset());
     this.poweredBridges.forEach((bridge) => bridge.reset());
     this.rangedTargets.forEach((target) => target.reset());
@@ -824,6 +965,8 @@ export class TestRoomScene extends Phaser.Scene {
 
   private isSignalActive(channel: string): boolean {
     return (
+      (channel === CREW_ABILITIES_LAYOUT.counterweight.channel &&
+        this.breakableFloor?.isBroken() === true) ||
       this.pressurePlates.some(
         (plate) => plate.data.channel === channel && plate.isPressed(),
       ) ||

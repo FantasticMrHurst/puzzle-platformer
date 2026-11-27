@@ -2,7 +2,7 @@ export const LEVEL_SCHEMA_VERSION = 8 as const;
 
 export const CHARACTER_ARCHETYPES = [
   'brute',
-  'scout',
+  'pilot',
   'tinkerer',
   'ranger',
   'pet',

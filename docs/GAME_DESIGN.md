@@ -49,9 +49,19 @@ The first prototype contains only the verbs needed to evaluate movement:
 
 Interaction, character switching, wall movement, and abilities should be added only as their milestones require them. Their eventual control scheme is unresolved.
 
-## Provisional character concepts
+## Selected roster
 
-These archetypes establish the kind of complementarity the game may use. Names, abilities, body sizes, and exact constraints are not final. Milestone 2 should prototype all six candidates at a deliberately small scale before the team selects or revises the final three-character roster.
+| Character | Abilities |
+| --- | --- |
+| Brute | Push and pull heavy objects, and break marked barriers. |
+| Pilot | Cling and wall-jump, and deploy a rope ladder for teammates. |
+| Tinkerer | Route power and reconfigure powered machinery. |
+
+All three can use ordinary pressure plates, buttons, and switches. The [Crew Abilities Lab](CREW_ABILITIES_LAB.md) is the reference for how their abilities work together. See the [character development standard](CHARACTER_DEVELOPMENT.md) for implementation and playtest guidance.
+
+## Earlier character experiments
+
+These notes record the concepts evaluated in Milestone 2. Use the selected roster above for the vertical slice.
 
 ### Brute
 

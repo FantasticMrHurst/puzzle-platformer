@@ -35,8 +35,13 @@ export interface MovementResult {
 export class MovementController {
   private state: MovementState = createInitialMovementState();
 
-  public constructor(private readonly config: MovementConfig) {
+  public constructor(private config: MovementConfig) {
     validateMovementConfig(config);
+  }
+
+  public setConfig(config: MovementConfig): void {
+    validateMovementConfig(config);
+    this.config = config;
   }
 
   public update(frame: MovementFrame): MovementResult {

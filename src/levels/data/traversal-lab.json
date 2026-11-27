@@ -9,8 +9,8 @@
   },
   "characters": [
     {
-      "id": "scout-prototype",
-      "archetype": "scout",
+      "id": "pilot-prototype",
+      "archetype": "pilot",
       "spawn": { "x": 120, "y": 520 }
     },
     {
@@ -98,7 +98,7 @@
   ],
   "pressurePlates": [
     {
-      "id": "scout-wall-plate",
+      "id": "pilot-wall-plate",
       "x": 820,
       "y": 208,
       "width": 110,

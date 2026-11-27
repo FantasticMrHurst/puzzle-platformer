@@ -52,9 +52,23 @@ Once the first deployment completes, the playable build will be available at
 
 The home page lists all play labs. Each lab has an **All play labs** link back to the menu, and its URL can be shared directly.
 
+Choose **Crew Abilities Lab** to try the Brute, Pilot, and Tinkerer in one room. See the [playtest guide](docs/CREW_ABILITIES_LAB.md) for controls and the full route.
+
+## Player roster
+
+The playable trio is Brute, Pilot, and Tinkerer. All three can use ordinary pressure plates, buttons, and switches. Each character also has two unique abilities:
+
+| Character    | Ability 1                                                                                                          | Ability 2                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Brute**    | **Push and pull heavy objects.** Reposition crates and counterweights, including pulling them out of corners.      | **Break marked barriers.** Smash cracked walls and floors to open routes or drop objects to a lower floor. Restarting the room restores broken barriers. |
+| **Pilot**    | **Cling and wall jump.** Slide slowly down walls and jump away to climb shafts or cross between walls.             | **Deploy a rope ladder.** Lower a ladder from a designated anchor so teammates can follow.                                                               |
+| **Tinkerer** | **Route power.** Carry and connect a power plug or redirect a circuit between devices such as a bridge and a gate. | **Reconfigure machinery.** Change how a powered device behaves, such as reversing a conveyor or choosing which floor a lift serves.                      |
+
+The table describes the agreed design. The play lab controls below describe what you can try in the current build.
+
 ## Current state
 
-The application currently provides a three-character prototype roster in the validated, data-driven movement test room. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
+The validated, data-driven movement test room supports three switchable characters. Device-independent input drives a shared custom movement controller through a fixed-step Arcade Physics integration with collision, camera follow, switching, and whole-roster fall reset.
 
 Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. `F` is the contextual ability: the Brute grips or braces, the Tinkerer operates nearby powered consoles, and the Ranger fires along the current `I`/`J`/`K`/`L` aim direction. In the Tinkerer Plug Lab, press `C` to grab the plug and press it again to place it. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
 
@@ -77,6 +91,8 @@ Choose **Forest of the Verdant Ruins** from the lab menu, or open `?level=verdan
 See the project documents for current direction:
 
 - [Game design](docs/GAME_DESIGN.md)
+- [Art asset pipeline and export specifications](docs/ART_ASSET_PIPELINE.md)
+- [Character development standard](docs/CHARACTER_DEVELOPMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap and proposed issues](docs/ROADMAP.md)
 - [Movement test-room measurements](docs/TEST_ROOM.md)

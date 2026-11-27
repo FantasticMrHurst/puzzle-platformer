@@ -15,7 +15,7 @@ const validLevel = {
   characters: [
     {
       id: 'test-character',
-      archetype: 'scout',
+      archetype: 'pilot',
       spawn: { x: 100, y: 100 },
     },
   ],
@@ -125,7 +125,7 @@ describe('loadLevelData', () => {
         'unknown-character.json',
       ),
     ).toThrow(
-      'unknown-character.json: $.characters[0].archetype must be one of brute, scout, tinkerer, ranger, pet, gardener',
+      'unknown-character.json: $.characters[0].archetype must be one of brute, pilot, tinkerer, ranger, pet, gardener',
     );
   });
 

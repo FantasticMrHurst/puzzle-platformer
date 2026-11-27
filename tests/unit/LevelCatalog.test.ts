@@ -16,7 +16,7 @@ describe('getLevelSource', () => {
 
     expect(traversalLab.id).toBe('traversal-lab');
     expect(traversalLab.characters.map(({ archetype }) => archetype)).toEqual([
-      'scout',
+      'pilot',
       'pet',
       'brute',
     ]);
@@ -58,7 +58,7 @@ describe('getLevelSource', () => {
     expect(getLevelSource('scout-brute-ranger-lab')).toBe(trioSource);
     const trioLab = loadLevelData(trioSource.data, trioSource.source);
     expect(trioLab.characters.map(({ archetype }) => archetype)).toEqual([
-      'scout',
+      'pilot',
       'brute',
       'ranger',
     ]);
@@ -66,7 +66,15 @@ describe('getLevelSource', () => {
     const relaySource = getLevelSource('relay-station');
     const relay = loadLevelData(relaySource.data, relaySource.source);
     expect(relay.characters.map(({ archetype }) => archetype)).toEqual([
-      'scout',
+      'pilot',
+      'brute',
+      'tinkerer',
+    ]);
+
+    const crewSource = getLevelSource('crew-abilities-lab');
+    const crew = loadLevelData(crewSource.data, crewSource.source);
+    expect(crew.characters.map(({ archetype }) => archetype)).toEqual([
+      'pilot',
       'brute',
       'tinkerer',
     ]);
@@ -74,7 +82,7 @@ describe('getLevelSource', () => {
 
   it('reports available IDs for an unknown level', () => {
     expect(() => getLevelSource('missing')).toThrow(
-      'Unknown level "missing". Available levels: relay-station, cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, pilot-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
+      'Unknown level "missing". Available levels: relay-station, crew-abilities-lab, cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, pilot-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
     );
   });
 });
