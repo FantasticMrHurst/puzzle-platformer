@@ -72,7 +72,7 @@
       "id": "main-power-plug",
       "plugStart": { "x": 470, "y": 615 },
       "outlet": { "x": 1420, "y": 615 },
-      "interactionRange": 36
+      "interactionRange": 64
     }
   ]
 }

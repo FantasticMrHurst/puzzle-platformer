@@ -8,7 +8,7 @@ The mechanism lab is the smallest prototype of the Tinkerer's first verb: delibe
 2. Brute verifies that the resulting route supports a full-height character.
 3. Pet verifies that the route is useful to a differently sized teammate.
 
-The Tinkerer uses the shared `baseline-v2` movement profile. The Brute and the existing playable Pet use their own prototype movement profiles.
+The Tinkerer uses `tinkerer-heavy-v1`, with a 640 px/s launch speed and the shared gravity. The Brute and the existing playable Pet use their own prototype movement profiles.
 
 ## Tinkerer companion
 

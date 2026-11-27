@@ -78,6 +78,8 @@ Open `?level=gate-lab` to try shared environmental controls. Leave one character
 
 Choose **Relay Station** from the lab menu to playtest Pilot, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches. Relay Station also accepts a standard-mapped gamepad. On a PlayStation controller, use the D-pad or left stick to move, Cross to jump, Square to use abilities, L1/R1 to cycle characters, and Options to reset. Hold Square beside an unlocked block to grip it as the Brute.
 
+Press `3` in **Relay Station** to play as the animated Tinkerer, or start as him in **Tinkerer Plug Lab**. Let him stand for a few seconds to see his arm swing and blink, then run and jump to see the movement poses. His flower companion sways while waiting, scuttles after him, and makes a short hop when he jumps.
+
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
 Open `?level=pilot-brute-ranger-lab&pilotArt=1` to preview the Pilot's eight-frame idle loop, eight-frame run, and five jump poses. The jump follows the actual arc from liftoff through falling, followed by the existing landing pose. Jump against a wall to see the cling, slide, and kick.

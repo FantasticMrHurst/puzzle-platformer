@@ -22,7 +22,10 @@ if (
   window.history.replaceState(window.history.state, '', url);
 }
 
-if (params.has('level') || params.get('pilotArt') === '1') {
+if (
+  params.has('level') ||
+  (params.get('pilotArt') ?? params.get('scoutArt')) === '1'
+) {
   document.body.classList.add('playing-lab');
   document.querySelector<HTMLElement>('#lab-nav')!.hidden = false;
   if (params.get('level') === VERDANT_RUINS_ID) {

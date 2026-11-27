@@ -71,7 +71,10 @@ export function getLabEntries(): readonly { id: string; name: string }[] {
 }
 
 export function getLevelSource(levelId: string | null): LevelSource {
-  const selectedId = levelId ?? DEFAULT_LEVEL_ID;
+  const selectedId =
+    levelId === 'scout-brute-ranger-lab'
+      ? 'pilot-brute-ranger-lab'
+      : (levelId ?? DEFAULT_LEVEL_ID);
   const levelSource = LEVEL_SOURCES[selectedId];
 
   if (levelSource === undefined) {
