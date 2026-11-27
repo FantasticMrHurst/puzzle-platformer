@@ -14,7 +14,12 @@ export function showLabMenu(container: HTMLElement): void {
   const list = document.createElement('ul');
   list.className = 'lab-list';
   for (const { id, name } of getLabEntries()) {
-    list.append(labLink(name, { level: id }));
+    const params: Record<string, string> = { level: id };
+    if (id === 'relay-station') {
+      params.scoutArt = '1';
+      params.bruteArt = '1';
+    }
+    list.append(labLink(name, params));
   }
   list.append(
     labLink('Scout Animation Preview', {

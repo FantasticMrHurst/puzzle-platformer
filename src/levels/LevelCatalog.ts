@@ -4,6 +4,7 @@ import gateLab from './data/gate-lab.json';
 import mechanismLab from './data/mechanism-lab.json';
 import movementTestRoom from './data/test-room.json';
 import rangerLab from './data/ranger-lab.json';
+import relayStation from './data/relay-station.json';
 import scoutBruteRangerLab from './data/scout-brute-ranger-lab.json';
 import tinkererPlugLab from './data/tinkerer-plug-lab.json';
 import traversalLab from './data/traversal-lab.json';
@@ -15,6 +16,10 @@ export interface LevelSource {
 
 const DEFAULT_LEVEL_ID = 'movement-test-room';
 const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
+  'relay-station': {
+    data: relayStation,
+    source: 'relay-station.json',
+  },
   'cooperation-lab': {
     data: cooperationLab,
     source: 'cooperation-lab.json',

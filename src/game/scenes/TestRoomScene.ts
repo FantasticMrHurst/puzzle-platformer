@@ -454,7 +454,11 @@ export class TestRoomScene extends Phaser.Scene {
         78,
         `Move: A/D or ←/→  ·  Jump: W, ↑, or Space  ·  Ability: F${
           this.tinkererPlugPuzzles.length > 0 ? '  ·  Grab/place: C' : ''
-        }  ·  Aim: I/J/K/L  ·  Switch: 1–3 or Q/E  ·  Reset: R`,
+        }${
+          level.characters.some(({ archetype }) => archetype === 'ranger')
+            ? '  ·  Aim: I/J/K/L'
+            : ''
+        }  ·  Switch: 1–3 or Q/E  ·  Reset: R`,
         {
           backgroundColor: '#080b16cc',
           color: '#cbd5e1',
@@ -501,13 +505,15 @@ export class TestRoomScene extends Phaser.Scene {
       .setDepth(10);
 
     const mixedLabHint =
-      level.id === 'cooperation-lab'
-        ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
-        : level.id === 'scout-brute-ranger-lab'
-          ? 'Scout: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
-          : level.id === 'gate-lab'
-            ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
-            : undefined;
+      level.id === 'relay-station'
+        ? 'Restore the service crossing and get the whole crew through the exit airlock.'
+        : level.id === 'cooperation-lab'
+          ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
+          : level.id === 'scout-brute-ranger-lab'
+            ? 'Scout: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
+            : level.id === 'gate-lab'
+              ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
+              : undefined;
     if (mixedLabHint !== undefined) {
       this.add
         .text(24, 148, mixedLabHint, {

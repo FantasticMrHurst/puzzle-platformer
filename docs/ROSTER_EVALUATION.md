@@ -37,4 +37,18 @@ These are preliminary observations from the focused labs and the mixed-team run.
 
 Advance **Scout, Brute, and Gardener** as the first trio to test together. They cover vertical access, object manipulation, and route creation. Before locking the roster, try a short puzzle where the plant stays in place to support the team while the Brute repositions a block or braces elsewhere. If the plant and brace feel interchangeable, test Ranger in the Gardener slot for a distinct remote interaction.
 
-The final selection is open for both developers to review.
+## Current working roster
+
+Scout, Brute, and Tinkerer are the working trio for **Relay Station**. The room is available from the lab menu as a test of this combination. Keep the roster open for both developers to review after playing it.
+
+Play the room without a walkthrough first. Note where you first understand what each device needs, whether you can recover when a teammate is in the wrong place, and which character you most want to use again.
+
+<details>
+<summary>Relay Station design and intended route</summary>
+
+- The Scout wall-jumps to the freight interlock and stays on the plate until the Brute slides the counterweight out of the bulkhead. The cleared passage persists after the Scout leaves the plate.
+- The Brute braces beside the relay balcony so the Tinkerer can take two jumps to reach it. The Tinkerer powers the service bridge at the console.
+- A teammate holds the plate near the exit airlock. Someone else crosses and latches the gate from the far side, freeing the character on the plate. The whole crew must reach the exit.
+- A fall into the bridge shaft resets everyone. The same room reset is available with `R`.
+
+</details>
