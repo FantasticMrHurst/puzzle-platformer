@@ -15,12 +15,12 @@ describe('calculateExitProgress', () => {
   it('completes only when every participant is inside the exit', () => {
     const participants = [
       { id: 'brute', position: { x: 120, y: 240 } },
-      { id: 'scout', position: { x: 170, y: 300 } },
+      { id: 'pilot', position: { x: 170, y: 300 } },
       { id: 'tinkerer', position: { x: 90, y: 240 } },
     ];
 
     expect(calculateExitProgress(exit, participants)).toEqual({
-      arrivedIds: ['brute', 'scout'],
+      arrivedIds: ['brute', 'pilot'],
       arrivedCount: 2,
       requiredCount: 3,
       complete: false,

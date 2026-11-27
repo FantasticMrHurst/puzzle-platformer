@@ -1,5 +1,8 @@
+import { CREW_ARCHETYPES } from '../entities/CharacterCatalog';
 import { getLabEntries } from '../levels/LevelCatalog';
+import { CREW_ABILITIES_LAB_ID } from '../levels/crewAbilitiesLab';
 import { VERDANT_RUINS_ID, VERDANT_RUINS_NAME } from '../levels/verdantRuins';
+import { enableCharacterArt } from '../rendering/CharacterArt';
 
 export function showLabMenu(container: HTMLElement): void {
   container.setAttribute('aria-labelledby', 'lab-menu-title');
@@ -16,21 +19,25 @@ export function showLabMenu(container: HTMLElement): void {
   list.className = 'lab-list';
   list.append(labLink(VERDANT_RUINS_NAME, { level: VERDANT_RUINS_ID }));
   for (const { id, name } of getLabEntries()) {
-    const params: Record<string, string> = { level: id };
-    if (id === 'relay-station') {
-      params.scoutArt = '1';
-      params.bruteArt = '1';
+    const params = new URLSearchParams({ level: id });
+    if (id === 'relay-station' || id === CREW_ABILITIES_LAB_ID) {
+      enableCharacterArt(params, CREW_ARCHETYPES);
     }
     list.append(labLink(name, params));
   }
+  if (import.meta.env.DEV) {
+    list.append(
+      labLink('Crew Tuning', { level: CREW_ABILITIES_LAB_ID, tune: '1' }),
+    );
+  }
   list.append(
-    labLink('Scout Animation Preview', {
-      level: 'scout-brute-ranger-lab',
-      scoutArt: '1',
+    labLink('Pilot Animation Preview', {
+      level: 'pilot-brute-ranger-lab',
+      pilotArt: '1',
     }),
     labLink('Brute Animation Preview', {
-      level: 'scout-brute-ranger-lab',
-      scoutArt: '1',
+      level: 'pilot-brute-ranger-lab',
+      pilotArt: '1',
       bruteArt: '1',
     }),
   );
@@ -38,7 +45,10 @@ export function showLabMenu(container: HTMLElement): void {
   container.replaceChildren(title, intro, list);
 }
 
-function labLink(name: string, params: Record<string, string>): HTMLLIElement {
+function labLink(
+  name: string,
+  params: Record<string, string> | URLSearchParams,
+): HTMLLIElement {
   const item = document.createElement('li');
   const link = document.createElement('a');
   link.href = `?${new URLSearchParams(params)}`;

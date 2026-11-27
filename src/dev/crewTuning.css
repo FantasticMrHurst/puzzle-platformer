@@ -1,0 +1,134 @@
+body.crew-tuning-open {
+  grid-template-columns: minmax(0, 1fr) min(23rem, 36vw);
+}
+
+.crew-tuning-open #lab-nav {
+  grid-column: 1 / -1;
+}
+
+.crew-tuning-open #game {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#lab-nav button[aria-controls='crew-tuning'] {
+  float: right;
+}
+
+.crew-tuning {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1rem;
+  border-left: 1px solid #334155;
+  background: #101528;
+  color: #eef4ff;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.crew-tuning[hidden] {
+  display: none;
+}
+
+.crew-tuning-fields {
+  overflow-y: auto;
+  padding-inline: 2px 5px;
+}
+
+.crew-tuning-heading,
+.crew-tuning-actions {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.crew-tuning-heading {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crew-tuning h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.crew-tuning p {
+  color: #b9c5dc;
+}
+
+.crew-tuning-filters {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.crew-tuning label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(5rem, 42%);
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.crew-tuning label[hidden] {
+  display: none;
+}
+
+.crew-tuning fieldset {
+  margin: 0.8rem 0;
+  min-width: 0;
+  border: 1px solid #334155;
+  border-radius: 0.4rem;
+  padding: 0.55rem;
+}
+
+.crew-tuning fieldset label + label {
+  margin-top: 0.4rem;
+}
+
+.crew-tuning legend {
+  color: #bfdbfe;
+}
+
+.crew-tuning input[type='number'],
+.crew-tuning select {
+  min-width: 0;
+  width: 100%;
+}
+
+.crew-tuning input,
+.crew-tuning select,
+.crew-tuning button,
+#lab-nav button[aria-controls='crew-tuning'] {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #506083;
+  border-radius: 0.3rem;
+  background: #172449;
+  color: inherit;
+  color-scheme: dark;
+  font: inherit;
+}
+
+.crew-tuning :focus-visible,
+#lab-nav button[aria-controls='crew-tuning']:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.crew-tuning-status {
+  margin: 0.35rem 0 0;
+  min-height: 1.5em;
+}
+
+@media (max-width: 780px) {
+  body.crew-tuning-open {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 44dvh);
+  }
+
+  .crew-tuning {
+    border-top: 1px solid #334155;
+    border-left: 0;
+  }
+}

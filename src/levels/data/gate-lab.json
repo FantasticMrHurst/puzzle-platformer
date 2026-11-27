@@ -17,8 +17,8 @@
       }
     },
     {
-      "id": "scout",
-      "archetype": "scout",
+      "id": "pilot",
+      "archetype": "pilot",
       "spawn": {
         "x": 220,
         "y": 566

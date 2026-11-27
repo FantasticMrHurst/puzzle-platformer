@@ -1,11 +1,12 @@
 import cooperationLab from './data/cooperation-lab.json';
+import crewAbilitiesLab from './data/crew-abilities-lab.json';
 import gardenerLab from './data/gardener-lab.json';
 import gateLab from './data/gate-lab.json';
 import mechanismLab from './data/mechanism-lab.json';
 import movementTestRoom from './data/test-room.json';
 import rangerLab from './data/ranger-lab.json';
 import relayStation from './data/relay-station.json';
-import scoutBruteRangerLab from './data/scout-brute-ranger-lab.json';
+import pilotBruteRangerLab from './data/pilot-brute-ranger-lab.json';
 import tinkererPlugLab from './data/tinkerer-plug-lab.json';
 import traversalLab from './data/traversal-lab.json';
 
@@ -19,6 +20,10 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
   'relay-station': {
     data: relayStation,
     source: 'relay-station.json',
+  },
+  'crew-abilities-lab': {
+    data: crewAbilitiesLab,
+    source: 'crew-abilities-lab.json',
   },
   'cooperation-lab': {
     data: cooperationLab,
@@ -44,9 +49,9 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
     data: rangerLab,
     source: 'ranger-lab.json',
   },
-  'scout-brute-ranger-lab': {
-    data: scoutBruteRangerLab,
-    source: 'scout-brute-ranger-lab.json',
+  'pilot-brute-ranger-lab': {
+    data: pilotBruteRangerLab,
+    source: 'pilot-brute-ranger-lab.json',
   },
   'traversal-lab': {
     data: traversalLab,

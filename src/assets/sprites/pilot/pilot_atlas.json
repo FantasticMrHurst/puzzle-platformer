@@ -1,0 +1,533 @@
+{
+  "frames": {
+    "pilot_brake": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_01": {
+      "frame": {
+        "x": 102,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_02": {
+      "frame": {
+        "x": 202,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_03": {
+      "frame": {
+        "x": 302,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_04": {
+      "frame": {
+        "x": 402,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_05": {
+      "frame": {
+        "x": 502,
+        "y": 2,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_06": {
+      "frame": {
+        "x": 2,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_07": {
+      "frame": {
+        "x": 102,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_idle_08": {
+      "frame": {
+        "x": 202,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_jump_01_liftoff": {
+      "frame": {
+        "x": 302,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_jump_02_rise": {
+      "frame": {
+        "x": 402,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_jump_03_apex": {
+      "frame": {
+        "x": 502,
+        "y": 118,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_jump_04_descend": {
+      "frame": {
+        "x": 2,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_jump_05_fall": {
+      "frame": {
+        "x": 102,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_land": {
+      "frame": {
+        "x": 202,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_01": {
+      "frame": {
+        "x": 302,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_02": {
+      "frame": {
+        "x": 402,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_03": {
+      "frame": {
+        "x": 502,
+        "y": 234,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_04": {
+      "frame": {
+        "x": 2,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_05": {
+      "frame": {
+        "x": 102,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_06": {
+      "frame": {
+        "x": 202,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_07": {
+      "frame": {
+        "x": 302,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_run_08": {
+      "frame": {
+        "x": 402,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_wall_cling": {
+      "frame": {
+        "x": 502,
+        "y": 350,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_wall_kick": {
+      "frame": {
+        "x": 2,
+        "y": 466,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_wall_slide": {
+      "frame": {
+        "x": 102,
+        "y": 466,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    }
+  },
+  "meta": {
+    "image": "pilot_atlas.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 600,
+      "h": 580
+    },
+    "scale": "1"
+  }
+}

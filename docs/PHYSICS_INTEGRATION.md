@@ -57,7 +57,7 @@ The `R` action requests the same recovery path. Room recovery also clears exit p
 
 - Automated clock tests cover synthetic 30, 60, and 120 Hz render deltas and produce 60 simulation steps per elapsed second.
 - Browser smoke tests verify boot, input response, roster switching, reset, and both authored test rooms without asserting frame-perfect movement.
-- Manual browser play at the available display rate confirmed ground acceleration, braking, full and cut jumps, static collision, short-gap traversal, camera tracking, roster switching, room reset, Scout plate activation, deliberate Brute grip/push/pull, Brute brace entry across a character switch, landing and jumping from the Brute platform, Pet tunnel traversal, and three-character exit completion.
+- Manual browser play at the available display rate confirmed ground acceleration, braking, full and cut jumps, static collision, short-gap traversal, camera tracking, roster switching, room reset, Pilot plate activation, deliberate Brute grip/push/pull, Brute brace entry across a character switch, landing and jumping from the Brute platform, Pet tunnel traversal, and three-character exit completion.
 - No browser console warnings or errors were observed during the manual pass.
 
 ## Current limitations
@@ -66,5 +66,5 @@ The `R` action requests the same recovery path. Room recovery also clears exit p
 - Controller tuning is an initial baseline and needs structured play-testing.
 - Interpolation intentionally presents state up to one fixed step behind the authoritative body.
 - Hardware testing on an additional physical high-refresh display remains useful; current cadence coverage includes browser emulation.
-- Scout wall traversal and Pet body size are prototype values that require structured play testing before acceptance.
+- Pilot wall traversal and Pet body size are prototype values that require structured play testing before acceptance.
 

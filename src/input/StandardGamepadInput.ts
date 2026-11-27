@@ -3,9 +3,12 @@ import type { RawPlayerInput } from './PlayerIntent';
 // Physical button positions in the browser's standard gamepad mapping.
 const CROSS = 0;
 const SQUARE = 2;
+const TRIANGLE = 3;
 const L1 = 4;
 const R1 = 5;
 const OPTIONS = 9;
+const DPAD_UP = 12;
+const DPAD_DOWN = 13;
 const DPAD_LEFT = 14;
 const DPAD_RIGHT = 15;
 const STICK_DEAD_ZONE = 0.28;
@@ -16,6 +19,8 @@ interface GamepadIntent {
   readonly primaryPressed: boolean;
   readonly cycleDirection: -1 | 0 | 1;
   readonly resetPressed: boolean;
+  readonly grabPressed: boolean;
+  readonly climbAxis: -1 | 0 | 1;
 }
 
 export class StandardGamepadInput {
@@ -24,6 +29,7 @@ export class StandardGamepadInput {
     previousCharacter: false,
     nextCharacter: false,
     reset: false,
+    grab: false,
   };
 
   public sample(): GamepadIntent {
@@ -32,11 +38,15 @@ export class StandardGamepadInput {
     const left = pressed(DPAD_LEFT);
     const right = pressed(DPAD_RIGHT);
     const axis = pad?.axes[0] ?? 0;
+    const verticalAxis = pad?.axes[1] ?? 0;
+    const up = pressed(DPAD_UP) || verticalAxis < -STICK_DEAD_ZONE;
+    const down = pressed(DPAD_DOWN) || verticalAxis > STICK_DEAD_ZONE;
     const current = {
       primary: pressed(SQUARE),
       previousCharacter: pressed(L1),
       nextCharacter: pressed(R1),
       reset: pressed(OPTIONS),
+      grab: pressed(TRIANGLE),
     };
     const previous = this.previous;
     this.previous = current;
@@ -55,6 +65,8 @@ export class StandardGamepadInput {
       cycleDirection:
         previousCharacter === nextCharacter ? 0 : previousCharacter ? -1 : 1,
       resetPressed: current.reset && !previous.reset,
+      grabPressed: current.grab && !previous.grab,
+      climbAxis: up === down ? 0 : up ? -1 : 1,
     };
   }
 

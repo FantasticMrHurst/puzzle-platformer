@@ -64,7 +64,10 @@ export class MechanismConsole {
   }
 
   private canUse(character: PlayerCharacter): boolean {
-    if (character.getArchetype() !== this.data.requiredArchetype) {
+    if (
+      !character.hasAbility('route-power') ||
+      character.getArchetype() !== this.data.requiredArchetype
+    ) {
       return false;
     }
 
