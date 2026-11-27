@@ -519,6 +519,66 @@
         "w": 96,
         "h": 112
       }
+    },
+    "pilot_rope_reach": {
+      "frame": {
+        "x": 202,
+        "y": 466,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_rope_lift": {
+      "frame": {
+        "x": 302,
+        "y": 466,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
+    },
+    "pilot_rope_throw": {
+      "frame": {
+        "x": 402,
+        "y": 466,
+        "w": 96,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      }
     }
   },
   "meta": {

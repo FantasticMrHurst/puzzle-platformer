@@ -12,6 +12,7 @@ import {
 } from './PoseTuning';
 
 type Clip = readonly [string, ...string[]];
+export type RopeCastPose = 'reach' | 'lift' | 'throw';
 
 export interface CharacterArt {
   readonly textureKey: string;
@@ -24,6 +25,7 @@ export interface CharacterArt {
   readonly run: Clip;
   readonly brake: string;
   readonly land: string;
+  readonly rope?: Readonly<Record<RopeCastPose, string>>;
   readonly jump: {
     readonly liftoff: string;
     readonly rise: string;
@@ -87,6 +89,11 @@ export const CHARACTER_ART = {
     atlasUrl: pilotAtlas,
     previewFlag: 'pilotArt',
     tuning: DEFAULT_PILOT_POSE_TUNING,
+    rope: {
+      reach: 'pilot_rope_reach',
+      lift: 'pilot_rope_lift',
+      throw: 'pilot_rope_throw',
+    },
     wall: {
       cling: 'pilot_wall_cling',
       slide: 'pilot_wall_slide',
@@ -129,7 +136,7 @@ export function enableCharacterArt(
 }
 
 export function getCharacterArtFrames(art: CharacterArt): readonly string[] {
-  const { jump, wall, grip, brace } = art;
+  const { jump, wall, grip, brace, rope } = art;
   return [
     ...art.idle,
     ...art.run,
@@ -143,5 +150,6 @@ export function getCharacterArtFrames(art: CharacterArt): readonly string[] {
     ...(wall ? [wall.cling, wall.slide, wall.kick] : []),
     ...(grip ? [...grip.push, ...grip.pull] : []),
     ...(brace?.frames ?? []),
+    ...(rope ? Object.values(rope) : []),
   ];
 }

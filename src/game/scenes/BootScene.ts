@@ -9,8 +9,8 @@ export class BootScene extends Phaser.Scene {
 
   public preload(): void {
     const params = new URLSearchParams(window.location.search);
-    for (const art of Object.values(CHARACTER_ART)) {
-      if (params.get(art.previewFlag) === '1') {
+    for (const [id, art] of Object.entries(CHARACTER_ART)) {
+      if (id === 'pilot' || params.get(art.previewFlag) === '1') {
         this.load.atlas(art.textureKey, art.textureUrl, art.atlasUrl);
       }
     }

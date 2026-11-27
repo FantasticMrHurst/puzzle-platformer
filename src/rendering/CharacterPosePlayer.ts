@@ -5,9 +5,14 @@ import type {
   MovementResult,
   MovementVelocity,
 } from '../movement/MovementController';
-import { getCharacterArtFrames, type CharacterArt } from './CharacterArt';
+import {
+  getCharacterArtFrames,
+  type CharacterArt,
+  type RopeCastPose,
+} from './CharacterArt';
 import type { Position } from './interpolatePosition';
 import type { PoseTuning } from './PoseTuning';
+import { drawRopeBundle } from './RopeLadderArt';
 
 const LANDING_SECONDS = 0.1;
 const IDLE_SPEED_PX_PER_SECOND = 12;
@@ -22,6 +27,7 @@ interface PoseAction {
 
 export class CharacterPosePlayer {
   private readonly sprite: Phaser.GameObjects.Image;
+  private readonly ropeGear?: Phaser.GameObjects.Graphics;
   private tuning: PoseTuning;
   private facingRight = true;
   private previousSpeed = 0;
@@ -32,6 +38,11 @@ export class CharacterPosePlayer {
   private wallSeconds = 0;
   private clip?: readonly string[];
   private phase = 0;
+  private carryingRope = true;
+  private ropeCast: {
+    readonly pose: RopeCastPose;
+    readonly direction: -1 | 1;
+  } | null = null;
 
   public static create(
     scene: Phaser.Scene,
@@ -68,6 +79,7 @@ export class CharacterPosePlayer {
     this.sprite = scene.add
       .image(x, y, art.textureKey, art.idle[0])
       .setOrigin(...art.origin);
+    if (art.rope !== undefined) this.ropeGear = scene.add.graphics();
     this.applyScale();
   }
 
@@ -78,6 +90,12 @@ export class CharacterPosePlayer {
     movement: MovementResult,
     { braced, gripDirection, moveX }: PoseAction,
   ): void {
+    if (this.ropeCast !== null && this.art.rope !== undefined) {
+      this.facingRight = this.ropeCast.direction > 0;
+      this.stop(this.art.rope[this.ropeCast.pose]);
+      return;
+    }
+
     const speed = Math.abs(velocity.x);
     const braking = speed < this.previousSpeed - 1;
     this.previousSpeed = speed;
@@ -169,10 +187,36 @@ export class CharacterPosePlayer {
       feet.x + this.tuning.offsetX,
       feet.y + this.tuning.offsetY,
     );
+    if (this.ropeGear !== undefined) {
+      this.ropeGear.clear();
+      if (this.carryingRope && this.ropeCast?.pose === 'lift') {
+        const direction = this.sprite.flipX ? -1 : 1;
+        const scale = this.tuning.scale;
+        drawRopeBundle(
+          this.ropeGear,
+          {
+            x: this.sprite.x + direction * 19 * scale,
+            y: this.sprite.y - 39 * scale,
+          },
+          7,
+          scale * 0.85,
+        );
+      }
+    }
   }
 
   public setDepth(depth: number): void {
     this.sprite.setDepth(depth);
+    this.ropeGear?.setDepth(depth + 0.1);
+  }
+
+  public setRopeEquipment(
+    carrying: boolean,
+    pose?: RopeCastPose,
+    direction: -1 | 1 = 1,
+  ): void {
+    this.carryingRope = carrying;
+    this.ropeCast = pose === undefined ? null : { pose, direction };
   }
 
   public setTuning(tuning: PoseTuning): void {
@@ -181,6 +225,7 @@ export class CharacterPosePlayer {
   }
 
   public reset(): void {
+    this.setRopeEquipment(true);
     this.facingRight = true;
     this.previousSpeed = 0;
     this.airSeconds = 0;
