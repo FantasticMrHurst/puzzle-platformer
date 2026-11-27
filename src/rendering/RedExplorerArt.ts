@@ -31,7 +31,13 @@ export const RISE_POSE = '03_jump_and_land_06.8s';
 export const APEX_POSE = '03_jump_and_land_07.0s';
 export const FALL_POSE = '03_jump_and_land_08.6s';
 export const LAND_POSE = '03_jump_and_land_07.2s';
-export const WALL_POSE = '04_gestures_and_turn_09.0s';
+// The source frames place the wall on the explorer's left.
+export const WALL_SLIDE_POSES = [
+  '04_gestures_and_turn_11.8s',
+  '04_gestures_and_turn_12.0s',
+  '04_gestures_and_turn_12.2s',
+  '04_gestures_and_turn_12.4s',
+] as const;
 
 export const EXPLORER_ART_SCALE = 1 / 8;
 export const EXPLORER_FOOT_ORIGIN = { x: 216 / 460, y: 491 / 494 };

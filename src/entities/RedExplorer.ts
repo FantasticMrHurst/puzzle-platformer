@@ -19,7 +19,7 @@ import {
   LAND_POSE,
   RISE_POSE,
   RUN_POSES,
-  WALL_POSE,
+  WALL_SLIDE_POSES,
 } from '../rendering/RedExplorerArt';
 import {
   interpolatePosition,
@@ -31,6 +31,7 @@ const HEIGHT = 40;
 const CLIMB_SPEED = 155;
 const LADDER_REACH = 18;
 const IDLE_FRAME_SECONDS = 0.22;
+const WALL_SLIDE_FRAME_SECONDS = 0.12;
 const LAND_SECONDS = 0.09;
 const RUN_PIXELS_PER_FRAME = 14;
 const CARRY_PIXELS_PER_FRAME = 16;
@@ -65,6 +66,7 @@ export class RedExplorer {
   private position: Position;
   private stride = 0;
   private idleSeconds = 0;
+  private wallSlideSeconds = 0;
   private airborneSeconds = 0;
   private landingSeconds = 0;
   private climbTravel = 0;
@@ -150,6 +152,10 @@ export class RedExplorer {
   public complete(deltaSeconds: number): void {
     this.position = this.adapter.readPosition();
     this.stride += Math.abs(this.position.x - this.previousPosition.x);
+    this.wallSlideSeconds =
+      this.getMode() === 'wall-sliding' && !this.isGrounded()
+        ? this.wallSlideSeconds + deltaSeconds
+        : 0;
     if (this.climbing) {
       this.climbTravel += Math.abs(this.position.y - this.previousPosition.y);
       this.airborneSeconds = 0;
@@ -180,7 +186,12 @@ export class RedExplorer {
     this.sprite.setPosition(Math.round(x), Math.round(y + HEIGHT / 2));
     if (this.sprite.texture.key !== pose) this.sprite.setTexture(pose);
     // Mirror around the common foot anchor, not the middle of the source canvas.
-    this.sprite.setScale(EXPLORER_ART_SCALE * this.facing, EXPLORER_ART_SCALE);
+    const wallDirection = this.result?.state.lastWallDirection ?? 0;
+    const facing =
+      this.wallSlideSeconds > 0 && !carrying && wallDirection !== 0
+        ? -wallDirection
+        : this.facing;
+    this.sprite.setScale(EXPLORER_ART_SCALE * facing, EXPLORER_ART_SCALE);
   }
 
   public isGrounded(): boolean {
@@ -196,6 +207,7 @@ export class RedExplorer {
     this.facing = 1;
     this.stride = 0;
     this.idleSeconds = 0;
+    this.wallSlideSeconds = 0;
     this.airborneSeconds = 0;
     this.landingSeconds = 0;
     this.climbTravel = 0;
@@ -215,7 +227,12 @@ export class RedExplorer {
     if (this.climbing) {
       return cyclePose(CLIMB_POSES, this.climbTravel / CLIMB_PIXELS_PER_FRAME);
     }
-    if (this.getMode() === 'wall-sliding') return WALL_POSE;
+    if (this.wallSlideSeconds > 0) {
+      return cyclePose(
+        WALL_SLIDE_POSES,
+        this.wallSlideSeconds / WALL_SLIDE_FRAME_SECONDS,
+      );
+    }
     if (!this.isGrounded()) {
       const verticalSpeed = this.body.velocity.y;
       if (verticalSpeed < -APEX_SPEED) return RISE_POSE;
