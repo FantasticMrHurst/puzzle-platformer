@@ -68,6 +68,8 @@ Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-fra
 
 Choose **Brute Animation Preview** from the lab menu to see both animated characters. Press `2` to select the Brute. Tap `F` on open ground to brace or release. Once the Scout unlocks the block, hold `F` beside it and move toward it to push or away to pull. The preview uses the current collision bodies and movement rules.
 
+Choose **Forest of the Verdant Ruins** from the lab menu, or open `?level=verdant-ruins`, to try the separate red-explorer puzzle. See [Verdant Ruins playtest](docs/VERDANT_RUINS_LAB.md) for controls and integration details.
+
 See the project documents for current direction:
 
 - [Game design](docs/GAME_DESIGN.md)
