@@ -161,8 +161,7 @@ export class TestRoomScene extends Phaser.Scene {
       (block) => new PushableBlock(this, block),
     );
     if (this.level.id === CREW_ABILITIES_LAB_ID) {
-      const { rope, barrier, counterweight, lift } = CREW_ABILITIES_LAYOUT;
-      this.ropeLadder = new RopeLadder(this, rope);
+      const { barrier, counterweight, lift } = CREW_ABILITIES_LAYOUT;
       this.breakableFloor = new BreakableBarrier(this, barrier);
       this.counterweight = new PushableBlock(this, counterweight);
       this.serviceLift = new ServiceLift(this, lift);
@@ -191,6 +190,39 @@ export class TestRoomScene extends Phaser.Scene {
     this.plantStructures = this.level.plantStructures.map(
       (structure) => new PlantStructure(this, structure),
     );
+    const crew = this.level.characters.map(({ archetype }) =>
+      getCharacterDefinition(archetype),
+    );
+    this.ropeLadder = crew.some(({ abilities }) =>
+      abilities.includes('deploy-rope'),
+    )
+      ? new RopeLadder(
+          this,
+          this.level,
+          {
+            width: Math.max(...crew.map(({ width }) => width)),
+            height: Math.max(...crew.map(({ height }) => height)),
+          },
+          () =>
+            [
+              ...this.gates,
+              ...this.poweredBridges,
+              ...this.plantStructures,
+              ...this.pushableBlocks,
+              this.breakableFloor,
+              this.serviceLift,
+            ].flatMap((object) => {
+              const geometry = object?.physicsObject;
+              const body = geometry?.body;
+              return geometry !== undefined &&
+                (body instanceof Phaser.Physics.Arcade.Body ||
+                  body instanceof Phaser.Physics.Arcade.StaticBody) &&
+                body.enable
+                ? [geometry.getBounds()]
+                : [];
+            }),
+        )
+      : undefined;
     this.tinkererPlugPuzzles = this.level.tinkererPlugs.map((plug) => {
       const groundY = this.level.staticGeometry
         .filter(
@@ -337,8 +369,10 @@ export class TestRoomScene extends Phaser.Scene {
               intent.moveX,
               GAMEPLAY_STEP_SECONDS,
             ),
+            this.ropeLadder?.isCasting(character),
           );
         });
+        this.ropeLadder?.advance(GAMEPLAY_STEP_SECONDS);
         this.tinkererCompanions.forEach((companion) =>
           companion.prepareSimulationStep(GAMEPLAY_STEP_SECONDS),
         );
@@ -422,6 +456,7 @@ export class TestRoomScene extends Phaser.Scene {
       .getMembers()
       .forEach((character) => character.render(interpolationAlpha));
     this.tinkererCompanions.forEach((companion) => companion.render());
+    this.ropeLadder?.render(this.roster.getActive());
     this.tinkererPlugPuzzles.forEach((puzzle) => puzzle.render());
 
     const snapshot = this.createDebugSnapshot();
@@ -650,7 +685,7 @@ export class TestRoomScene extends Phaser.Scene {
         .text(
           24,
           176,
-          `Controller: D-pad/stick move · Cross jump · Square ability · L1/R1 switch · Options reset${this.ropeLadder === undefined ? '' : ' · ↑/↓ climb · Triangle plug'}`,
+          `Controller: D-pad/stick move · Cross jump · Square ability · L1/R1 switch · Options reset${this.ropeLadder === undefined ? '' : ' · ↑/↓ climb'}${this.serviceLift === undefined ? '' : ' · Triangle plug'}`,
           {
             backgroundColor: '#080b16cc',
             color: '#cbd5e1',
@@ -665,7 +700,7 @@ export class TestRoomScene extends Phaser.Scene {
 
     const mixedLabHint =
       level.id === CREW_ABILITIES_LAB_ID
-        ? 'Pilot: wall jump, F at anchor, W/S or ↑/↓ to climb · Brute: F to break, hold F to grip · Tinkerer: C for plug, F on lift'
+        ? 'Pilot: F at ledge, W/S or ↑/↓ to climb · Brute: F to break, hold F to grip · Tinkerer: C for plug, F on lift'
         : level.id === 'relay-station'
           ? 'Restore the service crossing and get the whole crew through the exit airlock.'
           : level.id === 'cooperation-lab'
@@ -831,7 +866,7 @@ export class TestRoomScene extends Phaser.Scene {
     }
 
     if (
-      this.ropeLadder?.tryDeploy(activeCharacter) ||
+      this.ropeLadder?.tryUse(activeCharacter) ||
       this.serviceLift?.tryOperate(activeCharacter)
     ) {
       return;

@@ -12,6 +12,7 @@ import type { MovementState } from '../movement/MovementState';
 import type { MovementConfig } from '../movement/MovementConfig';
 import { ArcadeBodyAdapter } from '../physics/ArcadeBodyAdapter';
 import { CHARACTER_ART } from '../rendering/CharacterArt';
+import type { RopeCastPose } from '../rendering/CharacterArt';
 import { CharacterPosePlayer } from '../rendering/CharacterPosePlayer';
 import {
   interpolatePosition,
@@ -121,6 +122,7 @@ export class PlayerCharacter {
     deltaSeconds: number,
     intent: PlayerIntent,
     climb?: LadderMotion,
+    castingRope = false,
   ): void {
     this.previousPosition = { ...this.currentPosition };
     if (intent.moveX !== 0) {
@@ -150,6 +152,16 @@ export class PlayerCharacter {
     if (this.climbing) {
       this.climbing = false;
       this.bodyAdapter.setAllowGravity(true);
+    }
+    if (castingRope) {
+      this.controller.reset();
+      this.lastResult = {
+        velocity: { x: 0, y: this.bodyAdapter.readVelocity().y },
+        state: this.controller.getState(),
+        jumped: false,
+      };
+      this.bodyAdapter.applyVelocity(this.lastResult.velocity);
+      return;
     }
     this.lastResult = this.controller.update({
       deltaSeconds,
@@ -239,6 +251,16 @@ export class PlayerCharacter {
 
   public getFacingDirection(): -1 | 1 {
     return this.facingDirection;
+  }
+
+  public setRopeEquipment(
+    carrying: boolean,
+    pose?: RopeCastPose,
+    direction?: -1 | 1,
+  ): void {
+    if (this.posePreview instanceof CharacterPosePlayer) {
+      this.posePreview.setRopeEquipment(carrying, pose, direction);
+    }
   }
 
   public setPlugCarry(side: -1 | 1 | null): void {

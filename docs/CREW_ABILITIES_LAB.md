@@ -2,7 +2,7 @@
 
 Choose **Crew Abilities Lab** from the lab menu. To share the room with the current Pilot and Brute art enabled, use `?level=crew-abilities-lab&pilotArt=1&bruteArt=1`.
 
-The room prototypes the agreed Brute, Pilot, and Tinkerer abilities. Its standard level data uses the existing schema. The rope anchor, cracked floor, counterweight, and lift stops have a separate typed fixture while their authoring needs are still being tested.
+The room prototypes the agreed Brute, Pilot, and Tinkerer abilities. Its standard level data uses the existing schema. The cracked floor, counterweight, and lift stops have a separate typed fixture while their authoring needs are still being tested. The Pilot finds rope drop points from the terrain.
 
 ## Live tuning
 
@@ -31,9 +31,11 @@ Keep terrain placement, collision dimensions and signal connections in validated
 
 Use Space for wall jumps in the shaft. On the ladder, keep climbing until the character steps onto the upper deck. Release climb and move sideways to let go early.
 
+The Pilot carries one ladder inside the satchel. When **F · THROW ROPE** appears near a clear drop, press the ability button to pull out the coil and throw it down. The ladder reaches the first landing below, up to 480 px. The crew can climb once it unrolls. At either reachable end, wait for the crew to get off and press the ability button again to retract the ladder. The Pilot reels it toward that end and stows it inside the satchel. A room reset also returns it to the satchel.
+
 ## Playtest route
 
-1. **Pilot.** Jump into the right wall, then wall-jump left onto the west shelf. Jump from that shelf to the upper-right deck and use the ability at the anchor to lower the rope ladder. Bring the Brute and Tinkerer up.
+1. **Pilot.** Jump into the right wall, then wall-jump left onto the west shelf. Jump from that shelf to the upper-right deck and use the ability near the shaft edge to throw the rope ladder. Bring the Brute and Tinkerer up.
 2. **Brute.** Stand beside the cracked floor and use the ability to break it. Follow the falling counterweight down to the lower deck. Approach the weight from the right, hold the ability, and pull it onto the plate. Leave it there to hold the gate for everyone.
 3. **Tinkerer.** Approach the red plug from the left, grab it, then line up its prongs with the outlet and place it. Board the powered lift with the whole crew. Use the ability aboard to select service, then exit. An ability press at the ground call point brings the lift back down.
 4. Walk all three onto the exit deck. Restart and verify the ladder stows, the floor and counterweight return, the gate closes, and the lift loses power and returns to ground.
