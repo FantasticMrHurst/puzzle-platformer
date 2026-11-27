@@ -16,7 +16,12 @@ export function showLabMenu(container: HTMLElement): void {
   list.className = 'lab-list';
   list.append(labLink(VERDANT_RUINS_NAME, { level: VERDANT_RUINS_ID }));
   for (const { id, name } of getLabEntries()) {
-    list.append(labLink(name, { level: id }));
+    const params: Record<string, string> = { level: id };
+    if (id === 'relay-station') {
+      params.scoutArt = '1';
+      params.bruteArt = '1';
+    }
+    list.append(labLink(name, params));
   }
   list.append(
     labLink('Scout Animation Preview', {

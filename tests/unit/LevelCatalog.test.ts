@@ -61,11 +61,19 @@ describe('getLevelSource', () => {
       'brute',
       'ranger',
     ]);
+
+    const relaySource = getLevelSource('relay-station');
+    const relay = loadLevelData(relaySource.data, relaySource.source);
+    expect(relay.characters.map(({ archetype }) => archetype)).toEqual([
+      'scout',
+      'brute',
+      'tinkerer',
+    ]);
   });
 
   it('reports available IDs for an unknown level', () => {
     expect(() => getLevelSource('missing')).toThrow(
-      'Unknown level "missing". Available levels: cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
+      'Unknown level "missing". Available levels: relay-station, cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
     );
   });
 });

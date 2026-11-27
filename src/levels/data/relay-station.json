@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 8,
+  "id": "relay-station",
+  "name": "Relay Station",
+  "world": {
+    "width": 3020,
+    "height": 720,
+    "backgroundColor": "#0c1425"
+  },
+  "characters": [
+    {
+      "id": "scout",
+      "archetype": "scout",
+      "spawn": {
+        "x": 600,
+        "y": 566
+      }
+    },
+    {
+      "id": "brute",
+      "archetype": "brute",
+      "spawn": {
+        "x": 330,
+        "y": 564
+      }
+    },
+    {
+      "id": "tinkerer",
+      "archetype": "tinkerer",
+      "spawn": {
+        "x": 210,
+        "y": 564
+      }
+    }
+  ],
+  "exit": {
+    "id": "crew-exit",
+    "x": 2820,
+    "y": 462,
+    "width": 150,
+    "height": 138
+  },
+  "staticGeometry": [
+    {
+      "id": "station-ceiling",
+      "x": 0,
+      "y": 0,
+      "width": 3020,
+      "height": 52,
+      "surface": "wall"
+    },
+    {
+      "id": "freight-deck",
+      "x": 0,
+      "y": 600,
+      "width": 1080,
+      "height": 120,
+      "surface": "ground",
+      "purpose": "Freight deck"
+    },
+    {
+      "id": "relay-deck",
+      "x": 1080,
+      "y": 600,
+      "width": 640,
+      "height": 120,
+      "surface": "ground",
+      "purpose": "Maintenance bay"
+    },
+    {
+      "id": "airlock-deck",
+      "x": 2340,
+      "y": 600,
+      "width": 680,
+      "height": 120,
+      "surface": "ground",
+      "purpose": "Exit airlock"
+    },
+    {
+      "id": "freight-interlock-ledge",
+      "x": 380,
+      "y": 290,
+      "width": 180,
+      "height": 230,
+      "surface": "platform",
+      "purpose": "Freight interlock"
+    },
+    {
+      "id": "freight-bulkhead",
+      "x": 700,
+      "y": 0,
+      "width": 40,
+      "height": 520,
+      "surface": "wall"
+    },
+    {
+      "id": "relay-balcony",
+      "x": 1380,
+      "y": 342,
+      "width": 210,
+      "height": 88,
+      "surface": "platform",
+      "purpose": "Bridge power relay"
+    },
+    {
+      "id": "airlock-header",
+      "x": 2570,
+      "y": 0,
+      "width": 64,
+      "height": 408,
+      "surface": "wall"
+    },
+    {
+      "id": "left-boundary",
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    },
+    {
+      "id": "right-boundary",
+      "x": 2980,
+      "y": 0,
+      "width": 40,
+      "height": 600,
+      "surface": "wall"
+    }
+  ],
+  "pressurePlates": [
+    {
+      "id": "freight-release",
+      "x": 410,
+      "y": 278,
+      "width": 130,
+      "height": 12,
+      "channel": "freight-release"
+    },
+    {
+      "id": "airlock-approach-plate",
+      "x": 2410,
+      "y": 588,
+      "width": 84,
+      "height": 12,
+      "channel": "exit-airlock"
+    }
+  ],
+  "toggleSwitches": [
+    {
+      "id": "inside-airlock-latch",
+      "x": 2730,
+      "y": 552,
+      "width": 44,
+      "height": 48,
+      "channel": "exit-airlock",
+      "interactionRange": 56,
+      "initiallyActive": false
+    }
+  ],
+  "gates": [
+    {
+      "id": "exit-airlock-gate",
+      "x": 2570,
+      "y": 408,
+      "width": 64,
+      "height": 192,
+      "channel": "exit-airlock"
+    }
+  ],
+  "pushableBlocks": [
+    {
+      "id": "freight-counterweight",
+      "x": 700,
+      "y": 520,
+      "width": 60,
+      "height": 80,
+      "channel": "freight-release",
+      "requiredArchetype": "brute",
+      "maxPushX": 885,
+      "pushSpeed": 300
+    }
+  ],
+  "mechanismConsoles": [
+    {
+      "id": "bridge-power-relay",
+      "x": 1470,
+      "y": 286,
+      "width": 48,
+      "height": 56,
+      "channel": "bridge-power",
+      "requiredArchetype": "tinkerer",
+      "interactionRange": 30,
+      "initiallyPowered": false
+    }
+  ],
+  "poweredBridges": [
+    {
+      "id": "service-crossing",
+      "x": 1720,
+      "y": 600,
+      "width": 620,
+      "height": 32,
+      "channel": "bridge-power"
+    }
+  ],
+  "rangedTargets": [],
+  "growthNodes": [],
+  "plantStructures": [],
+  "tinkererPlugs": []
+}

@@ -62,6 +62,8 @@ Focused labs are selected with a query parameter: `?level=traversal-lab` for Sco
 
 Open `?level=gate-lab` to try shared environmental controls. Leave one character on the pressure plate, take another through the gate, then press `F` at the far-side switch to let the whole team through. The gate waits for occupied doorways to clear. Press `R` to reset.
 
+Choose **Relay Station** from the lab menu to playtest Scout, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches.
+
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
 Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-frame idle loop, eight-frame run, and five jump poses. The jump follows the actual arc from liftoff through falling, followed by the existing landing pose. Jump against a wall to see the cling, slide, and kick.
