@@ -58,17 +58,19 @@ The application currently provides a three-character prototype roster in the val
 
 Use `1`–`3` to select a character directly or `Q`/`E` to cycle the roster. Movement remains `A`/`D` or the arrow keys, with `W`, Up, or Space to jump. `F` is the contextual ability: the Brute grips or braces, the Tinkerer operates nearby powered consoles, and the Ranger fires along the current `I`/`J`/`K`/`L` aim direction. In the Tinkerer Plug Lab, press `C` to grab the plug and press it again to place it. Press `R` to reset the complete room to its authored checkpoint. Bring all three characters into the shared exit to complete the room.
 
-Focused labs are selected with a query parameter: `?level=traversal-lab` for Scout, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=tinkerer-plug-lab` for the Tinkerer-only plug-and-outlet puzzle, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
+Focused labs are selected with a query parameter: `?level=traversal-lab` for Pilot, Pet, and Brute cooperation, `?level=mechanism-lab` for the Tinkerer powered-bridge experiment, `?level=tinkerer-plug-lab` for the Tinkerer-only plug-and-outlet puzzle, `?level=ranger-lab` for the Ranger's aimed environmental shot, and `?level=gardener-lab` for the Gardener's living platform.
 
 Open `?level=gate-lab` to try shared environmental controls. Leave one character on the pressure plate, take another through the gate, then press `F` at the far-side switch to let the whole team through. The gate waits for occupied doorways to clear. Press `R` to reset.
 
-Choose **Relay Station** from the lab menu to playtest Scout, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches. Relay Station also accepts a standard-mapped gamepad. On a PlayStation controller, use the D-pad or left stick to move, Cross to jump, Square to use abilities, L1/R1 to cycle characters, and Options to reset. Hold Square beside an unlocked block to grip it as the Brute.
+Choose **Relay Station** from the lab menu to playtest Pilot, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches. Relay Station also accepts a standard-mapped gamepad. On a PlayStation controller, use the D-pad or left stick to move, Cross to jump, Square to use abilities, L1/R1 to cycle characters, and Options to reset. Hold Square beside an unlocked block to grip it as the Brute.
+
+Press `3` in **Relay Station** to play as the animated Tinkerer, or start as him in **Tinkerer Plug Lab**. Let him stand for a few seconds to see his arm swing and blink, then run and jump to see the movement poses. His flower companion sways while waiting, scuttles after him, and makes a short hop when he jumps.
 
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
-Open `?level=scout-brute-ranger-lab&scoutArt=1` to preview the Scout's eight-frame idle loop, eight-frame run, and five jump poses. The jump follows the actual arc from liftoff through falling, followed by the existing landing pose. Jump against a wall to see the cling, slide, and kick.
+Open `?level=pilot-brute-ranger-lab&pilotArt=1` to preview the Pilot's eight-frame idle loop, eight-frame run, and five jump poses. The jump follows the actual arc from liftoff through falling, followed by the existing landing pose. Jump against a wall to see the cling, slide, and kick.
 
-Choose **Brute Animation Preview** from the lab menu to see both animated characters. Press `2` to select the Brute. Tap `F` on open ground to brace or release. Once the Scout unlocks the block, hold `F` beside it and move toward it to push or away to pull. The preview uses the current collision bodies and movement rules.
+Choose **Brute Animation Preview** from the lab menu to see both animated characters. Press `2` to select the Brute. Tap `F` on open ground to brace or release. Once the Pilot unlocks the block, hold `F` beside it and move toward it to push or away to pull. The preview uses the current collision bodies and movement rules.
 
 Choose **Forest of the Verdant Ruins** from the lab menu, or open `?level=verdant-ruins`, to try the separate red-explorer puzzle. See [Verdant Ruins playtest](docs/VERDANT_RUINS_LAB.md) for controls and integration details.
 
@@ -78,7 +80,7 @@ See the project documents for current direction:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap and proposed issues](docs/ROADMAP.md)
 - [Movement test-room measurements](docs/TEST_ROOM.md)
-- [Scout, Brute, and Pet cooperation lab](docs/CHARACTER_LAB.md)
+- [Pilot, Brute, and Pet cooperation lab](docs/CHARACTER_LAB.md)
 - [Tinkerer powered-mechanism lab](docs/TINKERER_LAB.md)
 - [Tinkerer plug lab](docs/TINKERER_PLUG_LAB.md)
 - [Ranger ranged-action lab](docs/RANGER_LAB.md)

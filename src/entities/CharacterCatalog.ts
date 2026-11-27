@@ -35,7 +35,7 @@ const CHARACTER_CATALOG: Readonly<
     },
   },
   scout: {
-    ...createBaselineDefinition('scout', 'SCOUT', 0x22c55e, 0xdcfce7),
+    ...createBaselineDefinition('scout', 'PILOT', 0x22c55e, 0xdcfce7),
     width: 44,
     height: 68,
     movementProfileName: 'scout-prototype-v2',
@@ -54,12 +54,14 @@ const CHARACTER_CATALOG: Readonly<
       },
     },
   },
-  tinkerer: createBaselineDefinition(
-    'tinkerer',
-    'TINKERER',
-    0x3b82f6,
-    0xdbeafe,
-  ),
+  tinkerer: {
+    ...createBaselineDefinition('tinkerer', 'TINKERER', 0x3b82f6, 0xdbeafe),
+    movementProfileName: 'tinkerer-heavy-v1',
+    movementConfig: {
+      ...DEFAULT_MOVEMENT_CONFIG,
+      jumpSpeed: 640,
+    },
+  },
   ranger: createBaselineDefinition('ranger', 'RANGER', 0x84cc16, 0xecfccb),
   pet: {
     ...createBaselineDefinition('pet', 'PET', 0xa855f7, 0xf3e8ff),

@@ -113,9 +113,13 @@ export class ScoutPosePreview {
   private runDistance = 0;
   private previousSpeed = 0;
 
+  public static isEnabled(params: URLSearchParams): boolean {
+    return (params.get('pilotArt') ?? params.get('scoutArt')) === '1';
+  }
+
   public static preload(scene: Phaser.Scene): void {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('scoutArt') !== '1') {
+    if (!ScoutPosePreview.isEnabled(params)) {
       return;
     }
     for (const [pose, url] of Object.entries(POSES)) {

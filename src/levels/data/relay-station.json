@@ -96,7 +96,7 @@
     {
       "id": "relay-balcony",
       "x": 1380,
-      "y": 342,
+      "y": 414,
       "width": 210,
       "height": 88,
       "surface": "platform",
@@ -184,7 +184,7 @@
     {
       "id": "bridge-power-relay",
       "x": 1470,
-      "y": 286,
+      "y": 358,
       "width": 48,
       "height": 56,
       "channel": "bridge-power",

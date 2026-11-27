@@ -5,7 +5,7 @@ import mechanismLab from './data/mechanism-lab.json';
 import movementTestRoom from './data/test-room.json';
 import rangerLab from './data/ranger-lab.json';
 import relayStation from './data/relay-station.json';
-import scoutBruteRangerLab from './data/scout-brute-ranger-lab.json';
+import pilotBruteRangerLab from './data/pilot-brute-ranger-lab.json';
 import tinkererPlugLab from './data/tinkerer-plug-lab.json';
 import traversalLab from './data/traversal-lab.json';
 
@@ -44,9 +44,9 @@ const LEVEL_SOURCES: Readonly<Record<string, LevelSource>> = {
     data: rangerLab,
     source: 'ranger-lab.json',
   },
-  'scout-brute-ranger-lab': {
-    data: scoutBruteRangerLab,
-    source: 'scout-brute-ranger-lab.json',
+  'pilot-brute-ranger-lab': {
+    data: pilotBruteRangerLab,
+    source: 'pilot-brute-ranger-lab.json',
   },
   'traversal-lab': {
     data: traversalLab,
@@ -66,7 +66,10 @@ export function getLabEntries(): readonly { id: string; name: string }[] {
 }
 
 export function getLevelSource(levelId: string | null): LevelSource {
-  const selectedId = levelId ?? DEFAULT_LEVEL_ID;
+  const selectedId =
+    levelId === 'scout-brute-ranger-lab'
+      ? 'pilot-brute-ranger-lab'
+      : (levelId ?? DEFAULT_LEVEL_ID);
   const levelSource = LEVEL_SOURCES[selectedId];
 
   if (levelSource === undefined) {

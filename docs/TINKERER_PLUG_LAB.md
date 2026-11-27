@@ -5,18 +5,18 @@ The plug lab explores a deliberate carry-and-connect interaction for the Tinkere
 ## Controls and sequence
 
 1. Select the Tinkerer with `1` and approach the red plug.
-2. Press `C` beside it to grab it.
-3. Move across the room to drag the plug; the wire base stays at the first pickup point while the cable extends or retracts with a little slack.
-4. Press `C` again to place the plug. If its prongs are aligned with the outlet, it snaps in and the outlet reads `POWERED`.
+2. Press `C` within reach to grab it. The grab area extends 64 px from each edge of the plug, including above and below.
+3. Run or jump with the plug in both hands. The cable stays anchored at the pickup point and swings as the Tinkerer moves.
+4. Press `C` again to drop the plug. When its prongs line up with the outlet, the prompt reads `PRESS C TO CONNECT` and the plug snaps into place.
 
-Only the active Tinkerer can grab or place the plug. Brute and Scout see a `TINKERER ONLY` prompt near the object. Switching characters or leaving the ground releases the plug. Press `R` to reset it to its starting location.
+Only the active Tinkerer can grab or place the plug. Brute and Pilot see a `TINKERER ONLY` prompt near the object. The Tinkerer keeps his grip through jumps, landings, and character switches. Press `R` to reset the room and return the plug to its starting location.
 
 ## Prototype behavior
 
 - The plug is a 42 × 50 px red object, slightly smaller than the Tinkerer’s 48 × 72 px body. Two metal prongs give it a recognizable plug silhouette.
 - The outlet plate is red to match the plug. Two dark sockets make the target visible from a distance.
-- Press `C` once to grab; movement input carries the plug at the Tinkerer’s side. Press `C` again to drop it, or to plug it in when aligned.
-- The wire base stays at the first pickup point. The cable extends and retracts with the plug without a gameplay length limit, and damped motion keeps a small amount of slack without leaving excess wire on the floor.
+- The carry animation has a reach, a two-handed hold, two strides, a jump, and a landing. The plug follows the grip in each pose and falls to the floor if dropped in midair.
+- The cable is a chain with two pinned ends. The middle sags, swings, and drags against the floor as the cable extends or retracts.
 - The plug is visual-only and does not block characters. The wire's contact with the floor is visual; it does not affect movement or collision.
 - Level schema v8 adds authored plug start and outlet positions. Older level schemas load with no plug puzzles.
 

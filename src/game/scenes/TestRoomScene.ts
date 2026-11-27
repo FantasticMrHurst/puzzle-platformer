@@ -276,15 +276,16 @@ export class TestRoomScene extends Phaser.Scene {
             ),
           );
         this.tinkererCompanions.forEach((companion) =>
-          companion.completeSimulationStep(),
+          companion.completeSimulationStep(GAMEPLAY_STEP_SECONDS),
         );
-        this.tinkererPlugPuzzles.forEach((puzzle) =>
-          puzzle.update(
+        for (const puzzle of this.tinkererPlugPuzzles) {
+          const consumed = puzzle.update(
             activeCharacter,
             this.grabPressed,
             GAMEPLAY_STEP_SECONDS,
-          ),
-        );
+          );
+          if (consumed) this.grabPressed = false;
+        }
         this.clearConsumedInputEdges();
         this.pushableBlocks.forEach((block) => block.completeStep());
         this.pressurePlates.forEach((plate) =>
@@ -310,6 +311,7 @@ export class TestRoomScene extends Phaser.Scene {
       .getMembers()
       .forEach((character) => character.render(interpolationAlpha));
     this.tinkererCompanions.forEach((companion) => companion.render());
+    this.tinkererPlugPuzzles.forEach((puzzle) => puzzle.render());
 
     const snapshot = this.createDebugSnapshot();
     this.debugOverlay.update(snapshot);
@@ -545,8 +547,8 @@ export class TestRoomScene extends Phaser.Scene {
         ? 'Restore the service crossing and get the whole crew through the exit airlock.'
         : level.id === 'cooperation-lab'
           ? 'Ranger opens the first crossing · Gardener grows a step · Tinkerer powers the final crossing'
-          : level.id === 'scout-brute-ranger-lab'
-            ? 'Scout: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
+          : level.id === 'pilot-brute-ranger-lab'
+            ? 'Pilot: unlock block · Brute: push, then brace on teal strip · Ranger: climb on Brute, hold L, tap F'
             : level.id === 'gate-lab'
               ? 'Hold the plate for a teammate · That teammate can toggle the far switch with F'
               : undefined;
@@ -569,7 +571,7 @@ export class TestRoomScene extends Phaser.Scene {
         .text(
           24,
           148,
-          'Sequence: Scout holds plate  ·  Brute holds F to push/pull ↔ or taps F to brace  ·  Pet takes low tunnel',
+          'Sequence: Pilot holds plate  ·  Brute holds F to push/pull ↔ or taps F to brace  ·  Pet takes low tunnel',
           {
             backgroundColor: '#080b16cc',
             color: '#fde68a',

@@ -54,7 +54,8 @@ describe('getLevelSource', () => {
       ['ranger', 'gardener', 'tinkerer'],
     );
 
-    const trioSource = getLevelSource('scout-brute-ranger-lab');
+    const trioSource = getLevelSource('pilot-brute-ranger-lab');
+    expect(getLevelSource('scout-brute-ranger-lab')).toBe(trioSource);
     const trioLab = loadLevelData(trioSource.data, trioSource.source);
     expect(trioLab.characters.map(({ archetype }) => archetype)).toEqual([
       'scout',
@@ -73,7 +74,7 @@ describe('getLevelSource', () => {
 
   it('reports available IDs for an unknown level', () => {
     expect(() => getLevelSource('missing')).toThrow(
-      'Unknown level "missing". Available levels: relay-station, cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, scout-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
+      'Unknown level "missing". Available levels: relay-station, cooperation-lab, gardener-lab, gate-lab, movement-test-room, mechanism-lab, ranger-lab, pilot-brute-ranger-lab, traversal-lab, tinkerer-plug-lab',
     );
   });
 });

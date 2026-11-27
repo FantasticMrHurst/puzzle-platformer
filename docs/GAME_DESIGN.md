@@ -59,11 +59,11 @@ Provisional role: reposition heavy or reinforced parts of the environment.
 
 Candidate abilities include pushing and pulling heavy blocks, breaking barriers, bracing mechanisms, or carrying another character. Pulling uses a clear grip state so ordinary movement does not accidentally drag objects. The current brace experiment lets the Brute become a stationary one-way platform for another character, creating a cooperative height boost without a separate carry system. The design must avoid reducing this character to a slow key for strength-marked locks.
 
-### Scout
+### Pilot
 
 Provisional role: reach spaces through advanced traversal.
 
-Candidate abilities include higher jumps, wall jumps, wall slides, and narrow-space navigation. If the shared controller eventually supports some of these moves for everyone, the Scout will need a clearer exclusive identity.
+Candidate abilities include higher jumps, wall jumps, wall slides, and narrow-space navigation. If the shared controller eventually supports some of these moves for everyone, the Pilot will need a clearer exclusive identity.
 
 ### Tinkerer
 
@@ -108,7 +108,7 @@ The initial prototype verbs are:
 | Candidate | First verb to test |
 | --- | --- |
 | Brute | Grip/push/pull a heavy block; brace as a character platform |
-| Scout | Wall slide and wall jump |
+| Pilot | Wall slide and wall jump |
 | Tinkerer | Operate or reconfigure a powered mechanism |
 | Ranger | Aim and fire one environmental shot that toggles a remote target |
 | Pet | Traverse a half-height passage and retrieve or activate something useful |
@@ -144,7 +144,7 @@ These rules should be revisited if play tests show that unrestricted switching r
 **Decision for prototype:** A scenario is complete when all three characters in its active roster reach the shared exit. Candidate-focused chambers may use a shorter local objective, but they must still demonstrate how the candidate creates value for the team.
 
 - All characters retain the baseline movement fundamentals and use the same movement controller. Typed profiles may adjust values such as jump height, acceleration, or body dimensions.
-- Advanced traversal is character-specific when it defines a candidate's role. The first such experiment is the Scout's wall slide and wall jump.
+- Advanced traversal is character-specific when it defines a candidate's role. The first such experiment is the Pilot's wall slide and wall jump.
 - `F` is the initial contextual interaction or primary-ability key. Abilities consume named actions, not physical keys. Aimed abilities also consume device-independent aim intent.
 - Automatic interactions are reserved for unambiguous physical behavior such as standing on a plate. The Brute prototype confirms that moving a heavy object is deliberate: hold the contextual action while beside an unlocked block, then move to push or pull it. Using a console, firing a tether, or growing a plant likewise requires input.
 - Keyboard is the first supported input device. The action contracts must permit a gamepad adapter later without changing gameplay rules; touch controls are out of scope for Milestone 2.

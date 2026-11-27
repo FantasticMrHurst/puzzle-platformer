@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "id": "scout-brute-ranger-lab",
-  "name": "Scout, Brute & Ranger Lab",
+  "id": "pilot-brute-ranger-lab",
+  "name": "Pilot, Brute & Ranger Lab",
   "world": {
     "width": 2300,
     "height": 720,

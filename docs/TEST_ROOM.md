@@ -32,7 +32,7 @@ The dimensions are initial measurement fixtures, not final movement targets. Adj
 ## Current roster behavior
 
 - Schema version 2 defines one to three character spawns with stable IDs and candidate archetypes.
-- The current room loads Brute, Scout, and Tinkerer placeholders with their character-specific movement profiles. The Tinkerer also has a small visual companion that trails its movement and performs a delayed, shorter hop after the Tinkerer jumps.
+- The current room loads Brute, Pilot, and Tinkerer placeholders with their character-specific movement profiles. The Tinkerer also has a small visual companion that trails its movement and performs a delayed, shorter hop after the Tinkerer jumps.
 - Number keys select roster slots directly; `Q` and `E` cycle selection.
 - Inactive characters continue through physics with neutral movement input and do not collide with one another.
 - The camera follows the selected character, whose label and heavier outline indicate active control.

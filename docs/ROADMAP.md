@@ -50,7 +50,7 @@ Outcome: the team has playable evidence for selecting a complementary three-char
 - Add clear selection and camera feedback.
 - Implement the documented whole-room reset/checkpoint behavior.
 - Build a small character-playability lab that can evaluate abilities without requiring a production level.
-- Prototype the defining verb for Brute, Scout, Tinkerer, Ranger, Pet, and Gardener at deliberately small scope.
+- Prototype the defining verb for Brute, Pilot, Tinkerer, Ranger, Pet, and Gardener at deliberately small scope.
 - Ensure the Brute can push and deliberately pull a heavy object, and evaluate the Brute's brace-as-platform cooperation verb.
 - Test character combinations and revise, combine, or reject concepts before selecting the final three-character roster.
 
@@ -224,13 +224,13 @@ These issues are ordered to minimize overlapping work. They are proposals for re
 - Every candidate shares baseline movement fundamentals while typed profiles and composed abilities create differences.
 - Keyboard and current desktop Chromium are the first prototype targets; gamepad support remains an architectural seam, and touch is out of scope.
 - Milestone 2 rooms continue to use directly authored, validated JSON.
-- Brute, Scout, Tinkerer, Ranger, Pet, and Gardener each receive a focused playability prototype before the final three-character roster is selected.
+- Brute, Pilot, Tinkerer, Ranger, Pet, and Gardener each receive a focused playability prototype before the final three-character roster is selected.
 
 ## Milestone 2 implementation sequence
 
 1. Add a three-character roster, control transfer, selection feedback, and camera retargeting.
 2. Add whole-room reset, checkpoint state, and a shared three-character exit condition.
-3. Add distinct movement/body profiles and prototype Scout wall traversal and Pet half-height navigation in separate chambers.
+3. Add distinct movement/body profiles and prototype Pilot wall traversal and Pet half-height navigation in separate chambers.
 4. Prototype the Brute's deliberate grip/push/pull and brace-platform interactions (implemented in the cooperation lab), then the Tinkerer's contextual powered-bridge interaction (implemented in the mechanism lab; Issue 13).
 5. Add device-independent aiming for the Ranger's environmental action (implemented in the ranged-action lab; Issue 14).
 6. Add resettable world creation for the Gardener's first growth action (implemented in the growth lab, Issue 15).

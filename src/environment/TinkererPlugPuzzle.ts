@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 
 import type { PlayerCharacter } from '../entities/PlayerCharacter';
 import type { TinkererPlugData } from '../levels/LevelSchema';
+import type { Position } from '../rendering/interpolatePosition';
 
 const PLUG_WIDTH = 42;
 const PLUG_HEIGHT = 50;
@@ -9,14 +10,15 @@ const PLUG_TIP_OFFSET = 21;
 const PLUG_COLOR = 0xef4444;
 const PLUG_BODY_COLOR = 0xb91c1c;
 const SOCKET_COLOR = 0x1f2937;
-const CONTACT_TOLERANCE = 8;
+const HANDLE_OFFSET = 18;
+const DROP_GRAVITY = 1400;
 const OUTLET_SNAP_RANGE = 14;
-const WIRE_POINT_COUNT = 18;
-const WIRE_GRAVITY = 420;
-const WIRE_DAMPING = 0.985;
+const WIRE_POINT_COUNT = 32;
+const WIRE_GRAVITY = 760;
+const WIRE_DAMPING = 0.975;
 const WIRE_FLOOR_CLEARANCE = 4;
-const WIRE_SLACK_SAG = 12;
-const WIRE_FOLLOW_STIFFNESS = 9;
+const WIRE_CONSTRAINT_PASSES = 10;
+const WIRE_GROUND_DRAG = 0.7;
 
 type GrabSide = -1 | 1;
 
@@ -36,10 +38,10 @@ export class TinkererPlugPuzzle {
   private readonly wireGraphics: Phaser.GameObjects.Graphics;
   private readonly wireAnchorMarker: Phaser.GameObjects.Arc;
   private readonly wirePoints: WirePoint[];
-  private wireAnchor: { x: number; y: number } | null = null;
-  private plugPosition: { x: number; y: number };
-  private grabbedById: string | null = null;
-  private grabSide: GrabSide | null = null;
+  private wireAnchor: Position | null = null;
+  private plugPosition: Position;
+  private holder: PlayerCharacter | null = null;
+  private dropSpeed = 0;
   private plugOrientation: GrabSide = 1;
   private pluggedIn = false;
 
@@ -70,6 +72,7 @@ export class TinkererPlugPuzzle {
       .setDepth(6);
     this.plugVisual = scene.add.container(data.plugStart.x, data.plugStart.y);
     this.plugVisual.add([
+      scene.add.rectangle(-18, 0, 15, 18, 0x374151).setStrokeStyle(2, 0x111827),
       scene.add
         .rectangle(-6, 0, 30, PLUG_HEIGHT, PLUG_COLOR)
         .setStrokeStyle(3, 0xfca5a5),
@@ -95,9 +98,9 @@ export class TinkererPlugPuzzle {
       .setStrokeStyle(2, 0xf87171)
       .setDepth(4)
       .setVisible(false);
-    this.setPlugPosition(data.plugStart.x, data.plugStart.y);
     this.wirePoints = this.createWirePoints();
-    this.drawWire();
+    this.resetWirePoints();
+    this.render();
     this.updatePresentation(undefined);
   }
 
@@ -105,151 +108,139 @@ export class TinkererPlugPuzzle {
     activeCharacter: PlayerCharacter,
     grabPressed: boolean,
     deltaSeconds: number,
-  ): void {
+  ): boolean {
     if (this.pluggedIn) {
       this.updateWire(deltaSeconds);
-      return;
+      return false;
     }
 
-    const wasGrabbedByActive = this.grabbedById === activeCharacter.id;
-    const adjacentSide = this.findAdjacentSide(activeCharacter);
-    const isTinkerer = activeCharacter.getArchetype() === 'tinkerer';
-    const isGrounded = activeCharacter.getContacts().grounded;
-
-    if (this.grabbedById === null) {
-      if (grabPressed && isTinkerer && isGrounded && adjacentSide !== null) {
-        this.grabbedById = activeCharacter.id;
-        this.grabSide = adjacentSide;
-        this.plugOrientation = adjacentSide;
-        if (this.wireAnchor === null) {
-          this.wireAnchor = this.getWireRoot();
-          this.wireAnchorMarker
-            .setPosition(this.wireAnchor.x, this.wireAnchor.y)
-            .setVisible(true);
-          this.resetWirePoints();
-        }
+    let consumed = false;
+    if (this.holder !== null) {
+      this.plugOrientation = this.holder.getFacingDirection();
+      this.holder.setPlugCarry(this.plugOrientation);
+      this.plugPosition = this.carriedPosition(this.holder, false);
+      if (grabPressed && this.holder === activeCharacter) {
+        consumed = true;
+        if (this.isAlignedWithOutlet()) this.plugIn();
+        else this.release();
       }
-    } else if (
-      this.grabbedById !== activeCharacter.id ||
-      !isTinkerer ||
-      !isGrounded
-    ) {
-      this.release();
-    }
-
-    const activeGrabSide = this.grabSide;
-    if (this.grabbedById === activeCharacter.id && activeGrabSide !== null) {
-      this.positionBeside(activeCharacter, activeGrabSide);
-
-      if (wasGrabbedByActive && grabPressed) {
-        if (
-          this.isAlignedWithOutlet(
-            this.plugPosition.x,
-            this.plugPosition.y,
-            activeGrabSide,
-          )
-        ) {
-          this.plugIn(activeGrabSide);
-        } else {
-          this.release();
+    } else {
+      this.updateDrop(deltaSeconds);
+      if (
+        grabPressed &&
+        activeCharacter.getArchetype() === 'tinkerer' &&
+        activeCharacter.getPlugGrip() === undefined
+      ) {
+        const side = this.findGrabSide(activeCharacter);
+        if (side !== null) {
+          this.grab(activeCharacter, side);
+          consumed = true;
         }
       }
     }
 
     this.updateWire(deltaSeconds);
     this.updatePresentation(activeCharacter);
+    return consumed;
+  }
+
+  public render(): void {
+    const position =
+      this.holder === null
+        ? this.plugPosition
+        : this.carriedPosition(this.holder, true);
+    this.plugVisual
+      .setPosition(position.x, position.y)
+      .setScale(this.plugOrientation, 1)
+      .setDepth(
+        this.holder === null ? 5 : this.holder.visualObject.depth - 0.25,
+      );
+    this.statusText.setPosition(position.x, position.y - PLUG_HEIGHT / 2 - 10);
+    this.drawWire(this.getWireRoot(position));
   }
 
   public reset(): void {
     this.pluggedIn = false;
-    this.grabbedById = null;
-    this.grabSide = null;
+    this.release();
     this.plugOrientation = 1;
     this.wireAnchor = null;
     this.wireAnchorMarker.setVisible(false);
-    this.plugVisual.setScale(1, 1);
     this.outletLabel.setText('OUTLET').setColor('#fecaca');
     this.outletTopSocket.setVisible(true);
     this.outletBottomSocket.setVisible(true);
-    this.setPlugPosition(this.data.plugStart.x, this.data.plugStart.y);
+    this.plugPosition = { ...this.data.plugStart };
     this.resetWirePoints();
-    this.drawWire();
+    this.render();
     this.updatePresentation(undefined);
   }
 
-  private positionBeside(character: PlayerCharacter, side: GrabSide): void {
-    const characterBounds = character.physicsObject.getBounds();
-    const plugX =
-      characterBounds.centerX +
-      side * (characterBounds.width / 2 + PLUG_WIDTH / 2 - 2);
-    const plugY =
-      characterBounds.centerY + (characterBounds.height - PLUG_HEIGHT) / 2;
-    this.setPlugPosition(plugX, plugY);
-    this.plugVisual.setScale(side, 1);
-  }
-
-  private findAdjacentSide(character: PlayerCharacter): GrabSide | null {
-    const characterBounds = character.physicsObject.getBounds();
-    const plugLeft = this.plugPosition.x - PLUG_WIDTH / 2;
-    const plugRight = this.plugPosition.x + PLUG_WIDTH / 2;
-    const plugTop = this.plugPosition.y - PLUG_HEIGHT / 2;
-    const plugBottom = this.plugPosition.y + PLUG_HEIGHT / 2;
-    const overlapsVertically =
-      characterBounds.bottom > plugTop && characterBounds.top < plugBottom;
-    if (!overlapsVertically) {
-      return null;
+  private grab(character: PlayerCharacter, side: GrabSide): void {
+    if (this.wireAnchor === null) {
+      this.wireAnchor = this.getWireRoot(this.plugPosition);
+      this.wireAnchorMarker
+        .setPosition(this.wireAnchor.x, this.wireAnchor.y)
+        .setVisible(true);
+      this.resetWirePoints();
     }
-
-    const gapOnLeft = plugLeft - characterBounds.right;
-    if (
-      gapOnLeft >= -CONTACT_TOLERANCE &&
-      gapOnLeft <= this.data.interactionRange
-    ) {
-      return 1;
-    }
-
-    const gapOnRight = characterBounds.left - plugRight;
-    if (
-      gapOnRight >= -CONTACT_TOLERANCE &&
-      gapOnRight <= this.data.interactionRange
-    ) {
-      return -1;
-    }
-
-    return null;
-  }
-
-  private isAlignedWithOutlet(
-    plugX: number,
-    plugY: number,
-    side: GrabSide,
-  ): boolean {
-    return (
-      Math.abs(plugX + side * PLUG_TIP_OFFSET - this.data.outlet.x) <=
-        OUTLET_SNAP_RANGE &&
-      Math.abs(plugY - this.data.outlet.y) <= PLUG_HEIGHT / 2
-    );
-  }
-
-  private plugIn(side: GrabSide): void {
-    this.pluggedIn = true;
-    this.grabbedById = null;
-    this.grabSide = null;
+    this.holder = character;
     this.plugOrientation = side;
-    this.setPlugPosition(
-      this.data.outlet.x - side * PLUG_TIP_OFFSET,
-      this.data.outlet.y,
+    character.setPlugCarry(side);
+    this.plugPosition = this.carriedPosition(character, false);
+  }
+
+  private carriedPosition(
+    character: PlayerCharacter,
+    interpolated: boolean,
+  ): Position {
+    const grip = character.getPlugGrip(interpolated);
+    if (grip === undefined) return this.plugPosition;
+    return { x: grip.x + this.plugOrientation * HANDLE_OFFSET, y: grip.y };
+  }
+
+  private updateDrop(deltaSeconds: number): void {
+    const floor = this.floorY - PLUG_HEIGHT / 2;
+    if (this.plugPosition.y >= floor) return;
+    this.dropSpeed += DROP_GRAVITY * deltaSeconds;
+    this.plugPosition = {
+      x: this.plugPosition.x,
+      y: Math.min(floor, this.plugPosition.y + this.dropSpeed * deltaSeconds),
+    };
+  }
+
+  private findGrabSide(character: PlayerCharacter): GrabSide | null {
+    const characterBounds = character.physicsObject.getBounds();
+    const dx = this.plugPosition.x - characterBounds.centerX;
+    const dy = this.plugPosition.y - characterBounds.centerY;
+    const range = this.data.interactionRange;
+    if (
+      Math.abs(dx) > (characterBounds.width + PLUG_WIDTH) / 2 + range ||
+      Math.abs(dy) > (characterBounds.height + PLUG_HEIGHT) / 2 + range
+    )
+      return null;
+    return dx === 0 ? character.getFacingDirection() : dx > 0 ? 1 : -1;
+  }
+
+  private isAlignedWithOutlet(): boolean {
+    return (
+      Math.abs(
+        this.plugPosition.x +
+          this.plugOrientation * PLUG_TIP_OFFSET -
+          this.data.outlet.x,
+      ) <= OUTLET_SNAP_RANGE &&
+      Math.abs(this.plugPosition.y - this.data.outlet.y) <= PLUG_HEIGHT / 2
     );
-    this.plugVisual.setScale(side, 1);
+  }
+
+  private plugIn(): void {
+    this.pluggedIn = true;
+    this.release();
+    this.plugPosition = {
+      x: this.data.outlet.x - this.plugOrientation * PLUG_TIP_OFFSET,
+      y: this.data.outlet.y,
+    };
     this.outletLabel.setText('OUTLET · POWERED').setColor('#bbf7d0');
     this.outletTopSocket.setVisible(false);
     this.outletBottomSocket.setVisible(false);
-  }
-
-  private setPlugPosition(x: number, y: number): void {
-    this.plugPosition = { x, y };
-    this.plugVisual.setPosition(x, y);
-    this.statusText.setPosition(x, y - PLUG_HEIGHT / 2 - 10);
   }
 
   private updatePresentation(
@@ -260,8 +251,16 @@ export class TinkererPlugPuzzle {
       return;
     }
 
-    if (this.grabbedById !== null) {
-      this.statusText.setText('PRESS C TO PLACE').setColor('#fee2e2');
+    if (this.holder !== null) {
+      this.statusText
+        .setText(
+          this.holder === activeCharacter
+            ? this.isAlignedWithOutlet()
+              ? 'PRESS C TO CONNECT'
+              : 'PRESS C TO DROP'
+            : 'TINKERER HOLDING PLUG',
+        )
+        .setColor('#fee2e2');
       return;
     }
 
@@ -270,7 +269,7 @@ export class TinkererPlugPuzzle {
       return;
     }
 
-    const isNearby = this.findAdjacentSide(activeCharacter) !== null;
+    const isNearby = this.findGrabSide(activeCharacter) !== null;
     if (!isNearby) {
       this.statusText.setText('MATCH RED PLUG TO OUTLET').setColor('#fee2e2');
     } else if (activeCharacter.getArchetype() === 'tinkerer') {
@@ -281,14 +280,15 @@ export class TinkererPlugPuzzle {
   }
 
   private release(): void {
-    this.grabbedById = null;
-    this.grabSide = null;
+    this.holder?.setPlugCarry(null);
+    this.holder = null;
+    this.dropSpeed = 0;
   }
 
-  private getWireRoot(): { x: number; y: number } {
+  private getWireRoot(position: Position): Position {
     return {
-      x: this.plugPosition.x - this.plugOrientation * PLUG_TIP_OFFSET,
-      y: this.plugPosition.y,
+      x: position.x - this.plugOrientation * PLUG_TIP_OFFSET,
+      y: position.y,
     };
   }
 
@@ -302,84 +302,94 @@ export class TinkererPlugPuzzle {
   }
 
   private resetWirePoints(): void {
-    const root = this.getWireRoot();
-    const anchor = this.wireAnchor ?? {
-      x: root.x - this.plugOrientation * 20,
-      y: root.y,
-    };
+    const root = this.getWireRoot(this.plugPosition);
+    const anchor = this.getWireAnchor(root);
     this.wirePoints.forEach((point, index) => {
       const t = index / (this.wirePoints.length - 1);
       point.x = anchor.x + (root.x - anchor.x) * t;
-      point.y =
-        anchor.y +
-        (root.y - anchor.y) * t +
-        Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
+      point.y = anchor.y + (root.y - anchor.y) * t;
       point.previousX = point.x;
       point.previousY = point.y;
     });
   }
 
   private updateWire(deltaSeconds: number): void {
-    const root = this.getWireRoot();
-    const anchor = this.wireAnchor ?? {
-      x: root.x - this.plugOrientation * 20,
-      y: root.y,
-    };
-    const delta = Math.min(deltaSeconds, 1 / 30);
-    const gravityStep = WIRE_GRAVITY * delta * delta;
+    if (this.wireAnchor === null) return;
+    const root = this.getWireRoot(this.plugPosition);
+    const anchor = this.wireAnchor;
+    const gravityStep = WIRE_GRAVITY * deltaSeconds * deltaSeconds;
+    const last = this.wirePoints.length - 1;
     const floorLimit = this.floorY - WIRE_FLOOR_CLEARANCE;
+    const distance = Math.hypot(root.x - anchor.x, root.y - anchor.y);
+    const slack = Math.min(60, 16 + distance * 0.08);
+    const linkLength = (distance + slack) / last;
 
-    for (let index = 0; index < this.wirePoints.length; index += 1) {
+    Object.assign(this.wirePoints[0]!, anchor);
+    Object.assign(this.wirePoints[last]!, root);
+    for (let index = 1; index < last; index += 1) {
       const point = this.wirePoints[index]!;
-      const t = index / (this.wirePoints.length - 1);
-      const targetX = anchor.x + (root.x - anchor.x) * t;
-      const targetY =
-        anchor.y +
-        (root.y - anchor.y) * t +
-        Math.sin(Math.PI * t) * WIRE_SLACK_SAG;
-      if (index === 0 || index === this.wirePoints.length - 1) {
-        point.x = targetX;
-        point.y = targetY;
-        point.previousX = targetX;
-        point.previousY = targetY;
-        continue;
-      }
+      const drag = point.y >= floorLimit ? WIRE_GROUND_DRAG : 1;
       const velocityX = (point.x - point.previousX) * WIRE_DAMPING;
       const velocityY = (point.y - point.previousY) * WIRE_DAMPING;
       point.previousX = point.x;
       point.previousY = point.y;
-      point.x += velocityX;
+      point.x += velocityX * drag;
       point.y = Math.min(point.y + velocityY + gravityStep, floorLimit);
-      if (point.y === floorLimit) {
-        point.previousY = point.y;
-      }
-      const follow = Math.min(WIRE_FOLLOW_STIFFNESS * delta, 1);
-      point.x += (targetX - point.x) * follow;
-      point.y += (targetY - point.y) * follow;
     }
 
-    this.drawWire();
+    // Neighboring points pull on each other as the grounded end pays out slack.
+    // Alternating sweeps propagate tension from both pinned ends.
+    for (let pass = 0; pass < WIRE_CONSTRAINT_PASSES; pass += 1) {
+      for (let link = 0; link < last; link += 1) {
+        const index = pass % 2 === 0 ? link : last - 1 - link;
+        const start = this.wirePoints[index]!;
+        const end = this.wirePoints[index + 1]!;
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.hypot(dx, dy);
+        if (length <= linkLength) continue;
+        const startWeight = index === 0 ? 0 : index === last - 1 ? 1 : 0.5;
+        const correction = (length - linkLength) / length;
+        start.x += dx * correction * startWeight;
+        start.y = Math.min(floorLimit, start.y + dy * correction * startWeight);
+        end.x -= dx * correction * (1 - startWeight);
+        end.y = Math.min(
+          floorLimit,
+          end.y - dy * correction * (1 - startWeight),
+        );
+      }
+    }
   }
 
-  private drawWire(): void {
+  private getWireAnchor(root: Position): Position {
+    return (
+      this.wireAnchor ?? {
+        x: root.x - this.plugOrientation * 20,
+        y: root.y,
+      }
+    );
+  }
+
+  private drawWire(root: Position): void {
     this.wireGraphics.clear();
     this.wireGraphics.lineStyle(7, 0x1f2937, 1);
-    this.drawWirePath();
+    this.drawWirePath(root);
     this.wireGraphics.lineStyle(3, 0xf87171, 1);
-    this.drawWirePath();
-    const tail = this.wirePoints[this.wirePoints.length - 1]!;
-    this.wireGraphics.fillStyle(0xe5e7eb, 1).fillCircle(tail.x, tail.y, 4);
+    this.drawWirePath(root);
+    this.wireGraphics.fillStyle(0xe5e7eb, 1).fillCircle(root.x, root.y, 4);
   }
 
-  private drawWirePath(): void {
+  private drawWirePath(root: Position): void {
+    const anchor = this.getWireAnchor(root);
     this.wireGraphics.beginPath();
-    this.wireGraphics.moveTo(this.wirePoints[0]!.x, this.wirePoints[0]!.y);
-    for (let index = 1; index < this.wirePoints.length; index += 1) {
-      this.wireGraphics.lineTo(
-        this.wirePoints[index]!.x,
-        this.wirePoints[index]!.y,
-      );
+    this.wireGraphics.moveTo(anchor.x, anchor.y);
+    if (this.wireAnchor !== null) {
+      for (let index = 1; index < this.wirePoints.length - 1; index += 1) {
+        const point = this.wirePoints[index]!;
+        this.wireGraphics.lineTo(point.x, point.y);
+      }
     }
+    this.wireGraphics.lineTo(root.x, root.y);
     this.wireGraphics.strokePath();
   }
 }

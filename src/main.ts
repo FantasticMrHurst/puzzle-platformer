@@ -2,13 +2,14 @@ import Phaser from 'phaser';
 
 import { gameConfig } from './game/config';
 import { VERDANT_RUINS_ID } from './levels/verdantRuins';
+import { ScoutPosePreview } from './rendering/ScoutPosePreview';
 import { showLabMenu } from './ui/LabMenu';
 import './style.css';
 
 const params = new URLSearchParams(window.location.search);
 const gameContainer = document.querySelector<HTMLElement>('#game')!;
 
-if (params.has('level') || params.get('scoutArt') === '1') {
+if (params.has('level') || ScoutPosePreview.isEnabled(params)) {
   document.body.classList.add('playing-lab');
   document.querySelector<HTMLElement>('#lab-nav')!.hidden = false;
   if (params.get('level') === VERDANT_RUINS_ID) {

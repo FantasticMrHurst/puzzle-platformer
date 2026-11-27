@@ -18,19 +18,19 @@ export function showLabMenu(container: HTMLElement): void {
   for (const { id, name } of getLabEntries()) {
     const params: Record<string, string> = { level: id };
     if (id === 'relay-station') {
-      params.scoutArt = '1';
+      params.pilotArt = '1';
       params.bruteArt = '1';
     }
     list.append(labLink(name, params));
   }
   list.append(
-    labLink('Scout Animation Preview', {
-      level: 'scout-brute-ranger-lab',
-      scoutArt: '1',
+    labLink('Pilot Animation Preview', {
+      level: 'pilot-brute-ranger-lab',
+      pilotArt: '1',
     }),
     labLink('Brute Animation Preview', {
-      level: 'scout-brute-ranger-lab',
-      scoutArt: '1',
+      level: 'pilot-brute-ranger-lab',
+      pilotArt: '1',
       bruteArt: '1',
     }),
   );
