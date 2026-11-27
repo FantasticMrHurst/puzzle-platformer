@@ -1,4 +1,5 @@
 import { getLabEntries } from '../levels/LevelCatalog';
+import { VERDANT_RUINS_ID, VERDANT_RUINS_NAME } from '../levels/verdantRuins';
 
 export function showLabMenu(container: HTMLElement): void {
   container.setAttribute('aria-labelledby', 'lab-menu-title');
@@ -13,6 +14,7 @@ export function showLabMenu(container: HTMLElement): void {
 
   const list = document.createElement('ul');
   list.className = 'lab-list';
+  list.append(labLink(VERDANT_RUINS_NAME, { level: VERDANT_RUINS_ID }));
   for (const { id, name } of getLabEntries()) {
     list.append(labLink(name, { level: id }));
   }

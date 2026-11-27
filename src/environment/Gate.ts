@@ -9,12 +9,14 @@ export class Gate {
   public readonly physicsObject: Phaser.GameObjects.Rectangle;
 
   private readonly body: Phaser.Physics.Arcade.StaticBody;
+  private readonly sprite?: Phaser.GameObjects.Image;
   private readonly label: Phaser.GameObjects.Text;
   private state?: GateState;
 
   public constructor(
     scene: Phaser.Scene,
     public readonly data: GateData,
+    private readonly textures?: { readonly off: string; readonly on: string },
   ) {
     const { x, y, width, height } = data;
     this.physicsObject = scene.add
@@ -27,6 +29,12 @@ export class Gate {
       throw new TypeError('Gate requires a static Arcade body');
     }
     this.body = this.physicsObject.body;
+    if (textures !== undefined) {
+      this.physicsObject.setVisible(false);
+      this.sprite = scene.add
+        .image(data.x + data.width / 2, data.y + data.height / 2, textures.off)
+        .setDepth(4);
+    }
     this.label = scene.add
       .text(x + width / 2, y + 18, '', {
         backgroundColor: '#080b16dd',
@@ -41,7 +49,7 @@ export class Gate {
 
   public update(
     signalActive: boolean,
-    characters: readonly PlayerCharacter[],
+    characters: readonly Pick<PlayerCharacter, 'physicsObject'>[],
   ): void {
     if (signalActive) {
       this.setState('open');
@@ -69,6 +77,9 @@ export class Gate {
     this.body.enable = closed;
     const color = closed ? 0x94a3b8 : state === 'waiting' ? 0xfacc15 : 0x22c55e;
     this.physicsObject.setFillStyle(color, closed ? 1 : 0.12);
+    if (this.textures !== undefined) {
+      this.sprite?.setTexture(closed ? this.textures.off : this.textures.on);
+    }
     this.physicsObject.setStrokeStyle(2, color);
     this.label.setText(
       closed

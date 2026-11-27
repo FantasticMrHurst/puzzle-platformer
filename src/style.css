@@ -79,3 +79,15 @@ body.playing-lab {
 canvas {
   display: block;
 }
+
+.verdant-ruins-view {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  overflow: hidden;
+  background: #102226;
+}
+
+.verdant-ruins-view canvas {
+  image-rendering: pixelated;
+}

@@ -1,0 +1,729 @@
+{
+  "name": "Forest of the Verdant Ruins",
+  "version": "0.1",
+  "logical_tile_size": 32,
+  "pixel_art": true,
+  "assets": [
+    {
+      "id": "stone_01",
+      "category": "terrain",
+      "file": "terrain/stone_01.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [0, 0, 32, 32]
+    },
+    {
+      "id": "stone_02",
+      "category": "terrain",
+      "file": "terrain/stone_02.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [32, 0, 32, 32]
+    },
+    {
+      "id": "stone_03",
+      "category": "terrain",
+      "file": "terrain/stone_03.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [64, 0, 32, 32]
+    },
+    {
+      "id": "stone_04",
+      "category": "terrain",
+      "file": "terrain/stone_04.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [96, 0, 32, 32]
+    },
+    {
+      "id": "grass_top_01",
+      "category": "terrain",
+      "file": "terrain/grass_top_01.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [128, 0, 32, 32]
+    },
+    {
+      "id": "grass_top_02",
+      "category": "terrain",
+      "file": "terrain/grass_top_02.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [160, 0, 32, 32]
+    },
+    {
+      "id": "grass_top_03",
+      "category": "terrain",
+      "file": "terrain/grass_top_03.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [192, 0, 32, 32]
+    },
+    {
+      "id": "grass_top_04",
+      "category": "terrain",
+      "file": "terrain/grass_top_04.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [224, 0, 32, 32]
+    },
+    {
+      "id": "earth_fill_01",
+      "category": "terrain",
+      "file": "terrain/earth_fill_01.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [0, 32, 32, 32]
+    },
+    {
+      "id": "earth_fill_02",
+      "category": "terrain",
+      "file": "terrain/earth_fill_02.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [32, 32, 32, 32]
+    },
+    {
+      "id": "earth_fill_03",
+      "category": "terrain",
+      "file": "terrain/earth_fill_03.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [64, 32, 32, 32]
+    },
+    {
+      "id": "earth_fill_04",
+      "category": "terrain",
+      "file": "terrain/earth_fill_04.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [96, 32, 32, 32]
+    },
+    {
+      "id": "wall_edge_left",
+      "category": "terrain",
+      "file": "terrain/wall_edge_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [128, 32, 32, 32]
+    },
+    {
+      "id": "grass_corner_left",
+      "category": "terrain",
+      "file": "terrain/grass_corner_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [160, 32, 32, 32]
+    },
+    {
+      "id": "underside_corner_left",
+      "category": "terrain",
+      "file": "terrain/underside_corner_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [192, 32, 32, 32]
+    },
+    {
+      "id": "slope_up_left",
+      "category": "terrain",
+      "file": "terrain/slope_up_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "slope",
+      "collision_polygon": [
+        [0, 0],
+        [31, 31],
+        [0, 31]
+      ],
+      "terrain_atlas_rect": [224, 32, 32, 32]
+    },
+    {
+      "id": "wall_edge_right",
+      "category": "terrain",
+      "file": "terrain/wall_edge_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [0, 64, 32, 32]
+    },
+    {
+      "id": "grass_corner_right",
+      "category": "terrain",
+      "file": "terrain/grass_corner_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [32, 64, 32, 32]
+    },
+    {
+      "id": "underside_corner_right",
+      "category": "terrain",
+      "file": "terrain/underside_corner_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [64, 64, 32, 32]
+    },
+    {
+      "id": "slope_up_right",
+      "category": "terrain",
+      "file": "terrain/slope_up_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "slope",
+      "collision_polygon": [
+        [0, 31],
+        [31, 0],
+        [31, 31]
+      ],
+      "terrain_atlas_rect": [96, 64, 32, 32]
+    },
+    {
+      "id": "ceiling_01",
+      "category": "terrain",
+      "file": "terrain/ceiling_01.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [128, 64, 32, 32]
+    },
+    {
+      "id": "ceiling_02",
+      "category": "terrain",
+      "file": "terrain/ceiling_02.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [160, 64, 32, 32]
+    },
+    {
+      "id": "ceiling_03",
+      "category": "terrain",
+      "file": "terrain/ceiling_03.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [192, 64, 32, 32]
+    },
+    {
+      "id": "ceiling_04",
+      "category": "terrain",
+      "file": "terrain/ceiling_04.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid",
+      "terrain_atlas_rect": [224, 64, 32, 32]
+    },
+    {
+      "id": "timber_block_1",
+      "category": "structures",
+      "file": "structures/timber_block_1.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid"
+    },
+    {
+      "id": "timber_block_2",
+      "category": "structures",
+      "file": "structures/timber_block_2.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "solid"
+    },
+    {
+      "id": "bridge_left",
+      "category": "structures",
+      "file": "structures/bridge_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 2
+    },
+    {
+      "id": "bridge_center",
+      "category": "structures",
+      "file": "structures/bridge_center.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 2
+    },
+    {
+      "id": "bridge_right",
+      "category": "structures",
+      "file": "structures/bridge_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 2
+    },
+    {
+      "id": "ladder_top",
+      "category": "structures",
+      "file": "structures/ladder_top.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "climbable"
+    },
+    {
+      "id": "ladder_middle",
+      "category": "structures",
+      "file": "structures/ladder_middle.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "climbable"
+    },
+    {
+      "id": "ladder_bottom",
+      "category": "structures",
+      "file": "structures/ladder_bottom.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "climbable"
+    },
+    {
+      "id": "floating_platform_left",
+      "category": "structures",
+      "file": "structures/floating_platform_left.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 0
+    },
+    {
+      "id": "floating_platform_middle",
+      "category": "structures",
+      "file": "structures/floating_platform_middle.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 0
+    },
+    {
+      "id": "floating_platform_right",
+      "category": "structures",
+      "file": "structures/floating_platform_right.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 0
+    },
+    {
+      "id": "support_column",
+      "category": "structures",
+      "file": "structures/support_column.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "none"
+    },
+    {
+      "id": "foreground_trunk",
+      "category": "trees",
+      "file": "trees/foreground_trunk.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none",
+      "repeat_y": true
+    },
+    {
+      "id": "foreground_roots",
+      "category": "trees",
+      "file": "trees/foreground_roots.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none"
+    },
+    {
+      "id": "foreground_canopy",
+      "category": "trees",
+      "file": "trees/foreground_canopy.png",
+      "width": 192,
+      "height": 96,
+      "anchor": [96, 87],
+      "collision": "none"
+    },
+    {
+      "id": "foreground_branches",
+      "category": "trees",
+      "file": "trees/foreground_branches.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none"
+    },
+    {
+      "id": "distant_trunk",
+      "category": "trees",
+      "file": "trees/distant_trunk.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none",
+      "repeat_y": true
+    },
+    {
+      "id": "distant_roots",
+      "category": "trees",
+      "file": "trees/distant_roots.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none"
+    },
+    {
+      "id": "distant_canopy",
+      "category": "trees",
+      "file": "trees/distant_canopy.png",
+      "width": 192,
+      "height": 96,
+      "anchor": [96, 87],
+      "collision": "none"
+    },
+    {
+      "id": "distant_branches",
+      "category": "trees",
+      "file": "trees/distant_branches.png",
+      "width": 96,
+      "height": 64,
+      "anchor": [48, 64],
+      "collision": "none"
+    },
+    {
+      "id": "leaf_cluster_1",
+      "category": "vegetation",
+      "file": "vegetation/leaf_cluster_1.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "none"
+    },
+    {
+      "id": "leaf_cluster_2",
+      "category": "vegetation",
+      "file": "vegetation/leaf_cluster_2.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "none"
+    },
+    {
+      "id": "leaf_cluster_3",
+      "category": "vegetation",
+      "file": "vegetation/leaf_cluster_3.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "none"
+    },
+    {
+      "id": "leaf_cluster_4",
+      "category": "vegetation",
+      "file": "vegetation/leaf_cluster_4.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "none"
+    },
+    {
+      "id": "grass_tuft_1",
+      "category": "vegetation",
+      "file": "vegetation/grass_tuft_1.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [16, 16],
+      "collision": "none"
+    },
+    {
+      "id": "grass_tuft_2",
+      "category": "vegetation",
+      "file": "vegetation/grass_tuft_2.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [16, 16],
+      "collision": "none"
+    },
+    {
+      "id": "grass_tuft_3",
+      "category": "vegetation",
+      "file": "vegetation/grass_tuft_3.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [16, 16],
+      "collision": "none"
+    },
+    {
+      "id": "hanging_vine_1",
+      "category": "vegetation",
+      "file": "vegetation/hanging_vine_1.png",
+      "width": 16,
+      "height": 64,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_y": true
+    },
+    {
+      "id": "hanging_vine_2",
+      "category": "vegetation",
+      "file": "vegetation/hanging_vine_2.png",
+      "width": 16,
+      "height": 64,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_y": true
+    },
+    {
+      "id": "rock_cluster",
+      "category": "vegetation",
+      "file": "vegetation/rock_cluster.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [16, 16],
+      "collision": "none"
+    },
+    {
+      "id": "mushroom",
+      "category": "vegetation",
+      "file": "vegetation/mushroom.png",
+      "width": 32,
+      "height": 24,
+      "anchor": [16, 24],
+      "collision": "none"
+    },
+    {
+      "id": "sun_bloom",
+      "category": "vegetation",
+      "file": "vegetation/sun_bloom.png",
+      "width": 32,
+      "height": 24,
+      "anchor": [16, 24],
+      "collision": "none"
+    },
+    {
+      "id": "push_crate",
+      "category": "interactive",
+      "file": "interactive/push_crate.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "dynamic_solid",
+      "mass": "heavy"
+    },
+    {
+      "id": "energy_crate",
+      "category": "interactive",
+      "file": "interactive/energy_crate.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [0, 0],
+      "collision": "dynamic_solid"
+    },
+    {
+      "id": "pressure_plate_up",
+      "category": "interactive",
+      "file": "interactive/pressure_plate_up.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [0, 16],
+      "collision": "trigger"
+    },
+    {
+      "id": "pressure_plate_down",
+      "category": "interactive",
+      "file": "interactive/pressure_plate_down.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [0, 16],
+      "collision": "trigger"
+    },
+    {
+      "id": "lever_off",
+      "category": "interactive",
+      "file": "interactive/lever_off.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "trigger"
+    },
+    {
+      "id": "lever_on",
+      "category": "interactive",
+      "file": "interactive/lever_on.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 32],
+      "collision": "trigger"
+    },
+    {
+      "id": "gate_closed",
+      "category": "interactive",
+      "file": "interactive/gate_closed.png",
+      "width": 64,
+      "height": 96,
+      "anchor": [0, 96],
+      "collision": "solid"
+    },
+    {
+      "id": "gate_open",
+      "category": "interactive",
+      "file": "interactive/gate_open.png",
+      "width": 64,
+      "height": 96,
+      "anchor": [0, 96],
+      "collision": "none"
+    },
+    {
+      "id": "energy_gem",
+      "category": "interactive",
+      "file": "interactive/energy_gem.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 16],
+      "collision": "collectible"
+    },
+    {
+      "id": "moving_platform",
+      "category": "interactive",
+      "file": "interactive/moving_platform.png",
+      "width": 64,
+      "height": 16,
+      "anchor": [0, 0],
+      "collision": "one_way",
+      "surface_y": 2
+    },
+    {
+      "id": "spikes_steel",
+      "category": "hazards",
+      "file": "hazards/spikes_steel.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [0, 16],
+      "collision": "damage"
+    },
+    {
+      "id": "spikes_crystal",
+      "category": "hazards",
+      "file": "hazards/spikes_crystal.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [0, 16],
+      "collision": "damage"
+    },
+    {
+      "id": "thorn_patch",
+      "category": "hazards",
+      "file": "hazards/thorn_patch.png",
+      "width": 32,
+      "height": 16,
+      "anchor": [0, 16],
+      "collision": "damage"
+    },
+    {
+      "id": "rotating_saw",
+      "category": "hazards",
+      "file": "hazards/rotating_saw.png",
+      "width": 32,
+      "height": 32,
+      "anchor": [16, 16],
+      "collision": "damage"
+    },
+    {
+      "id": "01_sky",
+      "category": "parallax",
+      "file": "parallax/01_sky.png",
+      "width": 512,
+      "height": 240,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_x": true,
+      "scroll_factor": 0.0
+    },
+    {
+      "id": "02_distant_hills",
+      "category": "parallax",
+      "file": "parallax/02_distant_hills.png",
+      "width": 512,
+      "height": 240,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_x": true,
+      "scroll_factor": 0.12
+    },
+    {
+      "id": "03_distant_forest",
+      "category": "parallax",
+      "file": "parallax/03_distant_forest.png",
+      "width": 512,
+      "height": 240,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_x": true,
+      "scroll_factor": 0.28
+    },
+    {
+      "id": "04_midground_forest",
+      "category": "parallax",
+      "file": "parallax/04_midground_forest.png",
+      "width": 512,
+      "height": 240,
+      "anchor": [0, 0],
+      "collision": "none",
+      "repeat_x": true,
+      "scroll_factor": 0.52
+    }
+  ],
+  "notes": "Collision values are suggestions, not tested game logic. Anchor is local pixel position; [0,0] is top-left. Parallax backgrounds are 512x240 and horizontally repeatable. All assets original procedural pixel artwork inspired by reference, not extracted."
+}
