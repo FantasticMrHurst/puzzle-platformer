@@ -62,7 +62,7 @@ Focused labs are selected with a query parameter: `?level=traversal-lab` for Sco
 
 Open `?level=gate-lab` to try shared environmental controls. Leave one character on the pressure plate, take another through the gate, then press `F` at the far-side switch to let the whole team through. The gate waits for occupied doorways to clear. Press `R` to reset.
 
-Choose **Relay Station** from the lab menu to playtest Scout, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches.
+Choose **Relay Station** from the lab menu to playtest Scout, Brute, and Tinkerer as a team. Restore the service crossing and bring all three to the exit. Use `F` for contextual abilities and switches. Relay Station also accepts a standard-mapped gamepad. On a PlayStation controller, use the D-pad or left stick to move, Cross to jump, Square to use abilities, L1/R1 to cycle characters, and Options to reset. Hold Square beside an unlocked block to grip it as the Brute.
 
 Press `F3` to toggle the read-only movement diagnostics overlay. It starts hidden in all builds.
 
