@@ -17,6 +17,7 @@ import {
   interpolatePosition,
   type Position,
 } from '../rendering/interpolatePosition';
+import { TinkererArt } from '../rendering/TinkererArt';
 import type { PoseTuning } from '../rendering/PoseTuning';
 import type { CharacterAbility, CharacterDefinition } from './CharacterCatalog';
 import type { CharacterArchetype } from '../levels/LevelSchema';
@@ -41,7 +42,7 @@ export class PlayerCharacter {
   private readonly bodyAdapter: ArcadeBodyAdapter;
   private readonly controller: MovementController;
   private readonly labelObject: Phaser.GameObjects.Text;
-  private readonly posePreview?: CharacterPosePlayer;
+  private readonly posePreview?: CharacterPosePlayer | TinkererArt;
   private lastResult: MovementResult;
   private previousPosition: Position;
   private currentPosition: Position;
@@ -81,6 +82,8 @@ export class PlayerCharacter {
         feetY,
         definition.height,
       );
+    } else if (definition.archetype === 'tinkerer') {
+      this.posePreview = new TinkererArt(scene, x, feetY);
     }
     if (this.posePreview !== undefined) {
       this.posePreview.setDepth(5);
@@ -217,7 +220,9 @@ export class PlayerCharacter {
   }
 
   public setPoseTuning(tuning: PoseTuning): void {
-    this.posePreview?.setTuning(tuning);
+    if (this.posePreview instanceof CharacterPosePlayer) {
+      this.posePreview.setTuning(tuning);
+    }
   }
 
   public getLabel(): string {
@@ -234,6 +239,24 @@ export class PlayerCharacter {
 
   public getFacingDirection(): -1 | 1 {
     return this.facingDirection;
+  }
+
+  public setPlugCarry(side: -1 | 1 | null): void {
+    if (this.posePreview instanceof TinkererArt) {
+      if (side !== null) this.facingDirection = side;
+      this.posePreview.setPlugCarry(side);
+    }
+  }
+
+  public getPlugGrip(interpolated = false): Position | undefined {
+    if (!(this.posePreview instanceof TinkererArt)) return undefined;
+    const grip = this.posePreview.getPlugGrip();
+    if (grip === undefined) return undefined;
+    const center = interpolated ? this.visualObject : this.currentPosition;
+    return {
+      x: center.x + grip.x,
+      y: center.y + this.definition.height / 2 + grip.y,
+    };
   }
 
   public didJumpThisStep(): boolean {
@@ -266,6 +289,7 @@ export class PlayerCharacter {
 
   public reset(x: number, y: number): void {
     this.posePreview?.reset();
+    this.facingDirection = 1;
     this.braced = false;
     this.climbing = false;
     this.bodyAdapter.setImmovable(false);

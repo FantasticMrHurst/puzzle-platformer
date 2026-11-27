@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 
+import { TinkererCompanion } from '../../entities/TinkererCompanion';
 import { CHARACTER_ART } from '../../rendering/CharacterArt';
+import { TinkererArt } from '../../rendering/TinkererArt';
 
 export class BootScene extends Phaser.Scene {
   public constructor() {
@@ -10,10 +12,15 @@ export class BootScene extends Phaser.Scene {
   public preload(): void {
     const params = new URLSearchParams(window.location.search);
     for (const art of Object.values(CHARACTER_ART)) {
-      if (params.get(art.previewFlag) === '1') {
+      const enabled =
+        params.get(art.previewFlag) ??
+        (art.previewFlag === 'pilotArt' ? params.get('scoutArt') : null);
+      if (enabled === '1') {
         this.load.atlas(art.textureKey, art.textureUrl, art.atlasUrl);
       }
     }
+    TinkererArt.preload(this);
+    TinkererCompanion.preload(this);
   }
 
   public create(): void {

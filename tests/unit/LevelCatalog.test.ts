@@ -55,6 +55,7 @@ describe('getLevelSource', () => {
     );
 
     const trioSource = getLevelSource('pilot-brute-ranger-lab');
+    expect(getLevelSource('scout-brute-ranger-lab')).toBe(trioSource);
     const trioLab = loadLevelData(trioSource.data, trioSource.source);
     expect(trioLab.characters.map(({ archetype }) => archetype)).toEqual([
       'pilot',

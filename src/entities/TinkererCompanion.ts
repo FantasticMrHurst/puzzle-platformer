@@ -1,41 +1,55 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 
+import atlasData from '../assets/sprites/tinkerer-companion/companion.json';
+import atlasImage from '../assets/sprites/tinkerer-companion/companion.png';
 import type { PlayerCharacter } from './PlayerCharacter';
 
-const COMPANION_WIDTH = 16;
-const COMPANION_HEIGHT = 24;
+const TEXTURE_KEY = 'tinkerer-companion-art';
+const COMPANION_WIDTH = 34;
 const FOLLOW_GAP = 12;
 const JUMP_DELAY_SECONDS = 0.1;
 const JUMP_DURATION_SECONDS = 0.6;
 const JUMP_HEIGHT = 64;
+const LAND_POSE_SECONDS = 0.12;
+const HOP_EXTEND_SECONDS = 0.1;
+const IDLE_SWAY_SECONDS = 0.55;
+const SCUTTLE_PIXELS_PER_POSE = 7;
+const SCUTTLE_MIN_SPEED = 12;
+type Pose = keyof typeof atlasData.frames;
 
-/** Decorative prototype companion that follows the Tinkerer and delays its hop. */
+/** Decorative companion that follows the Tinkerer and delays its hop. */
 export class TinkererCompanion {
-  private readonly visualObject: Phaser.GameObjects.Rectangle;
+  private readonly visualObject: Phaser.GameObjects.Image;
   private pendingJumpDelaySeconds: number | null = null;
   private jumpElapsedSeconds: number | null = null;
   private lastJumpSignal = false;
   private leaderJumpSequence = false;
+  private landingSeconds = 0;
+  private idleSeconds = 0;
+  private scuttleDistance = 0;
+  private scuttling = false;
   private baseY: number;
+
+  public static preload(scene: Phaser.Scene): void {
+    scene.load.atlas(TEXTURE_KEY, atlasImage, atlasData);
+  }
 
   public constructor(
     scene: Phaser.Scene,
     private readonly tinkerer: PlayerCharacter,
   ) {
     this.baseY = this.getAlignedGroundY(tinkerer.visualObject.y);
+    scene.textures
+      .get(TEXTURE_KEY)
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.visualObject = scene.add
-      .rectangle(
-        tinkerer.visualObject.x,
-        tinkerer.visualObject.y,
-        COMPANION_WIDTH,
-        COMPANION_HEIGHT,
-        0xfacc15,
-      )
-      .setStrokeStyle(2, 0xfef3c7)
+      .image(tinkerer.visualObject.x, this.baseY, TEXTURE_KEY, 'idle')
+      .setOrigin(24 / 48, 46 / 56)
       .setDepth(6);
   }
 
   public prepareSimulationStep(deltaSeconds: number): void {
+    this.landingSeconds = Math.max(0, this.landingSeconds - deltaSeconds);
     const jumped = this.tinkerer.didJumpThisStep();
     if (jumped && !this.lastJumpSignal) {
       this.pendingJumpDelaySeconds = JUMP_DELAY_SECONDS;
@@ -56,16 +70,32 @@ export class TinkererCompanion {
       this.jumpElapsedSeconds += deltaSeconds;
       if (this.jumpElapsedSeconds >= JUMP_DURATION_SECONDS) {
         this.jumpElapsedSeconds = null;
+        this.landingSeconds = LAND_POSE_SECONDS;
       }
     }
   }
 
-  public completeSimulationStep(): void {
-    if (this.leaderJumpSequence && this.tinkerer.getContacts().grounded) {
+  public completeSimulationStep(deltaSeconds: number): void {
+    const { position, velocity, contacts } = this.tinkerer.getDebugState();
+    if (this.leaderJumpSequence && contacts.grounded) {
       this.leaderJumpSequence = false;
-      this.baseY = this.getAlignedGroundY(
-        this.tinkerer.getDebugState().position.y,
-      );
+      this.baseY = this.getAlignedGroundY(position.y);
+    }
+
+    const speed = Math.abs(velocity.x);
+    const feetDown =
+      this.jumpElapsedSeconds === null && this.landingSeconds === 0;
+    this.scuttling = feetDown && speed > SCUTTLE_MIN_SPEED;
+    if (this.scuttling) {
+      this.scuttleDistance =
+        (this.scuttleDistance + speed * deltaSeconds) %
+        (2 * SCUTTLE_PIXELS_PER_POSE);
+      this.idleSeconds = 0;
+    } else {
+      this.scuttleDistance = 0;
+      this.idleSeconds = feetDown
+        ? (this.idleSeconds + deltaSeconds) % (2 * IDLE_SWAY_SECONDS)
+        : 0;
     }
   }
 
@@ -86,10 +116,16 @@ export class TinkererCompanion {
     const horizontalOffset =
       leader.width / 2 + FOLLOW_GAP + COMPANION_WIDTH / 2;
 
-    this.visualObject.setPosition(
-      leader.x - facingDirection * horizontalOffset,
-      this.baseY - jumpOffset,
-    );
+    const pose = this.getPose();
+    if (this.visualObject.frame.name !== pose) {
+      this.visualObject.setFrame(pose);
+    }
+    this.visualObject
+      .setFlipX(facingDirection < 0)
+      .setPosition(
+        leader.x - facingDirection * horizontalOffset,
+        this.baseY - jumpOffset,
+      );
   }
 
   public reset(): void {
@@ -97,10 +133,31 @@ export class TinkererCompanion {
     this.jumpElapsedSeconds = null;
     this.lastJumpSignal = false;
     this.leaderJumpSequence = false;
+    this.landingSeconds = 0;
+    this.idleSeconds = 0;
+    this.scuttleDistance = 0;
+    this.scuttling = false;
     this.baseY = this.getAlignedGroundY(this.tinkerer.visualObject.y);
   }
 
+  private getPose(): Pose {
+    if (this.jumpElapsedSeconds !== null) {
+      const extendingLegs =
+        this.jumpElapsedSeconds < HOP_EXTEND_SECONDS ||
+        this.jumpElapsedSeconds > JUMP_DURATION_SECONDS - HOP_EXTEND_SECONDS;
+      return extendingLegs ? 'hop_push' : 'hop_tuck';
+    }
+    if (this.landingSeconds > 0) return 'land';
+    if (this.scuttling) {
+      // The neutral leg position doubles as the passing pose.
+      return this.scuttleDistance < SCUTTLE_PIXELS_PER_POSE
+        ? 'scuttle'
+        : 'idle';
+    }
+    return this.idleSeconds < IDLE_SWAY_SECONDS ? 'idle' : 'idle_sway';
+  }
+
   private getAlignedGroundY(leaderY: number): number {
-    return leaderY + (this.tinkerer.visualObject.height - COMPANION_HEIGHT) / 2;
+    return leaderY + this.tinkerer.visualObject.height / 2;
   }
 }
