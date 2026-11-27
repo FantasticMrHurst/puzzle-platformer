@@ -73,6 +73,11 @@ const CHARACTER_CATALOG: Readonly<
   tinkerer: {
     ...createBaselineDefinition('tinkerer', 'TINKERER', 0x3b82f6, 0xdbeafe),
     abilities: ['route-power', 'reconfigure-machine'],
+    movementProfileName: 'tinkerer-heavy-v1',
+    movementConfig: {
+      ...DEFAULT_MOVEMENT_CONFIG,
+      jumpSpeed: 640,
+    },
   },
   ranger: createBaselineDefinition('ranger', 'RANGER', 0x84cc16, 0xecfccb),
   pet: {

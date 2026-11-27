@@ -34,6 +34,10 @@ These values are a stable reference, not a prohibition on future tuning. Charact
 
 At maximum acceleration, the character reaches full ground speed in approximately 0.133 seconds and stops from full speed in approximately 0.107 seconds. These calculated values help compare profiles; feel must still be judged through play.
 
+## Tinkerer heavy profile
+
+`tinkerer-heavy-v1` uses a launch speed of 640 px/s, below the Brute's 680 px/s and Pilot's 860 px/s. It uses the shared gravity and early release behavior. Relay Station's balcony is 186 px above the floor so the Tinkerer still needs the Brute's brace to reach the console.
+
 ## Validation record
 
 | Condition | Method | Observation |

@@ -11,7 +11,7 @@ Run `npm run dev` and choose **Crew Tuning** from the lab menu. The direct link 
 | Panel | Settings to try |
 | --- | --- |
 | Movement | Select a character and adjust run speed, jump launch, landing forgiveness, acceleration, or braking. The Pilot also has wall cling, slide, kick, and steering delay controls. |
-| Animation & alignment | Adjust the Pilot or Brute's idle hold, run stride, sprite scale, or visual offset. Tinkerer uses placeholder art. |
+| Animation & alignment | Adjust the Pilot or Brute's idle hold, run stride, sprite scale, or visual offset. The Tinkerer has dedicated carry poses with fixed animation settings. |
 | Room & mechanisms | Adjust gravity, rope climb speed, maximum break reach, or lift travel speed for the current room. |
 
 Commit a field by pressing Enter or leaving it. **Restart room** restores the puzzle while keeping the current tuning. **Restore defaults** restores the authored settings. Download a JSON preset with **Save preset** and use **Load preset** to compare or share it. Reloading the page starts a fresh tuning session.

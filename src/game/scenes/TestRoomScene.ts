@@ -389,15 +389,16 @@ export class TestRoomScene extends Phaser.Scene {
             ),
           );
         this.tinkererCompanions.forEach((companion) =>
-          companion.completeSimulationStep(),
+          companion.completeSimulationStep(GAMEPLAY_STEP_SECONDS),
         );
-        this.tinkererPlugPuzzles.forEach((puzzle) =>
-          puzzle.update(
+        for (const puzzle of this.tinkererPlugPuzzles) {
+          const consumed = puzzle.update(
             activeCharacter,
             this.grabPressed,
             GAMEPLAY_STEP_SECONDS,
-          ),
-        );
+          );
+          if (consumed) this.grabPressed = false;
+        }
         this.clearConsumedInputEdges();
         this.pushableBlocks.forEach((block) => block.completeStep());
         this.pressurePlates.forEach((plate) => plate.update(plateOccupants));
@@ -421,6 +422,7 @@ export class TestRoomScene extends Phaser.Scene {
       .getMembers()
       .forEach((character) => character.render(interpolationAlpha));
     this.tinkererCompanions.forEach((companion) => companion.render());
+    this.tinkererPlugPuzzles.forEach((puzzle) => puzzle.render());
 
     const snapshot = this.createDebugSnapshot();
     this.debugOverlay.update(snapshot);
