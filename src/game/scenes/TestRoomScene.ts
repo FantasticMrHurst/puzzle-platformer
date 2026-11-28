@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+import { drawPowerSign } from '../../rendering/PowerMarkings';
+
 import type { MovementDebugSnapshot } from '../../debug/MovementDebugSnapshot';
 import { calculateExitProgress } from '../../environment/ExitProgress';
 import { BreakableBarrier } from '../../environment/BreakableBarrier';
@@ -161,10 +163,11 @@ export class TestRoomScene extends Phaser.Scene {
       (block) => new PushableBlock(this, block),
     );
     if (this.level.id === CREW_ABILITIES_LAB_ID) {
-      const { barrier, counterweight, lift } = CREW_ABILITIES_LAYOUT;
+      const { barrier, counterweight, lift, power } = CREW_ABILITIES_LAYOUT;
       this.breakableFloor = new BreakableBarrier(this, barrier);
       this.counterweight = new PushableBlock(this, counterweight);
       this.serviceLift = new ServiceLift(this, lift);
+      power.signs.forEach((sign) => drawPowerSign(this, sign));
       this.pushableBlocks.push(this.counterweight);
       this.physics.add.collider(
         this.counterweight.physicsObject,
@@ -228,6 +231,7 @@ export class TestRoomScene extends Phaser.Scene {
         .filter(
           (geometry) =>
             geometry.surface === 'ground' &&
+            geometry.y >= plug.plugStart.y &&
             plug.plugStart.x >= geometry.x &&
             plug.plugStart.x <= geometry.x + geometry.width,
         )
@@ -237,6 +241,10 @@ export class TestRoomScene extends Phaser.Scene {
         this,
         plug,
         groundY ?? this.level.world.height,
+        this.level.id === CREW_ABILITIES_LAB_ID &&
+          plug.id === CREW_ABILITIES_LAYOUT.power.plugId
+          ? CREW_ABILITIES_LAYOUT.power.outlets
+          : undefined,
       );
     });
     this.exitPresentation = new LevelExit(
@@ -484,8 +492,7 @@ export class TestRoomScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(level.world.backgroundColor);
     this.cameras.main.setBounds(0, 0, width, height);
-    const initialSpawn = level.characters[0]!.spawn;
-    this.cameras.main.centerOn(initialSpawn.x, initialSpawn.y);
+    this.centerCameraOnSpawn();
     this.physics.world.setBounds(0, 0, width, height);
   }
 
@@ -609,7 +616,12 @@ export class TestRoomScene extends Phaser.Scene {
         );
     }
     this.applyActiveSelection();
-    this.cameras.main.setDeadzone(360, 220);
+    this.cameras.main.setDeadzone(
+      360,
+      this.level.id === CREW_ABILITIES_LAB_ID
+        ? CREW_ABILITIES_LAYOUT.camera.verticalDeadzonePx
+        : 220,
+    );
   }
 
   private createHud(level: LevelData): void {
@@ -700,7 +712,7 @@ export class TestRoomScene extends Phaser.Scene {
 
     const mixedLabHint =
       level.id === CREW_ABILITIES_LAB_ID
-        ? 'Pilot: F at ledge, W/S or ↑/↓ to climb · Brute: F to break, hold F to grip · Tinkerer: C for plug, F on lift'
+        ? 'Pilot: F at ledge, ↑/↓ climb · Brute: F to break, hold F to grip · Tinkerer: C for plug, F on lift'
         : level.id === 'relay-station'
           ? 'Restore the service crossing and get the whole crew through the exit airlock.'
           : level.id === 'cooperation-lab'
@@ -792,7 +804,10 @@ export class TestRoomScene extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(10);
     }
-    if (this.tinkererPlugPuzzles.length > 0) {
+    if (
+      this.tinkererPlugPuzzles.length > 0 &&
+      level.id !== CREW_ABILITIES_LAB_ID
+    ) {
       this.add
         .text(
           24,
@@ -956,7 +971,25 @@ export class TestRoomScene extends Phaser.Scene {
     this.roster
       .getMembers()
       .forEach((character) => character.setActive(character === active));
-    this.cameras.main.startFollow(active.visualObject, true, 0.12, 0.12);
+    this.cameras.main.startFollow(
+      active.visualObject,
+      true,
+      0.12,
+      0.12,
+      0,
+      this.cameraLookAbovePx(),
+    );
+  }
+
+  private cameraLookAbovePx(): number {
+    return this.level.id === CREW_ABILITIES_LAB_ID
+      ? CREW_ABILITIES_LAYOUT.camera.lookAbovePx
+      : 0;
+  }
+
+  private centerCameraOnSpawn(): void {
+    const { x, y } = this.level.characters[0]!.spawn;
+    this.cameras.main.centerOn(x, y - this.cameraLookAbovePx());
   }
 
   private resetRoomToCheckpoint(): void {
@@ -967,8 +1000,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.tinkererCompanions.forEach((companion) => companion.reset());
     this.roster.selectSlot(0);
     this.applyActiveSelection();
-    const initialSpawn = this.level.characters[0]!.spawn;
-    this.cameras.main.centerOn(initialSpawn.x, initialSpawn.y);
+    this.centerCameraOnSpawn();
     this.pendingIntent = { ...NEUTRAL_PLAYER_INTENT };
     this.lastSampledIntent = { ...NEUTRAL_PLAYER_INTENT };
     this.primaryAbilityHeld = false;
@@ -999,6 +1031,12 @@ export class TestRoomScene extends Phaser.Scene {
   }
 
   private isSignalActive(channel: string): boolean {
+    if (
+      this.level.id === CREW_ABILITIES_LAB_ID &&
+      channel === CREW_ABILITIES_LAYOUT.power.gateChannel &&
+      this.breakableFloor?.isBroken() !== true
+    )
+      return false;
     return (
       (channel === CREW_ABILITIES_LAYOUT.counterweight.channel &&
         this.breakableFloor?.isBroken() === true) ||

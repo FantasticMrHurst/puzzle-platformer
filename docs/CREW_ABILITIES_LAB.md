@@ -35,9 +35,10 @@ The Pilot carries one ladder inside the satchel. When **F · THROW ROPE** appear
 
 ## Playtest route
 
-1. **Pilot.** Jump into the right wall, then wall-jump left onto the west shelf. Jump from that shelf to the upper-right deck and use the ability near the shaft edge to throw the rope ladder. Bring the Brute and Tinkerer up.
-2. **Brute.** Stand beside the cracked floor and use the ability to break it. Follow the falling counterweight down to the lower deck. Approach the weight from the right, hold the ability, and pull it onto the plate. Leave it there to hold the gate for everyone.
-3. **Tinkerer.** Approach the red plug from the left, grab it, then line up its prongs with the outlet and place it. Board the powered lift with the whole crew. Use the ability aboard to select service, then exit. An ability press at the ground call point brings the lift back down.
-4. Walk all three onto the exit deck. Restart and verify the ladder stows, the floor and counterweight return, the gate closes, and the lift loses power and returns to ground.
+1. **Pilot.** Wall-jump onto the west shelf, cross the starting shaft, and deploy the ladder from the upper-right ledge. Bring the Brute and Tinkerer up, then have the Pilot retract the ladder.
+2. **Brute.** Break the cracked floor and follow the counterweight to the main deck. Approach the weight from the right, hold the ability, and pull it onto the pressure plate to keep the service gate open.
+3. **Tinkerer.** Drop from the end of the main deck while the Pilot stays above. Pass the green square, blue circle, and red triangle signs. Grab the plain red plug with C, then use the signs to choose among the three white outlets. Connect to the triangle outlet with C. It turns red and powers the lift. The other two outlets reject the plug, and the Tinkerer keeps holding it.
+4. **Pilot.** Deploy the ladder at the edge of the power chamber. The lower floor is 380 px below the main deck. Have the Tinkerer climb back up, then gather the crew on the lift to the left of the drop.
+5. **Tinkerer.** Use F aboard the lift to reach Service. At Service, press F again for Exit. Walk all three crew members east to the nearby exit. Press R to reset the ladder, floor, gate, plug, and lift.
 
 For implementation context, see [Brute barriers](https://github.com/FantasticMrHurst/puzzle-platformer/issues/27), [Pilot ladder](https://github.com/FantasticMrHurst/puzzle-platformer/issues/28), [Tinkerer power](https://github.com/FantasticMrHurst/puzzle-platformer/issues/29), and [lift reconfiguration](https://github.com/FantasticMrHurst/puzzle-platformer/issues/33).

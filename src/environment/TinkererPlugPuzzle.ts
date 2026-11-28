@@ -3,6 +3,7 @@ import type Phaser from 'phaser';
 import type { PlayerCharacter } from '../entities/PlayerCharacter';
 import type { TinkererPlugData } from '../levels/LevelSchema';
 import type { Position } from '../rendering/interpolatePosition';
+import { drawPowerShape, type PowerShape } from '../rendering/PowerMarkings';
 
 const PLUG_WIDTH = 42;
 const PLUG_HEIGHT = 50;
@@ -10,9 +11,11 @@ const PLUG_TIP_OFFSET = 21;
 const PLUG_COLOR = 0xef4444;
 const PLUG_BODY_COLOR = 0xb91c1c;
 const SOCKET_COLOR = 0x1f2937;
+const OUTLET_WHITE = 0xf8fafc;
 const HANDLE_OFFSET = 18;
 const DROP_GRAVITY = 1400;
 const OUTLET_SNAP_RANGE = 14;
+const MISMATCH_SECONDS = 0.8;
 const WIRE_POINT_COUNT = 32;
 const WIRE_GRAVITY = 760;
 const WIRE_DAMPING = 0.975;
@@ -21,6 +24,77 @@ const WIRE_CONSTRAINT_PASSES = 10;
 const WIRE_GROUND_DRAG = 0.7;
 
 type GrabSide = -1 | 1;
+type Alignment = 'match' | 'decoy' | 'none';
+
+export interface PlugOutletOptions {
+  readonly shape: PowerShape;
+  readonly decoys: readonly {
+    readonly position: Position;
+    readonly shape: PowerShape;
+  }[];
+}
+
+interface OutletPresentation {
+  readonly position: Position;
+  readonly shape?: PowerShape;
+  readonly plate: Phaser.GameObjects.Rectangle;
+  readonly marking?: Phaser.GameObjects.Graphics;
+  readonly sockets: readonly Phaser.GameObjects.Ellipse[];
+  readonly label: Phaser.GameObjects.Text;
+}
+
+function paintOutlet(outlet: OutletPresentation, powered: boolean): void {
+  const { label, plate, sockets, marking, shape, position } = outlet;
+  label
+    .setText(powered ? 'OUTLET · POWERED' : 'OUTLET')
+    .setColor(
+      powered ? '#bbf7d0' : shape === undefined ? '#fecaca' : '#f8fafc',
+    );
+  sockets.forEach((socket) => socket.setVisible(!powered));
+  if (shape === undefined || marking === undefined) return;
+
+  plate
+    .setFillStyle(powered ? PLUG_COLOR : OUTLET_WHITE)
+    .setStrokeStyle(4, powered ? 0xfca5a5 : 0x94a3b8);
+  marking.clear();
+  drawPowerShape(
+    marking,
+    shape,
+    position.x + 23,
+    position.y,
+    12,
+    powered ? OUTLET_WHITE : SOCKET_COLOR,
+  );
+}
+
+function createOutlet(
+  scene: Phaser.Scene,
+  position: Position,
+  shape?: PowerShape,
+): OutletPresentation {
+  const { x, y } = position;
+  const outlet = {
+    position,
+    shape,
+    plate: scene.add
+      .rectangle(x + 14, y, 64, 84, PLUG_COLOR)
+      .setStrokeStyle(4, 0xfca5a5)
+      .setDepth(3),
+    sockets: [-9, 9].map((dy) =>
+      scene.add.ellipse(x, y + dy, 8, 16, SOCKET_COLOR).setDepth(4),
+    ),
+    marking: shape === undefined ? undefined : scene.add.graphics().setDepth(4),
+    label: scene.add
+      .text(x + 14, y - 48, 'OUTLET', {
+        fontFamily: 'ui-monospace, monospace',
+        fontSize: '12px',
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(6),
+  };
+  paintOutlet(outlet, false);
+  return outlet;
+}
 
 interface WirePoint {
   x: number;
@@ -31,9 +105,7 @@ interface WirePoint {
 
 export class TinkererPlugPuzzle {
   private readonly plugVisual: Phaser.GameObjects.Container;
-  private readonly outletTopSocket: Phaser.GameObjects.Ellipse;
-  private readonly outletBottomSocket: Phaser.GameObjects.Ellipse;
-  private readonly outletLabel: Phaser.GameObjects.Text;
+  private readonly targetOutlet: OutletPresentation;
   private readonly statusText: Phaser.GameObjects.Text;
   private readonly wireGraphics: Phaser.GameObjects.Graphics;
   private readonly wireAnchorMarker: Phaser.GameObjects.Arc;
@@ -44,42 +116,31 @@ export class TinkererPlugPuzzle {
   private dropSpeed = 0;
   private plugOrientation: GrabSide = 1;
   private pluggedIn = false;
+  private mismatchSeconds = 0;
 
   public constructor(
     scene: Phaser.Scene,
     public readonly data: TinkererPlugData,
     private readonly floorY: number,
+    private readonly outlets?: PlugOutletOptions,
   ) {
     this.plugPosition = { ...data.plugStart };
-    scene.add
-      .rectangle(data.outlet.x + 14, data.outlet.y, 64, 84, PLUG_COLOR)
-      .setStrokeStyle(4, 0xfca5a5)
-      .setDepth(3);
-    this.outletTopSocket = scene.add
-      .ellipse(data.outlet.x, data.outlet.y - 9, 8, 16, SOCKET_COLOR)
-      .setDepth(4);
-    this.outletBottomSocket = scene.add
-      .ellipse(data.outlet.x, data.outlet.y + 9, 8, 16, SOCKET_COLOR)
-      .setDepth(4);
-    this.outletLabel = scene.add
-      .text(data.outlet.x + 14, data.outlet.y - 48, 'OUTLET', {
-        color: '#fecaca',
-        fontFamily: 'ui-monospace, monospace',
-        fontSize: '12px',
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5, 1)
-      .setDepth(6);
+    this.targetOutlet = createOutlet(scene, data.outlet, outlets?.shape);
+    outlets?.decoys.forEach(({ position, shape }) =>
+      createOutlet(scene, position, shape),
+    );
     this.plugVisual = scene.add.container(data.plugStart.x, data.plugStart.y);
+    const plugBody = scene.add.rectangle(-6, 0, 30, PLUG_HEIGHT, PLUG_COLOR);
     this.plugVisual.add([
       scene.add.rectangle(-18, 0, 15, 18, 0x374151).setStrokeStyle(2, 0x111827),
-      scene.add
-        .rectangle(-6, 0, 30, PLUG_HEIGHT, PLUG_COLOR)
-        .setStrokeStyle(3, 0xfca5a5),
+      plugBody,
       scene.add.rectangle(15, -9, 12, 6, 0xe5e7eb),
       scene.add.rectangle(15, 9, 12, 6, 0xe5e7eb),
-      scene.add.rectangle(-6, 0, 12, 16, PLUG_BODY_COLOR),
     ]);
+    if (outlets === undefined) {
+      plugBody.setStrokeStyle(3, 0xfca5a5);
+      this.plugVisual.add(scene.add.rectangle(-6, 0, 12, 16, PLUG_BODY_COLOR));
+    }
     this.plugVisual.setDepth(5);
     this.statusText = scene.add
       .text(data.plugStart.x, data.plugStart.y - PLUG_HEIGHT / 2 - 10, '', {
@@ -114,6 +175,7 @@ export class TinkererPlugPuzzle {
       return false;
     }
 
+    this.mismatchSeconds = Math.max(0, this.mismatchSeconds - deltaSeconds);
     let consumed = false;
     if (this.holder !== null) {
       this.plugOrientation = this.holder.getFacingDirection();
@@ -121,7 +183,9 @@ export class TinkererPlugPuzzle {
       this.plugPosition = this.carriedPosition(this.holder, false);
       if (grabPressed && this.holder === activeCharacter) {
         consumed = true;
-        if (this.isAlignedWithOutlet()) this.plugIn();
+        const alignment = this.getAlignment();
+        if (alignment === 'match') this.plugIn();
+        else if (alignment === 'decoy') this.mismatchSeconds = MISMATCH_SECONDS;
         else this.release();
       }
     } else {
@@ -161,13 +225,12 @@ export class TinkererPlugPuzzle {
 
   public reset(): void {
     this.pluggedIn = false;
+    this.mismatchSeconds = 0;
     this.release();
     this.plugOrientation = 1;
     this.wireAnchor = null;
     this.wireAnchorMarker.setVisible(false);
-    this.outletLabel.setText('OUTLET').setColor('#fecaca');
-    this.outletTopSocket.setVisible(true);
-    this.outletBottomSocket.setVisible(true);
+    paintOutlet(this.targetOutlet, false);
     this.plugPosition = { ...this.data.plugStart };
     this.resetWirePoints();
     this.render();
@@ -224,14 +287,20 @@ export class TinkererPlugPuzzle {
     return dx === 0 ? character.getFacingDirection() : dx > 0 ? 1 : -1;
   }
 
-  private isAlignedWithOutlet(): boolean {
+  private getAlignment(): Alignment {
+    if (this.isAlignedWith(this.targetOutlet.position)) return 'match';
+    return this.outlets?.decoys.some(({ position }) =>
+      this.isAlignedWith(position),
+    )
+      ? 'decoy'
+      : 'none';
+  }
+
+  private isAlignedWith(position: Position): boolean {
+    const tipX = this.plugPosition.x + this.plugOrientation * PLUG_TIP_OFFSET;
     return (
-      Math.abs(
-        this.plugPosition.x +
-          this.plugOrientation * PLUG_TIP_OFFSET -
-          this.data.outlet.x,
-      ) <= OUTLET_SNAP_RANGE &&
-      Math.abs(this.plugPosition.y - this.data.outlet.y) <= PLUG_HEIGHT / 2
+      Math.abs(tipX - position.x) <= OUTLET_SNAP_RANGE &&
+      Math.abs(this.plugPosition.y - position.y) <= PLUG_HEIGHT / 2
     );
   }
 
@@ -242,9 +311,7 @@ export class TinkererPlugPuzzle {
       x: this.data.outlet.x - this.plugOrientation * PLUG_TIP_OFFSET,
       y: this.data.outlet.y,
     };
-    this.outletLabel.setText('OUTLET · POWERED').setColor('#bbf7d0');
-    this.outletTopSocket.setVisible(false);
-    this.outletBottomSocket.setVisible(false);
+    paintOutlet(this.targetOutlet, true);
   }
 
   private updatePresentation(
@@ -256,13 +323,16 @@ export class TinkererPlugPuzzle {
     }
 
     if (this.holder !== null) {
+      const alignment = this.getAlignment();
+      const prompt =
+        alignment === 'none'
+          ? 'PRESS C TO DROP'
+          : alignment === 'decoy' && this.mismatchSeconds > 0
+            ? 'OUTLET MISMATCH'
+            : 'PRESS C TO CONNECT';
       this.statusText
         .setText(
-          this.holder === activeCharacter
-            ? this.isAlignedWithOutlet()
-              ? 'PRESS C TO CONNECT'
-              : 'PRESS C TO DROP'
-            : 'TINKERER HOLDING PLUG',
+          this.holder === activeCharacter ? prompt : 'TINKERER HOLDING PLUG',
         )
         .setColor('#fee2e2');
       return;
@@ -275,7 +345,13 @@ export class TinkererPlugPuzzle {
 
     const isNearby = this.findGrabSide(activeCharacter) !== null;
     if (!isNearby) {
-      this.statusText.setText('MATCH RED PLUG TO OUTLET').setColor('#fee2e2');
+      this.statusText
+        .setText(
+          this.outlets === undefined
+            ? 'MATCH RED PLUG TO OUTLET'
+            : 'FIND THE MATCHING OUTLET',
+        )
+        .setColor('#fee2e2');
     } else if (activeCharacter.hasAbility('route-power')) {
       this.statusText.setText('PRESS C TO GRAB').setColor('#fee2e2');
     } else {
