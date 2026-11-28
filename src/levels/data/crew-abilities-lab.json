@@ -3,8 +3,8 @@
   "id": "crew-abilities-lab",
   "name": "Crew Abilities Lab",
   "world": {
-    "width": 2160,
-    "height": 720,
+    "width": 3060,
+    "height": 1080,
     "backgroundColor": "#0c1425"
   },
   "characters": [
@@ -35,9 +35,9 @@
   ],
   "exit": {
     "id": "crew-exit",
-    "x": 1930,
+    "x": 1950,
     "y": 110,
-    "width": 188,
+    "width": 236,
     "height": 130
   },
   "staticGeometry": [
@@ -58,52 +58,55 @@
       "surface": "wall"
     },
     {
-      "id": "floor",
+      "id": "main-deck",
       "x": 0,
       "y": 600,
-      "width": 1550,
-      "height": 120,
-      "surface": "ground"
+      "width": 1780,
+      "height": 480,
+      "surface": "ground",
+      "purpose": "Main deck"
     },
     {
       "id": "blast-door-header",
-      "x": 1210,
+      "x": 1320,
       "y": 0,
       "width": 50,
       "height": 420,
       "surface": "wall"
     },
     {
-      "id": "lift-pit",
-      "x": 1550,
-      "y": 680,
-      "width": 270,
-      "height": 40,
-      "surface": "ground"
+      "id": "power-chamber-floor",
+      "x": 1780,
+      "y": 980,
+      "width": 1280,
+      "height": 100,
+      "surface": "ground",
+      "purpose": "Lower power chamber"
     },
     {
       "id": "exit-deck",
-      "x": 1820,
+      "x": 1660,
       "y": 240,
-      "width": 340,
-      "height": 480,
-      "surface": "platform"
+      "width": 1400,
+      "height": 42,
+      "surface": "platform",
+      "purpose": "Exit gallery"
     },
     {
       "id": "end-wall",
-      "x": 2136,
+      "x": 3036,
       "y": 0,
       "width": 24,
-      "height": 240,
+      "height": 980,
       "surface": "wall"
     }
   ],
   "pressurePlates": [
     {
       "id": "weight-plate",
-      "x": 1024,
+      "x": 1112,
       "y": 590,
-      "width": 64,
+      "width": 72,
       "height": 10,
       "channel": "service-access"
     }
@@ -112,7 +115,7 @@
   "gates": [
     {
       "id": "service-gate",
-      "x": 1210,
+      "x": 1320,
       "y": 420,
       "width": 50,
       "height": 180,
@@ -129,12 +132,12 @@
     {
       "id": "lift-supply",
       "plugStart": {
-        "x": 1345,
-        "y": 575
+        "x": 2240,
+        "y": 955
       },
       "outlet": {
-        "x": 1480,
-        "y": 575
+        "x": 2730,
+        "y": 955
       },
       "interactionRange": 64
     }
