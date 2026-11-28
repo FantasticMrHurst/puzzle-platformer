@@ -62,9 +62,25 @@
       "x": 0,
       "y": 600,
       "width": 1780,
-      "height": 480,
+      "height": 200,
       "surface": "ground",
       "purpose": "Main deck"
+    },
+    {
+      "id": "secret-alcove-back",
+      "x": 0,
+      "y": 800,
+      "width": 1530,
+      "height": 180,
+      "surface": "ground"
+    },
+    {
+      "id": "secret-alcove-base",
+      "x": 0,
+      "y": 980,
+      "width": 1780,
+      "height": 100,
+      "surface": "ground"
     },
     {
       "id": "blast-door-header",
