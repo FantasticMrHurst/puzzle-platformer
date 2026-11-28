@@ -7,6 +7,11 @@ export const CREW_ABILITIES_LAB_ID = 'crew-abilities-lab';
 export const CREW_ABILITIES_LAYOUT = {
   camera: { lookAbovePx: 180, verticalDeadzonePx: 48 },
   barrier: { x: 800, y: 240, width: 84, height: 26 },
+  secretAlcove: {
+    wall: { x: 1754, y: 800, width: 26, height: 180 },
+    room: { x: 1530, y: 800, width: 250, height: 180 },
+    shellIds: ['main-deck', 'secret-alcove-back', 'secret-alcove-base'],
+  },
   counterweight: {
     id: 'lift-counterweight',
     x: 800,

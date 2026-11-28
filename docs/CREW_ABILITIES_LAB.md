@@ -41,4 +41,11 @@ The Pilot carries one ladder inside the satchel. When **F · THROW ROPE** appear
 4. **Pilot.** Deploy the ladder at the edge of the power chamber. The lower floor is 380 px below the main deck. Have the Tinkerer climb back up, then gather the crew on the lift to the left of the drop.
 5. **Tinkerer.** Use F aboard the lift to reach Service. At Service, press F again for Exit. Walk all three crew members east to the nearby exit. Press R to reset the ladder, floor, gate, plug, and lift.
 
+<details>
+<summary>Optional secret playtest</summary>
+
+The grey wall immediately left of the lower chamber landing has a faint crack. Bring the Brute down and press F beside it to open the concealed alcove. Confirm the cavity stays covered until the wall breaks and that R reseals it. The alcove is empty for now.
+
+</details>
+
 For implementation context, see [Brute barriers](https://github.com/FantasticMrHurst/puzzle-platformer/issues/27), [Pilot ladder](https://github.com/FantasticMrHurst/puzzle-platformer/issues/28), [Tinkerer power](https://github.com/FantasticMrHurst/puzzle-platformer/issues/29), and [lift reconfiguration](https://github.com/FantasticMrHurst/puzzle-platformer/issues/33).

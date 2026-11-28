@@ -89,6 +89,7 @@ export class TestRoomScene extends Phaser.Scene {
   private tinkererPlugPuzzles: TinkererPlugPuzzle[] = [];
   private ropeLadder?: RopeLadder;
   private breakableFloor?: BreakableBarrier;
+  private secretWall?: BreakableBarrier;
   private counterweight?: PushableBlock;
   private serviceLift?: ServiceLift;
   private completionText!: Phaser.GameObjects.Text;
@@ -165,6 +166,7 @@ export class TestRoomScene extends Phaser.Scene {
     if (this.level.id === CREW_ABILITIES_LAB_ID) {
       const { barrier, counterweight, lift, power } = CREW_ABILITIES_LAYOUT;
       this.breakableFloor = new BreakableBarrier(this, barrier);
+      this.secretWall = this.createSecretAlcove();
       this.counterweight = new PushableBlock(this, counterweight);
       this.serviceLift = new ServiceLift(this, lift);
       power.signs.forEach((sign) => drawPowerSign(this, sign));
@@ -213,6 +215,7 @@ export class TestRoomScene extends Phaser.Scene {
               ...this.plantStructures,
               ...this.pushableBlocks,
               this.breakableFloor,
+              this.secretWall,
               this.serviceLift,
             ].flatMap((object) => {
               const geometry = object?.physicsObject;
@@ -290,6 +293,8 @@ export class TestRoomScene extends Phaser.Scene {
                 this.ropeLadder.climbSpeed = room.climbSpeed;
               if (this.breakableFloor !== undefined)
                 this.breakableFloor.breakReach = room.breakReach;
+              if (this.secretWall !== undefined)
+                this.secretWall.breakReach = room.breakReach;
               if (this.serviceLift !== undefined)
                 this.serviceLift.travelSpeed = room.liftSpeed;
             },
@@ -514,15 +519,17 @@ export class TestRoomScene extends Phaser.Scene {
   }
 
   private createStaticGeometry(geometry: StaticGeometryData): void {
-    const rectangle = this.add
-      .rectangle(
-        geometry.x + geometry.width / 2,
-        geometry.y + geometry.height / 2,
-        geometry.width,
-        geometry.height,
-        SURFACE_COLORS[geometry.surface],
-      )
-      .setStrokeStyle(2, 0xcbd5e1, 0.7);
+    const partOfAlcoveShell =
+      this.level.id === CREW_ABILITIES_LAB_ID &&
+      CREW_ABILITIES_LAYOUT.secretAlcove.shellIds.includes(geometry.id);
+    const rectangle = this.add.rectangle(
+      geometry.x + geometry.width / 2,
+      geometry.y + geometry.height / 2,
+      geometry.width,
+      geometry.height,
+      SURFACE_COLORS[geometry.surface],
+    );
+    if (!partOfAlcoveShell) rectangle.setStrokeStyle(2, 0xcbd5e1, 0.7);
 
     rectangle.setData('levelEntityId', geometry.id);
     this.staticGeometry.add(rectangle);
@@ -537,6 +544,33 @@ export class TestRoomScene extends Phaser.Scene {
         })
         .setDepth(1);
     }
+  }
+
+  private createSecretAlcove(): BreakableBarrier {
+    const { wall, room } = CREW_ABILITIES_LAYOUT.secretAlcove;
+    const deck = this.level.staticGeometry.find(
+      ({ id }) => id === 'main-deck',
+    )!;
+    const right = room.x + room.width;
+    const floorY = room.y + room.height;
+    const backdrop = this.add.graphics().setDepth(1);
+    backdrop
+      .fillStyle(0x1e2938)
+      .fillRect(room.x, room.y, room.width, room.height);
+    backdrop
+      .fillStyle(0x273444)
+      .fillRect(room.x + 10, room.y + 13, room.width - 20, room.height - 22);
+    backdrop.lineStyle(2, 0x3d4d5e, 1);
+    backdrop.lineBetween(room.x + 10, room.y + 14, room.x + 10, floorY - 9);
+    backdrop.lineBetween(room.x + 10, floorY - 9, right - 9, floorY - 9);
+    backdrop.lineStyle(2, 0xcbd5e1, 0.7);
+    backdrop.lineBetween(deck.x, deck.y, right, deck.y);
+    backdrop.lineBetween(right, deck.y, right, room.y);
+    backdrop.lineBetween(right, floorY, right, this.level.world.height);
+    return new BreakableBarrier(this, wall, {
+      cover: room,
+      color: SURFACE_COLORS.ground,
+    });
   }
 
   private createSpawnMarkers(level: LevelData): void {
@@ -565,6 +599,12 @@ export class TestRoomScene extends Phaser.Scene {
         getCharacterDefinition(archetype),
       );
       this.physics.add.collider(character.physicsObject, this.staticGeometry);
+      if (this.secretWall !== undefined) {
+        this.physics.add.collider(
+          character.physicsObject,
+          this.secretWall.physicsObject,
+        );
+      }
       if (this.breakableFloor !== undefined && this.serviceLift !== undefined) {
         this.physics.add.collider(
           character.physicsObject,
@@ -890,6 +930,7 @@ export class TestRoomScene extends Phaser.Scene {
       this.counterweight?.drop();
       return;
     }
+    if (this.secretWall?.tryBreak(activeCharacter)) return;
 
     if (
       this.mechanismConsoles.some((consoleObject) =>
@@ -1015,6 +1056,7 @@ export class TestRoomScene extends Phaser.Scene {
     this.toggleSwitches.forEach((toggle) => toggle.reset());
     this.pushableBlocks.forEach((block) => block.reset());
     this.breakableFloor?.reset();
+    this.secretWall?.reset();
     this.ropeLadder?.reset();
     this.serviceLift?.reset();
     this.mechanismConsoles.forEach((consoleObject) => consoleObject.reset());
